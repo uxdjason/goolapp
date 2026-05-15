@@ -10,42 +10,37 @@ export async function getStaticPaths() {
 }
 
 const { category } = Astro.params;
-
-const allApps = await getCollection('apps', ({ data }) => {
-  return data.draft !== true && data.category === category;
-});
-
-const sortedApps = allApps.sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
+const allApps = await getCollection('apps', ({ data }) =>
+  !data.draft && data.category === category
+);
+const sortedApps = allApps.sort((a, b) =>
+  b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
+);
 
 const categoryLabels: Record<string, string> = {
-  calculator: '계산기',
-  quiz: '퀴즈',
-  converter: '변환기',
-  tool: '유틸리티',
-  misc: '기타'
+  calculator: '계산기', quiz: '퀴즈', converter: '변환기', tool: '유틸리티', misc: '기타',
 };
-const label = categoryLabels[category || ''] || category;
+const label = categoryLabels[category ?? ''] ?? category;
 ---
 
-<BaseLayout 
-  title={`${label} 앱 모음 | GoolAPP`} 
-  description={`${label} 카테고리에 속한 다양하고 유용한 앱들을 무료로 사용해 보세요.`}
+<BaseLayout
+  title={`${label} 앱 모음 | GoolAPP`}
+  description={`${label} 카테고리의 무료 유틸리티 앱들을 한 곳에서 편리하게 사용해 보세요.`}
 >
-  <section class="category-header">
+  <section class="cat-header">
     <div class="container">
       <h1>{label}</h1>
-      <p>해당 카테고리의 모든 앱 목록입니다.</p>
+      <p class="cat-subtitle">{label} 카테고리의 모든 앱 목록입니다.</p>
     </div>
   </section>
 
   <section class="apps-section">
     <div class="container">
       <CategoryNav activeCategory={category} />
-      
       <div class="app-grid">
         {sortedApps.length > 0 ? (
           sortedApps.map(app => (
-            <AppCard 
+            <AppCard
               title={app.data.title}
               shortDescription={app.data.shortDescription}
               slug={app.data.slug}
@@ -63,42 +58,22 @@ const label = categoryLabels[category || ''] || category;
 </BaseLayout>
 
 <style>
-  .category-header {
-    padding: var(--space-8) 0;
-    text-align: center;
-  }
-  .category-header h1 {
-    font-size: var(--font-size-3xl);
-    margin-bottom: var(--space-2);
-  }
-  .category-header p {
-    color: var(--color-on-surface-variant);
-  }
-  
-  .apps-section {
-    padding-bottom: var(--space-16);
-  }
+  .cat-header { padding: var(--space-12) 0 var(--space-6); }
+  .cat-subtitle { color: var(--color-on-surface-variant); margin: 0; }
+
+  .apps-section { padding-bottom: var(--space-20); }
   .app-grid {
     display: grid;
-    /* 모바일 우선 반응형 그리드 */
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--space-6);
   }
-
   .empty-state {
     grid-column: 1 / -1;
-    padding: var(--space-12);
+    padding: var(--space-16);
     text-align: center;
     color: var(--color-on-surface-variant);
   }
 
-  /* 모바일 대응 */
-  @media (max-width: 768px) {
-    .category-header h1 {
-      font-size: var(--font-size-2xl);
-    }
-    .app-grid {
-      grid-template-columns: 1fr;
-    }
-  }
+  @media (max-width: 1024px) { .app-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 768px)  { .app-grid { grid-template-columns: 1fr; } }
 </style>

@@ -2,15 +2,17 @@
 const currentYear = new Date().getFullYear();
 ---
 <footer class="global-footer">
-  <div class="container footer-container">
-    <div class="footer-info">
-      <div class="footer-logo">GoolAPP</div>
-      <p>단순하고 직관적인 유틸리티 컬렉션</p>
+  <div class="container footer-body">
+    <div class="footer-brand">
+      <img src="/logo.png" alt="GoolAPP" class="footer-logo" width="100" height="26" />
+      <p class="footer-tagline">단순하고 직관적인 유틸리티 컬렉션</p>
     </div>
-    <div class="footer-links">
-      <a href="/privacy">개인정보처리방침</a>
-      <a href="/terms">이용약관</a>
-    </div>
+    <nav class="footer-nav" aria-label="하단 메뉴">
+      <ul>
+        <li><a href="/privacy">개인정보처리방침</a></li>
+        <li><a href="/terms">이용약관</a></li>
+      </ul>
+    </nav>
   </div>
   <div class="container footer-bottom">
     <p>&copy; {currentYear} GoolAPP. All rights reserved.</p>
@@ -19,11 +21,12 @@ const currentYear = new Date().getFullYear();
 
 <style>
   .global-footer {
-    background-color: var(--color-surface-variant);
+    background: var(--color-surface-variant);
+    border-top: 1px solid var(--color-outline-variant);
     padding: var(--space-12) 0 var(--space-6);
     margin-top: var(--space-20);
   }
-  .footer-container {
+  .footer-body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -32,30 +35,43 @@ const currentYear = new Date().getFullYear();
     margin-bottom: var(--space-8);
   }
   .footer-logo {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-primary);
+    height: 26px;
+    width: auto;
+    object-fit: contain;
     margin-bottom: var(--space-2);
   }
-  .footer-info p {
+  .footer-tagline {
+    margin: 0;
+    font-size: var(--font-size-sm);
     color: var(--color-on-surface-variant);
   }
-  .footer-links {
+  .footer-nav ul {
     display: flex;
     gap: var(--space-4);
+    list-style: none;
+    padding: 0; margin: 0;
   }
-  .footer-links a {
+  .footer-nav a {
+    font-size: var(--font-size-sm);
     color: var(--color-on-surface-variant);
     text-decoration: none;
+    transition: color var(--transition-fast);
   }
-  .footer-links a:hover {
-    color: var(--color-primary);
-  }
+  .footer-nav a:hover { color: var(--color-primary); opacity: 1; }
   .footer-bottom {
     border-top: 1px solid var(--color-outline-variant);
     padding-top: var(--space-6);
     text-align: center;
+  }
+  .footer-bottom p {
+    margin: 0;
+    font-size: var(--font-size-xs);
     color: var(--color-on-surface-variant);
-    font-size: var(--font-size-sm);
+    opacity: 0.7;
+  }
+
+  @media (max-width: 768px) {
+    .footer-body { flex-direction: column; gap: var(--space-6); }
+    .footer-nav ul { flex-wrap: wrap; }
   }
 </style>

@@ -6,48 +6,161 @@ interface Props {
   title: string;
   description: string;
   shortDescription: string;
+  category?: string;
+  keywords?: string[];
 }
-const { title, description, shortDescription } = Astro.props;
+const { title, description, shortDescription, category, keywords = [] } = Astro.props;
+
+const categoryLabels: Record<string, string> = {
+  calculator: '계산기', quiz: '퀴즈', converter: '변환기', tool: '유틸리티', misc: '기타',
+};
+const catLabel = category ? (categoryLabels[category] ?? category) : '';
 ---
 <BaseLayout title={`${title} | GoolAPP`} description={description}>
-  <section class="app-hero">
-    <h1>{title}</h1>
-    <p class="app-description">{shortDescription}</p>
-  </section>
+  <article class="app-page">
+    <div class="container">
 
-  <AdUnit position="top" />
+      <!-- ── App Hero Header (from goolapp-app-260508.md) ── -->
+      <header class="app-header">
+        <div class="chip-row">
+          {catLabel && (
+            <span class="cat-chip chip-primary label-caps">
+              <span class="chip-dot" aria-hidden="true">●</span>
+              {catLabel}
+            </span>
+          )}
+          {keywords.map(kw => (
+            <span class="tag-chip chip-secondary label-caps">{kw}</span>
+          ))}
+        </div>
 
-  <section class="app-container">
-    <slot name="app" />
-  </section>
+        <div class="app-title-row">
+          <h1 class="app-title">{title}</h1>
+          <button class="fav-btn" aria-label="즐겨찾기">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </button>
+        </div>
 
-  <AdUnit position="middle" />
+        <p class="app-description">{shortDescription}</p>
+      </header>
 
-  <section class="app-content">
-    <slot name="longform" />
-  </section>
+      <!-- ── Ad: top (앱 헤더 바로 아래) ── -->
+      <AdUnit position="top" />
 
-  <AdUnit position="bottom" />
+      <!-- ── App UI area ── -->
+      <section class="app-ui-section glass-surface" aria-label="앱 실행 영역">
+        <slot name="app" />
+      </section>
+
+      <!-- ── Ad: middle (앱 UI 아래, 롱폼 위) ── -->
+      <AdUnit position="middle" />
+
+      <!-- ── Long-form content ── -->
+      <section class="longform-section" aria-label="상세 설명">
+        <slot name="longform" />
+      </section>
+
+      <!-- ── Ad: bottom (페이지 맨 아래) ── -->
+      <AdUnit position="bottom" />
+
+    </div>
+  </article>
 </BaseLayout>
 
 <style>
-  .app-hero {
-    text-align: center;
+  .app-page {
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-16);
+  }
+
+  /* ── App header (from goolapp-app-260508.md) ── */
+  .app-header {
     margin-bottom: var(--space-8);
   }
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+  .cat-chip, .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 16px;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.08em;
+  }
+  .chip-dot { font-size: 8px; line-height: 1; }
+
+  .app-title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 16px 0 8px;
+  }
+  .app-title {
+    /* from design: 48px, letter-spacing -0.96px */
+    font-size: var(--font-size-3xl);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--color-on-surface);
+    margin: 0;
+  }
+  .fav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; height: 40px;
+    background: none;
+    border: 1px solid rgba(139, 79, 50, 0.5);
+    border-radius: 2px;
+    color: var(--color-outline-variant);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: color var(--transition-fast), border-color var(--transition-fast);
+  }
+  .fav-btn:hover { color: #fff809; border-color: var(--color-primary); }
+
   .app-description {
-    color: var(--color-on-surface-variant);
+    /* from design: 18px, color #53433D, max-width 672px */
     font-size: var(--font-size-lg);
+    color: var(--color-on-surface-variant);
+    max-width: 672px;
+    margin: 0;
   }
-  .app-container {
-    background: var(--color-surface-container-low);
-    border-radius: var(--radius-xl);
+
+  /* ── App UI glass panel ── */
+  .app-ui-section {
+    /* from goolapp-app-mobile-260508.md: padding 24px, border-radius 24px, glass */
     padding: var(--space-8);
-    margin-bottom: var(--space-12);
+    margin-bottom: var(--space-8);
+    border-radius: var(--radius-2xl);
+    background: rgba(251, 249, 245, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0px 20px 40px rgba(74, 68, 63, 0.1);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    min-height: 200px;
   }
-  .app-content {
-    max-width: 800px;
+
+  .longform-section {
+    max-width: 768px;
     margin: 0 auto;
     font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+  }
+  .longform-section :global(h2) { margin-top: var(--space-8); }
+  .longform-section :global(p)  { margin-bottom: var(--space-4); }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .app-title { font-size: 2rem; }
+    .app-ui-section { padding: var(--space-6); border-radius: var(--radius-2xl); }
+    .app-description { font-size: var(--font-size-base); }
   }
 </style>

@@ -30,6 +30,7 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content={robotsContent} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <Seo title={title} description={description} ogImage={ogImage} canonicalUrl={canonicalUrl} />
     {showAdsense && (
       <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`} crossorigin="anonymous"></script>

@@ -4,27 +4,29 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import AppCard from '../components/AppCard.astro';
 
 const allApps = await getCollection('apps', ({ data }) => !data.draft);
-const popularApps = allApps.slice(0, 3); // 임시로 처음 3개를 추천 앱으로 표시
+const popularApps = allApps
+  .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf())
+  .slice(0, 3);
 ---
 
-<BaseLayout 
-  title="페이지를 찾을 수 없습니다 | GoolAPP" 
-  description="요청하신 페이지가 존재하지 않습니다."
+<BaseLayout
+  title="페이지를 찾을 수 없습니다 | GoolAPP"
+  description="요청하신 페이지가 존재하지 않습니다. 다른 유용한 앱을 찾아보세요."
 >
-  <section class="not-found-section">
+  <section class="not-found">
     <div class="container">
-      <div class="error-header">
-        <h1>404</h1>
-        <h2>페이지를 찾을 수 없어요.</h2>
+      <div class="error-block">
+        <div class="error-code">404</div>
+        <h1>페이지를 찾을 수 없어요.</h1>
         <p>요청하신 주소가 잘못되었거나, 페이지가 삭제되었을 수 있습니다.</p>
         <a href="/" class="home-btn">홈으로 돌아가기</a>
       </div>
 
-      <div class="suggested-apps">
-        <h3>대신 이런 앱들은 어떠세요?</h3>
+      <div class="suggested">
+        <h2>이런 앱은 어떠세요?</h2>
         <div class="app-grid">
           {popularApps.map(app => (
-            <AppCard 
+            <AppCard
               title={app.data.title}
               shortDescription={app.data.shortDescription}
               slug={app.data.slug}
@@ -38,27 +40,21 @@ const popularApps = allApps.slice(0, 3); // 임시로 처음 3개를 추천 앱�
 </BaseLayout>
 
 <style>
-  .not-found-section {
-    padding: var(--space-16) 0;
+  .not-found { padding: var(--space-16) 0; }
+  .error-block {
     text-align: center;
-  }
-  .error-header {
     margin-bottom: var(--space-16);
   }
-  .error-header h1 {
-    font-size: 120px;
+  .error-code {
+    font-size: 8rem;
+    font-weight: var(--font-weight-bold);
     color: var(--color-primary);
     line-height: 1;
-    margin-bottom: var(--space-2);
-  }
-  .error-header h2 {
-    font-size: var(--font-size-2xl);
+    opacity: 0.25;
     margin-bottom: var(--space-4);
   }
-  .error-header p {
-    color: var(--color-on-surface-variant);
-    margin-bottom: var(--space-8);
-  }
+  .error-block h1 { font-size: var(--font-size-2xl); }
+  .error-block p  { color: var(--color-on-surface-variant); margin-bottom: var(--space-8); }
   .home-btn {
     display: inline-block;
     padding: var(--space-3) var(--space-8);
@@ -67,33 +63,20 @@ const popularApps = allApps.slice(0, 3); // 임시로 처음 3개를 추천 앱�
     border-radius: var(--radius-full);
     font-weight: var(--font-weight-bold);
     text-decoration: none;
-    transition: var(--transition-fast);
+    transition: background var(--transition-fast);
   }
-  .home-btn:hover {
-    background: var(--color-on-primary-container);
-  }
-  
-  .suggested-apps {
-    text-align: left;
-    border-top: 1px solid var(--color-outline-variant);
-    padding-top: var(--space-8);
-  }
-  .suggested-apps h3 {
-    margin-bottom: var(--space-6);
-  }
+  .home-btn:hover { background: #713a1f; opacity: 1; }
+
+  .suggested h2 { margin-bottom: var(--space-6); }
   .app-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--space-6);
   }
 
-  /* 모바일 대응 */
+  @media (max-width: 1024px) { .app-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 768px) {
-    .error-header h1 {
-      font-size: 80px;
-    }
-    .app-grid {
-      grid-template-columns: 1fr;
-    }
+    .error-code { font-size: 5rem; }
+    .app-grid { grid-template-columns: 1fr; }
   }
 </style>

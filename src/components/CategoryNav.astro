@@ -5,19 +5,24 @@ interface Props {
 const { activeCategory = 'all' } = Astro.props;
 
 const categories = [
-  { id: 'all', label: '전체', href: '/' },
-  { id: 'calculator', label: '계산기', href: '/category/calculator' },
-  { id: 'tool', label: '유틸리티', href: '/category/tool' },
-  { id: 'quiz', label: '퀴즈', href: '/category/quiz' },
-  { id: 'converter', label: '변환기', href: '/category/converter' },
-  { id: 'misc', label: '기타', href: '/category/misc' },
+  { id: 'all',        label: '모든 앱',   href: '/'                    },
+  { id: 'calculator', label: '계산기',    href: '/category/calculator' },
+  { id: 'converter',  label: '변환기',    href: '/category/converter'  },
+  { id: 'quiz',       label: '퀴즈',      href: '/category/quiz'       },
+  { id: 'tool',       label: '유틸리티',  href: '/category/tool'       },
+  { id: 'misc',       label: '기타',      href: '/category/misc'       },
 ];
 ---
-<nav class="category-nav">
+<nav class="category-nav" aria-label="카테고리 필터">
   <ul class="category-list">
     {categories.map(cat => (
       <li>
-        <a href={cat.href} class={`category-link ${activeCategory === cat.id ? 'active' : ''}`}>
+        <a
+          href={cat.href}
+          class={`cat-btn ${activeCategory === cat.id ? 'active' : ''}`}
+          aria-current={activeCategory === cat.id ? 'page' : undefined}
+        >
+          {cat.id === 'all' && <span class="star-icon" aria-hidden="true">★</span>}
           {cat.label}
         </a>
       </li>
@@ -27,31 +32,64 @@ const categories = [
 
 <style>
   .category-nav {
-    margin-bottom: var(--space-8);
+    margin-bottom: var(--space-10);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: var(--space-2);
+    scrollbar-width: none;
   }
+  .category-nav::-webkit-scrollbar { display: none; }
+
   .category-list {
     display: flex;
-    gap: var(--space-3);
+    gap: 12px;
+    list-style: none;
+    padding: 2px 0 4px;
     min-width: max-content;
   }
-  .category-link {
-    display: block;
-    padding: var(--space-2) var(--space-4);
+
+  /* Default (inactive) button — from design spec */
+  .cat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 24px;
+    height: 30px;
+    background: rgba(251, 249, 245, 0.6);
+    border: 1px solid rgba(216, 194, 185, 0.5);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     border-radius: var(--radius-full);
-    background: var(--color-surface-container);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.08em;
     color: var(--color-on-surface);
     text-decoration: none;
-    font-weight: var(--font-weight-bold);
-    transition: var(--transition-fast);
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+    cursor: pointer;
   }
-  .category-link:hover {
-    background: var(--color-surface-variant);
+  .cat-btn:hover {
+    border-color: rgba(139, 79, 50, 0.4);
+    color: var(--color-primary);
   }
-  .category-link.active {
-    background: var(--color-primary);
-    color: var(--color-on-primary);
+
+  /* Active button — from design spec: primary border + glow */
+  .cat-btn.active {
+    background: rgba(251, 249, 245, 0.6);
+    border: 1px solid var(--color-primary);
+    box-shadow: 0px 0px 15px rgba(139, 79, 50, 0.15);
+    color: var(--color-primary);
+  }
+
+  .star-icon {
+    font-size: 10px;
+    line-height: 1;
+    color: inherit;
+  }
+
+  @media (max-width: 768px) {
+    .category-list { gap: 8px; }
+    .cat-btn { padding: 8px 16px; }
   }
 </style>
