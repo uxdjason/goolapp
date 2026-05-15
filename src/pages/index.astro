@@ -16,14 +16,21 @@ const sortedApps = allApps.sort((a, b) =>
 >
   <!-- ── Hero ── -->
   <section class="hero-section">
-    <div class="container hero-container">
-      <h1 class="hero-title">일상의 편리함을 추구하는,<br class="hero-br" />작지만 유용한 도구들</h1>
+    <div class="hero-container">
+      <!-- 
+        Heading: "일상의 편리함을 추구하는," is black (#1B1C1A)
+        "작지만 유용한 도구들" uses primary color (#8B4F32) — two-tone heading
+        All on one natural wrapping line per design
+      -->
+      <h1 class="hero-title">
+        <span class="hero-title-black">일상의 편리함을 추구하는, </span><span class="hero-title-primary">작지만 유용한 도구들</span>
+      </h1>
       <p class="hero-subtitle">필요한 앱을 바로 꺼내 쓰세요. 모두 공짜랍니다.</p>
 
-      <!-- Search bar — from design spec -->
+      <!-- Search bar — from design: 672px wide, pill shape, blur(4px) -->
       <div class="search-bar" role="search">
         <div class="search-icon-wrap" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B4F32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
         </div>
@@ -40,10 +47,11 @@ const sortedApps = allApps.sort((a, b) =>
     </div>
   </section>
 
-  <!-- ── App list ── -->
+  <!-- ── Apps section ── -->
   <section class="apps-section">
     <div class="container">
       <CategoryNav activeCategory="all" />
+
       <div class="app-grid">
         {sortedApps.map(app => (
           <AppCard
@@ -54,6 +62,11 @@ const sortedApps = allApps.sort((a, b) =>
           />
         ))}
       </div>
+
+      <!-- "더 꺼내기" button — from design spec -->
+      <div class="load-more-wrap">
+        <button class="load-more-btn">더 꺼내기</button>
+      </div>
     </div>
   </section>
 </BaseLayout>
@@ -61,40 +74,57 @@ const sortedApps = allApps.sort((a, b) =>
 <style>
   /* ── Hero ── */
   .hero-section {
-    padding: var(--space-16) 0 var(--space-12);
     text-align: center;
+    padding: 80px 0 64px;
   }
-  .hero-title {
-    /* from design: font-size 48px, letter-spacing -0.96px, line-height 53px */
-    font-size: var(--font-size-3xl);
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    color: #1b1c1a;
-    margin-bottom: 0;
-  }
-  .hero-subtitle {
-    /* from design: 18px, color #53433D, margin-top ~31px */
-    margin-top: 1.93rem;
-    font-size: var(--font-size-lg);
-    color: var(--color-on-surface-variant);
-    display: inline-block;
-    margin-bottom: var(--space-8);
+  .hero-container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
-  /* Search bar — from goolapp-home-260507.md */
+  /* Two-tone heading — 48px, letter-spacing -0.96px */
+  .hero-title {
+    font-family: var(--font-family-base);
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-align: center;
+    margin-bottom: 0;
+    max-width: 900px;
+  }
+  .hero-title-black   { color: #1b1c1a; }
+  .hero-title-primary { color: var(--color-primary); }
+
+  /* Subtitle: 18px, #53433D */
+  .hero-subtitle {
+    margin-top: 32px;
+    margin-bottom: var(--space-8);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 29px;
+    color: #53433d;
+  }
+
+  /* Search bar — 672px, pill, blur(4px) */
   .search-bar {
     display: flex;
     align-items: center;
-    gap: 0;
+    width: 100%;
     max-width: 672px;
-    margin: 0 auto;
+    height: 72px;
     padding: 8px;
     background: rgba(245, 243, 239, 0.5);
     border: 1px solid rgba(216, 194, 185, 0.5);
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    border-radius: var(--radius-full);
+    border-radius: 9999px;
+    box-sizing: border-box;
   }
   .search-icon-wrap {
     display: flex;
@@ -102,7 +132,6 @@ const sortedApps = allApps.sort((a, b) =>
     justify-content: center;
     width: 48px;
     height: 48px;
-    color: var(--color-primary);
     flex-shrink: 0;
   }
   .search-input {
@@ -111,7 +140,8 @@ const sortedApps = allApps.sort((a, b) =>
     border: none;
     outline: none;
     font-family: var(--font-family-base);
-    font-size: var(--font-size-lg);
+    font-size: 18px;
+    font-weight: 400;
     color: rgba(83, 67, 61, 0.6);
     padding: 0 12px;
     min-width: 0;
@@ -122,23 +152,55 @@ const sortedApps = allApps.sort((a, b) =>
     padding: 12px 24px;
     height: 48px;
     background: var(--color-primary);
-    color: var(--color-on-primary);
+    color: #ffffff;
     border: none;
-    border-radius: var(--radius-full);
+    border-radius: 9999px;
     font-family: var(--font-family-base);
-    font-size: var(--font-size-base);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
     cursor: pointer;
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
     transition: background var(--transition-fast);
+    white-space: nowrap;
   }
-  .search-btn:hover { background: #713a1f; }
+  .search-btn:hover:not(:disabled) { background: #713a1f; }
 
-  /* ── App grid ── */
-  .apps-section { padding-bottom: var(--space-20); }
+  /* ── Apps ── */
+  .apps-section { padding-bottom: var(--space-16); }
   .app-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-6);
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  /* "더 꺼내기" button — pill, glass, primary border */
+  .load-more-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .load-more-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 48px;
+    background: rgba(251, 249, 245, 0.6);
+    border: 1px solid var(--color-primary);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-radius: 9999px;
+    font-family: var(--font-family-base);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    box-shadow: 0px 0px 15px rgba(139, 79, 50, 0.15);
+  }
+  .load-more-btn:hover {
+    background: rgba(139, 79, 50, 0.06);
   }
 
   /* Tablet */
@@ -148,17 +210,13 @@ const sortedApps = allApps.sort((a, b) =>
 
   /* Mobile */
   @media (max-width: 768px) {
-    .hero-section {
-      padding: var(--space-12) 0 var(--space-8);
-    }
+    .hero-section { padding: 60px 0 40px; }
     .hero-title {
-      /* mobile: 48px same size, 2-line */
       font-size: 2rem;
       line-height: 1.33;
     }
-    .hero-br { display: none; }
-    .hero-subtitle { font-size: var(--font-size-base); }
-    .search-bar { max-width: 100%; }
-    .app-grid { grid-template-columns: 1fr; }
+    .hero-subtitle { font-size: 16px; margin-top: 24px; }
+    .search-bar { height: auto; }
+    .app-grid { grid-template-columns: 1fr; gap: 16px; }
   }
 </style>

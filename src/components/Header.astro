@@ -2,15 +2,21 @@
 ---
 <header class="global-header" id="global-header">
   <div class="container header-inner">
+    <!-- Logo: icon + "GoolAPP" text side by side (from design spec) -->
     <a href="/" class="logo-link" aria-label="GoolAPP 홈으로">
-      <img src="/logo.png" alt="GoolAPP" class="logo-img" width="120" height="32" />
+      <img src="/logo.png" alt="" class="logo-icon" width="40" height="40" aria-hidden="true" />
+      <span class="logo-text">GoolAPP</span>
     </a>
+
+    <!-- Nav items: from goolapp-home-260507.md nav section -->
     <nav class="main-nav" aria-label="주요 메뉴">
       <ul>
-        <li><a href="/category/calculator">계산기</a></li>
-        <li><a href="/category/tool">유틸리티</a></li>
-        <li><a href="/category/quiz">퀴즈</a></li>
-        <li><a href="/category/converter">변환기</a></li>
+        <li><a href="/category/calculator">각종 계산기</a></li>
+        <li><a href="/category/converter">날짜와 시간</a></li>
+        <li><a href="/category/tool">금융 재테크</a></li>
+        <li><a href="/category/tool">편리한 도구들</a></li>
+        <li><a href="/category/quiz">학습 및 퀴즈</a></li>
+        <li><a href="/category/misc">심심풀이 Fun</a></li>
       </ul>
     </nav>
   </div>
@@ -21,61 +27,81 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 100;
-    height: 72px;
-    /* Glassmorphism nav — from design spec */
-    background: rgba(251, 249, 245, 0.7);
+    height: 80px;
+    /* from design spec: TopNavBar */
+    background: rgba(251, 249, 245, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0px 20px 40px rgba(74, 68, 63, 0.05);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(216, 194, 185, 0.5);
-    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
   }
   .header-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 72px;
+    height: 80px;
+    padding: 0 48px;
+    max-width: var(--container-max);
+    margin: 0 auto;
   }
+
+  /* Logo container: icon + text (gap: 16px from spec) */
   .logo-link {
     display: flex;
     align-items: center;
+    gap: 16px;
     text-decoration: none;
+    flex-shrink: 0;
   }
-  .logo-img {
-    height: 32px;
-    width: auto;
+  .logo-icon {
+    width: 40px;
+    height: 40px;
     object-fit: contain;
+    flex-shrink: 0;
   }
+  .logo-text {
+    /* from design: 24px bold, letter-spacing -0.6px, color #350F00 */
+    font-family: var(--font-family-base);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 31px;
+    letter-spacing: -0.6px;
+    color: #350f00;
+    white-space: nowrap;
+  }
+
+  /* Nav: gap 32px, each link 16px, color #53433D */
   .main-nav ul {
     display: flex;
-    gap: var(--space-8);
+    gap: 32px;
     list-style: none;
     margin: 0; padding: 0;
   }
   .main-nav a {
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-on-surface);
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: var(--font-family-base);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: #53433d;
     text-decoration: none;
-    letter-spacing: 0.02em;
-    transition: color var(--transition-fast);
+    white-space: nowrap;
+    transition: color var(--transition-fast), background var(--transition-fast);
   }
   .main-nav a:hover {
     color: var(--color-primary);
+    background: rgba(139, 79, 50, 0.06);
   }
 
-  /* Mobile: hide nav links, show hamburger placeholder */
-  @media (max-width: 768px) {
-    .main-nav {
-      display: none;
-    }
-    .global-header {
-      height: 60px;
-    }
-    .header-inner {
-      height: 60px;
-    }
-    .logo-img {
-      height: 26px;
-    }
+  /* Mobile: hide nav */
+  @media (max-width: 900px) {
+    .main-nav { display: none; }
+    .global-header { height: 60px; }
+    .header-inner { height: 60px; padding: 0 var(--gutter-mobile); }
+    .logo-icon { width: 32px; height: 32px; }
+    .logo-text { font-size: 20px; }
   }
 </style>

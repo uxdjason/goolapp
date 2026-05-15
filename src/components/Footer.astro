@@ -1,77 +1,108 @@
 ---
 const currentYear = new Date().getFullYear();
 ---
+<!-- Footer: from goolapp-home-260507.md Footer Component spec -->
 <footer class="global-footer">
-  <div class="container footer-body">
+  <div class="footer-inner">
+    <!-- Left: logo icon + "GoolAPP" text + copyright -->
     <div class="footer-brand">
-      <img src="/logo.png" alt="GoolAPP" class="footer-logo" width="100" height="26" />
-      <p class="footer-tagline">단순하고 직관적인 유틸리티 컬렉션</p>
+      <div class="footer-logo-row">
+        <img src="/logo.png" alt="" class="footer-logo-icon" width="40" height="40" aria-hidden="true" />
+        <span class="footer-logo-text">GoolAPP</span>
+      </div>
+      <p class="footer-copyright">© {currentYear}-{currentYear + 1} GoolAPP 굴랩. All rights reserved.</p>
     </div>
-    <nav class="footer-nav" aria-label="하단 메뉴">
+
+    <!-- Right: nav links -->
+    <nav class="footer-nav" aria-label="하단 링크">
       <ul>
-        <li><a href="/privacy">개인정보처리방침</a></li>
-        <li><a href="/terms">이용약관</a></li>
+        <li><a href="#">사용 문의</a></li>
+        <li><a href="/privacy">개인정보 처리방침</a></li>
       </ul>
     </nav>
-  </div>
-  <div class="container footer-bottom">
-    <p>&copy; {currentYear} GoolAPP. All rights reserved.</p>
   </div>
 </footer>
 
 <style>
+  /* Footer: background #F5F3EF, border-top 1px solid rgba(216,194,185,0.3) */
   .global-footer {
-    background: var(--color-surface-variant);
-    border-top: 1px solid var(--color-outline-variant);
-    padding: var(--space-12) 0 var(--space-6);
-    margin-top: var(--space-20);
+    background: #f5f3ef;
+    border-top: 1px solid rgba(216, 194, 185, 0.3);
+    padding: 0;
   }
-  .footer-body {
+  .footer-inner {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: var(--space-8);
-    margin-bottom: var(--space-8);
+    align-items: center;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 40px 48px;
+    gap: 0;
+    min-height: 120px;
   }
-  .footer-logo {
-    height: 26px;
-    width: auto;
+
+  /* Brand: logo + text side by side, copyright below */
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .footer-logo-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .footer-logo-icon {
+    width: 40px;
+    height: 40px;
     object-fit: contain;
-    margin-bottom: var(--space-2);
   }
-  .footer-tagline {
+  .footer-logo-text {
+    /* from design: 24px bold, color #350F00 */
+    font-family: var(--font-family-base);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 31px;
+    color: #350f00;
+  }
+  .footer-copyright {
+    /* from design: 16px regular, color #53433D */
     margin: 0;
-    font-size: var(--font-size-sm);
-    color: var(--color-on-surface-variant);
+    font-family: var(--font-family-base);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: #53433d;
   }
+
+  /* Nav: gap 32px, 16px regular, #53433D */
   .footer-nav ul {
     display: flex;
-    gap: var(--space-4);
+    flex-direction: row;
+    gap: 32px;
     list-style: none;
-    padding: 0; margin: 0;
+    margin: 0; padding: 0;
   }
   .footer-nav a {
-    font-size: var(--font-size-sm);
-    color: var(--color-on-surface-variant);
+    font-family: var(--font-family-base);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: #53433d;
     text-decoration: none;
+    opacity: 0.8;
     transition: color var(--transition-fast);
   }
   .footer-nav a:hover { color: var(--color-primary); opacity: 1; }
-  .footer-bottom {
-    border-top: 1px solid var(--color-outline-variant);
-    padding-top: var(--space-6);
-    text-align: center;
-  }
-  .footer-bottom p {
-    margin: 0;
-    font-size: var(--font-size-xs);
-    color: var(--color-on-surface-variant);
-    opacity: 0.7;
-  }
 
   @media (max-width: 768px) {
-    .footer-body { flex-direction: column; gap: var(--space-6); }
-    .footer-nav ul { flex-wrap: wrap; }
+    .footer-inner {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-6);
+      padding: var(--space-8) var(--gutter-mobile);
+    }
+    .footer-nav ul { flex-wrap: wrap; gap: var(--space-4); }
   }
 </style>

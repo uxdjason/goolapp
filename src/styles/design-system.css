@@ -147,7 +147,7 @@ body {
 
 .global-main {
   flex: 1;
-  padding-top: 72px; /* header height */
+  padding-top: 80px; /* header height */
 }
 
 /* ─── Glass surface ─── */

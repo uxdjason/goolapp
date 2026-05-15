@@ -4,13 +4,18 @@ interface Props {
 }
 const { activeCategory = 'all' } = Astro.props;
 
+// Category buttons — from goolapp-home-260507.md:
+// 1st button = "모든 앱" (active style, primary border+glow, NO star)
+// 2nd button = "즐겨찾는 앱" (star icon + text)
+// Rest = plain label tags (퇴직금, 생일, 기대수명, 영단어 in design — we use our categories)
 const categories = [
-  { id: 'all',        label: '모든 앱',   href: '/'                    },
-  { id: 'calculator', label: '계산기',    href: '/category/calculator' },
-  { id: 'converter',  label: '변환기',    href: '/category/converter'  },
-  { id: 'quiz',       label: '퀴즈',      href: '/category/quiz'       },
-  { id: 'tool',       label: '유틸리티',  href: '/category/tool'       },
-  { id: 'misc',       label: '기타',      href: '/category/misc'       },
+  { id: 'all',        label: '모든 앱',    href: '/',                    star: false },
+  { id: 'favorites',  label: '즐겨찾는 앱', href: '#',                   star: true  },
+  { id: 'calculator', label: '계산기',     href: '/category/calculator', star: false },
+  { id: 'converter',  label: '변환기',     href: '/category/converter',  star: false },
+  { id: 'quiz',       label: '퀴즈',       href: '/category/quiz',       star: false },
+  { id: 'tool',       label: '유틸리티',   href: '/category/tool',       star: false },
+  { id: 'misc',       label: '기타',       href: '/category/misc',       star: false },
 ];
 ---
 <nav class="category-nav" aria-label="카테고리 필터">
@@ -19,10 +24,17 @@ const categories = [
       <li>
         <a
           href={cat.href}
-          class={`cat-btn ${activeCategory === cat.id ? 'active' : ''}`}
+          class={`cat-btn ${cat.star ? 'cat-btn--star' : ''} ${activeCategory === cat.id ? 'active' : ''}`}
           aria-current={activeCategory === cat.id ? 'page' : undefined}
         >
-          {cat.id === 'all' && <span class="star-icon" aria-hidden="true">★</span>}
+          {cat.star && (
+            <span class="star-mark" aria-hidden="true">
+              <!-- Yellow star 20×20, border #D8C2B9, border-radius 1px — from spec -->
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFF809" stroke="#D8C2B9" stroke-width="1.5" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            </span>
+          )}
           {cat.label}
         </a>
       </li>
@@ -38,19 +50,20 @@ const categories = [
     scrollbar-width: none;
   }
   .category-nav::-webkit-scrollbar { display: none; }
-
   .category-list {
     display: flex;
+    align-items: flex-start;
     gap: 12px;
     list-style: none;
     padding: 2px 0 4px;
     min-width: max-content;
   }
 
-  /* Default (inactive) button — from design spec */
+  /* Base button — from design: 8px 24px padding, 30px height */
   .cat-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
     padding: 8px 24px;
     height: 30px;
@@ -58,38 +71,39 @@ const categories = [
     border: 1px solid rgba(216, 194, 185, 0.5);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    border-radius: var(--radius-full);
+    border-radius: 9999px;
+    /* from design: 12px bold, letter-spacing 0.96px, #53433D */
     font-family: var(--font-family-base);
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: 0.08em;
-    color: var(--color-on-surface);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.96px;
+    color: #53433d;
     text-decoration: none;
     white-space: nowrap;
     transition: all var(--transition-fast);
-    cursor: pointer;
+    box-sizing: border-box;
   }
   .cat-btn:hover {
     border-color: rgba(139, 79, 50, 0.4);
     color: var(--color-primary);
   }
 
-  /* Active button — from design spec: primary border + glow */
+  /* Active (모든 앱) — primary border + glow, primary text color */
   .cat-btn.active {
-    background: rgba(251, 249, 245, 0.6);
     border: 1px solid var(--color-primary);
     box-shadow: 0px 0px 15px rgba(139, 79, 50, 0.15);
     color: var(--color-primary);
   }
 
-  .star-icon {
-    font-size: 10px;
-    line-height: 1;
-    color: inherit;
+  /* Star icon alignment */
+  .star-mark {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
   }
 
   @media (max-width: 768px) {
     .category-list { gap: 8px; }
-    .cat-btn { padding: 8px 16px; }
+    .cat-btn { padding: 8px 16px; font-size: 11px; }
   }
 </style>
