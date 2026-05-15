@@ -23,7 +23,7 @@ const sortedApps = allApps.sort((a, b) =>
         All on one natural wrapping line per design
       -->
       <h1 class="hero-title">
-        <span class="hero-title-black">일상의 편리함을 추구하는, </span><span class="hero-title-primary">작지만 유용한 도구들</span>
+        <span class="hero-title-black">일상의 편리함을 추구하는,<br /></span><span class="hero-title-primary">작지만 유용한 도구들</span>
       </h1>
       <p class="hero-subtitle">필요한 앱을 바로 꺼내 쓰세요. 모두 공짜랍니다.</p>
 
@@ -139,10 +139,10 @@ const sortedApps = allApps.sort((a, b) =>
     background: transparent;
     border: none;
     outline: none;
-    font-family: var(--font-family-base);
+    font-family: var(--font-family-gothic);
     font-size: 18px;
     font-weight: 400;
-    color: rgba(83, 67, 61, 0.6);
+    color: rgba(83, 67, 61, 0.8);
     padding: 0 12px;
     min-width: 0;
   }
@@ -155,9 +155,9 @@ const sortedApps = allApps.sort((a, b) =>
     color: #ffffff;
     border: none;
     border-radius: 9999px;
-    font-family: var(--font-family-base);
+    font-family: var(--font-family-gothic);
     font-size: 16px;
-    font-weight: 400;
+    font-weight: 700;
     line-height: 24px;
     cursor: pointer;
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
@@ -175,7 +175,7 @@ const sortedApps = allApps.sort((a, b) =>
     margin-bottom: 48px;
   }
 
-  /* "더 꺼내기" button — pill, glass, primary border */
+  /* "더 꺼내기" button — Gothic font, 16px bold */
   .load-more-wrap {
     display: flex;
     justify-content: center;
@@ -185,15 +185,15 @@ const sortedApps = allApps.sort((a, b) =>
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 48px;
+    padding: 14px 52px;
     background: rgba(251, 249, 245, 0.6);
     border: 1px solid var(--color-primary);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     border-radius: 9999px;
-    font-family: var(--font-family-base);
+    font-family: var(--font-family-gothic);
     font-size: 16px;
-    font-weight: 400;
+    font-weight: 700;
     color: var(--color-primary);
     cursor: pointer;
     transition: all var(--transition-fast);

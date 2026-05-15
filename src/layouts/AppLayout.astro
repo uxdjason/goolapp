@@ -25,7 +25,6 @@ const catLabel = category ? (categoryLabels[category] ?? category) : '';
         <div class="chip-row">
           {catLabel && (
             <span class="cat-chip chip-primary label-caps">
-              <span class="chip-dot" aria-hidden="true">●</span>
               {catLabel}
             </span>
           )}
@@ -89,11 +88,12 @@ const catLabel = category ? (categoryLabels[category] ?? category) : '';
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 16px;
+    padding: 6px 16px;
     border-radius: var(--radius-full);
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: 0.08em;
+    font-family: var(--font-family-gothic);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
   }
   .chip-dot { font-size: 8px; line-height: 1; }
 

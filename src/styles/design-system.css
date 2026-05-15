@@ -19,6 +19,27 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: 'KimjungchulGothic';
+  src: url('/fonts/KimjungchulGothic-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'KimjungchulGothic';
+  src: url('/fonts/KimjungchulGothic-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'KimjungchulGothic';
+  src: url('/fonts/KimjungchulGothic-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   /* ─── Colors (from DESIGN-from-Stitch-1.md) ─── */
@@ -62,7 +83,8 @@
   --glass-shadow-md:   0px 20px 40px rgba(74, 68, 63, 0.1);
 
   /* ─── Typography ─── */
-  --font-family-base: 'KimjungchulMyungjo', serif;
+  --font-family-base:   'KimjungchulMyungjo', serif;
+  --font-family-gothic: 'KimjungchulGothic', sans-serif;
   
   --font-size-xs:   0.75rem;   /* 12px */
   --font-size-sm:   0.875rem;  /* 14px */

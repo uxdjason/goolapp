@@ -19,8 +19,10 @@ const clientId    = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
     </>
   ) : (
     <div class="ad-placeholder">
-      <span class="ad-label">AD</span>
-      <span class="ad-pos">({position})</span>
+      <div class="ad-content">
+        <span class="ad-label">AD UNIT</span>
+        <span class="ad-pos">{position.toUpperCase()} SLOT</span>
+      </div>
     </div>
   )}
 </div>
@@ -28,26 +30,36 @@ const clientId    = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
 <style>
   .ad-unit {
     width: 100%;
-    margin: var(--space-8) 0;
+    margin: var(--space-10) 0;
+    clear: both;
   }
   .ad-placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
     width: 100%;
-    min-height: 90px;
-    background: rgba(245, 243, 239, 0.7);
-    border: 1px dashed var(--color-outline-variant);
+    min-height: 120px; /* Increased height for visibility */
+    background: rgba(139, 79, 50, 0.05); /* Very subtle primary tint */
+    border: 2px dashed rgba(139, 79, 50, 0.2);
     border-radius: var(--radius-lg);
-    color: var(--color-on-surface-variant);
-    font-size: var(--font-size-xs);
-    letter-spacing: 0.08em;
+    color: var(--color-primary);
+  }
+  .ad-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.6;
   }
   .ad-label {
-    font-weight: var(--font-weight-bold);
-    text-transform: uppercase;
-    opacity: 0.5;
+    font-family: var(--font-family-gothic);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.1em;
   }
-  .ad-pos { opacity: 0.4; }
+  .ad-pos {
+    font-family: var(--font-family-gothic);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
 </style>

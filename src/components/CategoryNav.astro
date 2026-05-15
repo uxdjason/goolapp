@@ -4,10 +4,6 @@ interface Props {
 }
 const { activeCategory = 'all' } = Astro.props;
 
-// Category buttons — from goolapp-home-260507.md:
-// 1st button = "모든 앱" (active style, primary border+glow, NO star)
-// 2nd button = "즐겨찾는 앱" (star icon + text)
-// Rest = plain label tags (퇴직금, 생일, 기대수명, 영단어 in design — we use our categories)
 const categories = [
   { id: 'all',        label: '모든 앱',    href: '/',                    star: false },
   { id: 'favorites',  label: '즐겨찾는 앱', href: '#',                   star: true  },
@@ -29,8 +25,8 @@ const categories = [
         >
           {cat.star && (
             <span class="star-mark" aria-hidden="true">
-              <!-- Yellow star 20×20, border #D8C2B9, border-radius 1px — from spec -->
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFF809" stroke="#D8C2B9" stroke-width="1.5" stroke-linejoin="round">
+              <!-- ★ 20×20 yellow fill, border #D8C2B9 — from design spec -->
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFF200" stroke="#c8a898" stroke-width="1.2" stroke-linejoin="round">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
               </svg>
             </span>
@@ -52,58 +48,58 @@ const categories = [
   .category-nav::-webkit-scrollbar { display: none; }
   .category-list {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
     list-style: none;
     padding: 2px 0 4px;
     min-width: max-content;
+    margin: 0;
   }
 
-  /* Base button — from design: 8px 24px padding, 30px height */
+  /* 고딕 폰트, 14px bold — 기존 12px보다 살짝 크게 */
   .cat-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 8px 24px;
-    height: 30px;
+    gap: 6px;
+    padding: 8px 20px;
+    height: 32px;
     background: rgba(251, 249, 245, 0.6);
     border: 1px solid rgba(216, 194, 185, 0.5);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     border-radius: 9999px;
-    /* from design: 12px bold, letter-spacing 0.96px, #53433D */
-    font-family: var(--font-family-base);
-    font-size: 12px;
+    font-family: var(--font-family-gothic);
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: 0.96px;
+    letter-spacing: 0.06em;
     color: #53433d;
     text-decoration: none;
     white-space: nowrap;
     transition: all var(--transition-fast);
     box-sizing: border-box;
+    cursor: pointer;
   }
   .cat-btn:hover {
-    border-color: rgba(139, 79, 50, 0.4);
+    border-color: rgba(139, 79, 50, 0.5);
     color: var(--color-primary);
   }
-
-  /* Active (모든 앱) — primary border + glow, primary text color */
   .cat-btn.active {
     border: 1px solid var(--color-primary);
     box-shadow: 0px 0px 15px rgba(139, 79, 50, 0.15);
     color: var(--color-primary);
   }
 
-  /* Star icon alignment */
+  /* Star icon — visible, 16px */
   .star-mark {
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    line-height: 1;
   }
 
   @media (max-width: 768px) {
     .category-list { gap: 8px; }
-    .cat-btn { padding: 8px 16px; font-size: 11px; }
+    .cat-btn { padding: 7px 14px; font-size: 12px; }
   }
 </style>
