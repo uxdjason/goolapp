@@ -13,7 +13,7 @@ seo:
   description: "cm와 inch, kg과 lb, 섭씨와 화씨 등 일상생활 및 업무에 자주 쓰이는 다양한 단위들을 클릭 한 번으로 쉽고 빠르고 정확하게 변환해 보세요."
   canonicalPath: "/unit-converter/"
   ogTitle: "단위 변환기 - 복잡한 단위 변환을 한 번에 쉽게"
-  ogDescription: "길이, 무게, 부피, 온도 등 자주 쓰는 단위들을 빠르게 변환합니다."
+  ogDescription: "cm와 inch, kg과 lb, 섭씨와 화씨 등 일상생활 및 실무에서 자주 쓰이는 복잡한 길이, 무게, 부피, 온도 단위들을 클릭 한 번으로 쉽고 빠르고 정확하게 변환해 보세요."
   intent: "informational"
   primaryKeyword: "단위 변환기"
   secondaryKeywords: ["단위변환", "길이계산"]

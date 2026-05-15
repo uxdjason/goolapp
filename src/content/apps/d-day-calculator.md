@@ -13,7 +13,7 @@ seo:
   description: "중요한 이벤트, 시험, 커플 기념일 등 목표하는 날짜까지 며칠이 남았는지, 혹은 며칠이 지났는지 간편하고 정확하게 계산하는 디데이 계산기를 무료로 이용하세요."
   canonicalPath: "/d-day-calculator/"
   ogTitle: "디데이 계산기 - 목표일까지 며칠 남았는지 바로 확인"
-  ogDescription: "기념일이나 시험, 중요한 일정까지 남은 날짜를 손쉽게 계산해 보세요."
+  ogDescription: "중요한 이벤트, 시험, 사랑하는 연인과의 커플 기념일 등 내가 목표로 하는 날짜까지 며칠이 남았는지, 혹은 며칠이 지났는지 간편하고 정확하게 계산해 보세요."
   intent: "informational"
   primaryKeyword: "디데이 계산기"
   secondaryKeywords: ["디데이", "날짜계산기"]

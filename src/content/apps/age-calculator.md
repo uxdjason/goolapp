@@ -13,7 +13,7 @@ seo:
   description: "태어난 생년월일만 입력하면 새해 최신 기준법에 따른 정확한 만나이를 계산합니다. 추가로 나의 띠와 별자리 정보까지 한 번에 쉽고 빠르게 확인해 보세요."
   canonicalPath: "/age-calculator/"
   ogTitle: "만나이 계산기 - 내 나이는 정확히 몇 살일까?"
-  ogDescription: "단 1초 만에 최신 기준법으로 만나이를 계산하고 띠, 별자리까지 알려드립니다."
+  ogDescription: "단 1초 만에 새해 최신 기준법으로 나의 정확한 만나이를 자동으로 계산해 드립니다. 추가로 내가 태어난 해의 띠와 별자리 정보까지 한 번에 쉽고 빠르고 편리하게 확인해 보세요."
   intent: "informational"
   primaryKeyword: "만나이 계산기"
   secondaryKeywords: ["만나이", "나이계산"]
