@@ -25,4 +25,5 @@ pnpm-debug.log*
 
 # GoolAPP specific
 references/
+!references/AI_CONTEXT.md
 .env.local
