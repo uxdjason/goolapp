@@ -32,15 +32,22 @@ const clientId    = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
     width: 100%;
     margin: var(--space-10) 0;
     clear: both;
+    min-height: 120px; /* Ensure space is reserved */
+  }
+  /* Show a subtle background even for real ad tags in development/preview */
+  .adsbygoogle {
+    background: rgba(139, 79, 50, 0.03);
+    min-height: 120px;
+    display: block;
   }
   .ad-placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 120px; /* Increased height for visibility */
-    background: rgba(139, 79, 50, 0.05); /* Very subtle primary tint */
-    border: 2px dashed rgba(139, 79, 50, 0.2);
+    min-height: 120px;
+    background: rgba(139, 79, 50, 0.08); /* More visible background */
+    border: 2px dashed rgba(139, 79, 50, 0.3);
     border-radius: var(--radius-lg);
     color: var(--color-primary);
   }

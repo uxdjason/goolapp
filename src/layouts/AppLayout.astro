@@ -12,7 +12,12 @@ interface Props {
 const { title, description, shortDescription, category, keywords = [] } = Astro.props;
 
 const categoryLabels: Record<string, string> = {
-  calculator: '계산기', quiz: '퀴즈', converter: '변환기', tool: '유틸리티', misc: '기타',
+  calculator: '각종 계산기',
+  converter:  '날짜와 시간',
+  tool:       '편리한 도구들',
+  quiz:       '학습 및 퀴즈',
+  fun:        '심심풀이 Fun',
+  misc:       '기타',
 };
 const catLabel = category ? (categoryLabels[category] ?? category) : '';
 ---
@@ -117,14 +122,13 @@ const catLabel = category ? (categoryLabels[category] ?? category) : '';
     justify-content: center;
     width: 40px; height: 40px;
     background: none;
-    border: 1px solid rgba(139, 79, 50, 0.5);
-    border-radius: 2px;
+    border: none;
     color: var(--color-outline-variant);
     cursor: pointer;
     flex-shrink: 0;
-    transition: color var(--transition-fast), border-color var(--transition-fast);
+    transition: color var(--transition-fast);
   }
-  .fav-btn:hover { color: #fff809; border-color: var(--color-primary); }
+  .fav-btn:hover { color: #ffd700; }
 
   .app-description {
     /* from design: 18px, color #53433D, max-width 672px */
@@ -138,7 +142,7 @@ const catLabel = category ? (categoryLabels[category] ?? category) : '';
   .app-ui-section {
     /* from goolapp-app-mobile-260508.md: padding 24px, border-radius 24px, glass */
     padding: var(--space-8);
-    margin-bottom: var(--space-8);
+    margin: var(--space-6) 0 var(--space-12);
     border-radius: var(--radius-2xl);
     background: rgba(251, 249, 245, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.4);
@@ -146,6 +150,7 @@ const catLabel = category ? (categoryLabels[category] ?? category) : '';
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     min-height: 200px;
+    clear: both;
   }
 
   .longform-section {
