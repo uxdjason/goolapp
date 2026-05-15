@@ -1,9 +1,71 @@
 ---
+import { getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
 export async function getStaticPaths() {
-  return [
-    { params: { slug: 'placeholder' } },
-  ];
+  const apps = await getCollection('apps');
+  return apps.map(entry => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
 }
-const { slug } = Astro.params;
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+
+// Related Apps logic
+const allApps = await getCollection('apps');
+const related = allApps
+  .filter(app => entry.data.relatedSlugs.includes(app.data.slug))
+  .map(app => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category
+  }));
 ---
-<h1>App: {slug}</h1>
+
+<AppLayout 
+  title={entry.data.title} 
+  description={entry.data.description}
+  shortDescription={entry.data.shortDescription}
+>
+  <Fragment slot="app">
+    <!-- 향후 Vanilla JS로 구현될 실제 유틸리티 컴포넌트나 마크다운 내용이 들어가는 자리 -->
+    <div class="app-ui-placeholder glass-surface">
+      <p>{entry.data.title} 기능이 들어갈 자리입니다.</p>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <!-- 마크다운 파일의 본문 (설명, FAQ 등 롱폼 콘텐츠) -->
+    <div class="prose">
+      <Content />
+    </div>
+
+    {related.length > 0 && (
+      <RelatedApps apps={related} />
+    )}
+  </Fragment>
+</AppLayout>
+
+<style>
+  .app-ui-placeholder {
+    padding: var(--space-16);
+    text-align: center;
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-lg);
+  }
+  .prose {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    color: var(--color-on-background);
+  }
+  .prose :global(h2) {
+    margin-top: var(--space-8);
+  }
+  .prose :global(p) {
+    margin-bottom: var(--space-4);
+  }
+</style>

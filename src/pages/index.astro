@@ -1,17 +1,127 @@
 ---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AppCard from '../components/AppCard.astro';
+import CategoryNav from '../components/CategoryNav.astro';
 
+const allApps = await getCollection('apps', ({ data }) => {
+  return data.draft !== true;
+});
+
+// 최신 발행일 순 정렬
+const sortedApps = allApps.sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout 
+  title="GoolAPP - 일상의 편리함을 추구하는 유용한 도구들" 
+  description="계산기, 단위 변환기, 퀴즈 등 일상에서 바로 꺼내 쓸 수 있는 유용한 무료 앱 컬렉션입니다."
+>
+  <section class="hero-section">
+    <div class="container hero-container">
+      <h1 class="hero-title">일상의 편리함을 추구하는,<br />작지만 유용한 도구들</h1>
+      <div class="hero-subtitle-box">
+        <p class="hero-subtitle">필요한 앱을 바로 꺼내 쓰세요. 모두 공짜랍니다.</p>
+      </div>
+      
+      <!-- 향후 검색 컴포넌트로 교체될 자리 -->
+      <div class="search-placeholder glass-surface">
+        <p>어떤 앱이 필요하세요?</p>
+        <button class="search-btn">찾기</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="apps-section">
+    <div class="container">
+      <CategoryNav activeCategory="all" />
+      
+      <div class="app-grid">
+        {sortedApps.map(app => (
+          <AppCard 
+            title={app.data.title}
+            shortDescription={app.data.shortDescription}
+            slug={app.data.slug}
+            category={app.data.category}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-section {
+    padding: var(--space-12) 0;
+    text-align: center;
+  }
+  .hero-title {
+    font-size: var(--font-size-3xl);
+    letter-spacing: -0.02em;
+    margin-bottom: var(--space-6);
+  }
+  .hero-subtitle-box {
+    display: inline-block;
+    padding: var(--space-2) var(--space-6);
+    background: rgba(245, 243, 239, 0.5);
+    border: 1px solid rgba(216, 194, 185, 0.5);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-12);
+  }
+  .hero-subtitle {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    color: var(--color-on-surface-variant);
+  }
+  .search-placeholder {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-full);
+    text-align: left;
+  }
+  .search-placeholder p {
+    margin: 0;
+    color: var(--color-on-surface-variant);
+    opacity: 0.6;
+  }
+  .search-btn {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    padding: var(--space-2) var(--space-6);
+    border-radius: var(--radius-full);
+    font-weight: var(--font-weight-bold);
+    transition: var(--transition-fast);
+  }
+  .search-btn:hover {
+    background: var(--color-on-primary-container);
+  }
+
+  .apps-section {
+    padding-bottom: var(--space-16);
+  }
+  .app-grid {
+    display: grid;
+    /* 모바일 우선: 최소 280px 너비로 자동 채움 */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-6);
+  }
+
+  /* 모바일 대응 (반응형) */
+  @media (max-width: 768px) {
+    .hero-section {
+      padding: var(--space-8) 0;
+    }
+    .hero-title {
+      font-size: var(--font-size-2xl);
+    }
+    .hero-subtitle {
+      font-size: var(--font-size-base);
+    }
+    .app-grid {
+      grid-template-columns: 1fr; /* 모바일에서는 1열 */
+    }
+  }
+</style>
