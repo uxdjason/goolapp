@@ -1,0 +1,43 @@
+---
+import '../styles/reset.css';
+import '../styles/design-system.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Seo from '../components/Seo.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  canonicalUrl?: string;
+}
+const { title, description, ogImage, canonicalUrl } = Astro.props;
+
+// AdSense는 (1) 환경변수 enable 플래그가 켜져 있고 (2) client ID가 있을 때만 출력.
+// 도메인 이전 전까지는 PUBLIC_ADSENSE_ENABLED=false 로 두어 ad request 자체를 회피한다.
+const adsenseClient  = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
+const adsenseEnabled = import.meta.env.PUBLIC_ADSENSE_ENABLED === 'true';
+const showAdsense    = adsenseEnabled && Boolean(adsenseClient);
+
+// 색인 정책: production hostname이 정식 도메인이 아닐 경우 noindex로 강제.
+// (PUBLIC_ADSENSE_ENABLED와 동일한 환경 신호로 판단해도 무방)
+const isLiveDomain = adsenseEnabled; // production에서만 true 주입되므로 동일 신호 활용
+const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content={robotsContent} />
+    <Seo title={title} description={description} ogImage={ogImage} canonicalUrl={canonicalUrl} />
+    {showAdsense && (
+      <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`} crossorigin="anonymous"></script>
+    )}
+  </head>
+  <body>
+    <Header />
+    <main><slot /></main>
+    <Footer />
+  </body>
+</html>

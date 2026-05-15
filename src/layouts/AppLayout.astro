@@ -1,0 +1,31 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import AdUnit from '../components/AdUnit.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  shortDescription: string;
+}
+const { title, description, shortDescription } = Astro.props;
+---
+<BaseLayout title={`${title} | GoolAPP`} description={description}>
+  <section class="app-hero">
+    <h1>{title}</h1>
+    <p class="app-description">{shortDescription}</p>
+  </section>
+
+  <AdUnit position="top" />
+
+  <section class="app-container">
+    <slot name="app" />
+  </section>
+
+  <AdUnit position="middle" />
+
+  <section class="app-content">
+    <slot name="longform" />
+  </section>
+
+  <AdUnit position="bottom" />
+</BaseLayout>
