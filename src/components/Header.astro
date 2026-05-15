@@ -8,6 +8,15 @@
       <span class="logo-text">GoolAPP</span>
     </a>
 
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="모바일 메뉴 열기" aria-expanded="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 12H21" stroke="#8B4F32" stroke-width="2" stroke-linecap="round"/>
+        <path d="M3 6H21" stroke="#8B4F32" stroke-width="2" stroke-linecap="round"/>
+        <path d="M3 18H21" stroke="#8B4F32" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+
     <!-- Nav items: from goolapp-home-260507.md nav section -->
     <nav class="main-nav" aria-label="주요 메뉴">
       <ul>
@@ -21,6 +30,18 @@
     </nav>
   </div>
 </header>
+
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const nav = document.querySelector('.main-nav');
+  if (btn && nav) {
+    btn.addEventListener('click', () => {
+      const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!isExpanded));
+      nav.classList.toggle('is-active');
+    });
+  }
+</script>
 
 <style>
   .global-header {
@@ -70,6 +91,15 @@
     white-space: nowrap;
   }
 
+  .mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    margin-left: auto;
+  }
+
   /* Nav: gap 32px, each link 16px, color #53433D */
   .main-nav ul {
     display: flex;
@@ -96,12 +126,42 @@
     background: rgba(139, 79, 50, 0.06);
   }
 
-  /* Mobile: hide nav */
+  /* Mobile */
   @media (max-width: 900px) {
-    .main-nav { display: none; }
     .global-header { height: 60px; }
     .header-inner { height: 60px; padding: 0 var(--gutter-mobile); }
     .logo-icon { width: 32px; height: 32px; }
     .logo-text { font-size: 20px; }
+    
+    .mobile-menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .main-nav { 
+      display: none; 
+    }
+    .main-nav.is-active {
+      display: block;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      background: rgba(251, 249, 245, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(216, 194, 185, 0.3);
+      padding: 16px var(--gutter-mobile);
+      box-shadow: 0px 20px 40px rgba(74, 68, 63, 0.05);
+    }
+    .main-nav.is-active ul {
+      flex-direction: column;
+      gap: 8px;
+    }
+    .main-nav.is-active a {
+      font-size: 16px;
+      padding: 12px 8px;
+    }
   }
 </style>
