@@ -1,0 +1,30 @@
+---
+import AppCard from './AppCard.astro';
+
+interface Props {
+  apps: { title: string; shortDescription: string; slug: string; category: string; }[];
+}
+const { apps } = Astro.props;
+---
+<div class="related-apps">
+  <h2>관련 유틸리티</h2>
+  <div class="related-grid">
+    {apps.map(app => (
+      <AppCard {...app} />
+    ))}
+  </div>
+</div>
+
+<style>
+  .related-apps {
+    margin-top: var(--space-12);
+  }
+  .related-apps h2 {
+    margin-bottom: var(--space-6);
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-6);
+  }
+</style>

@@ -1,0 +1,58 @@
+---
+interface Props {
+  title: string;
+  shortDescription: string;
+  slug: string;
+  category: string;
+}
+const { title, shortDescription, slug, category } = Astro.props;
+---
+<a href={`/${slug}`} class="app-card glass-surface">
+  <div class="card-header">
+    <span class="category-chip">{category}</span>
+  </div>
+  <div class="card-body">
+    <h3 class="card-title">{title}</h3>
+    <p class="card-desc">{shortDescription}</p>
+  </div>
+</a>
+
+<style>
+  .app-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-6);
+    text-decoration: none;
+    transition: var(--transition-base);
+    color: inherit;
+    height: 100%;
+  }
+  .app-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 30px 60px rgba(139, 79, 50, 0.1);
+  }
+  .card-header {
+    margin-bottom: var(--space-4);
+  }
+  .category-chip {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .card-title {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-2);
+    color: var(--color-on-surface);
+  }
+  .card-desc {
+    font-size: var(--font-size-sm);
+    color: var(--color-on-surface-variant);
+    margin: 0;
+  }
+</style>

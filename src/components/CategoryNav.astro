@@ -1,0 +1,57 @@
+---
+interface Props {
+  activeCategory?: string;
+}
+const { activeCategory = 'all' } = Astro.props;
+
+const categories = [
+  { id: 'all', label: '전체', href: '/' },
+  { id: 'calculator', label: '계산기', href: '/category/calculator' },
+  { id: 'tool', label: '유틸리티', href: '/category/tool' },
+  { id: 'quiz', label: '퀴즈', href: '/category/quiz' },
+  { id: 'converter', label: '변환기', href: '/category/converter' },
+  { id: 'misc', label: '기타', href: '/category/misc' },
+];
+---
+<nav class="category-nav">
+  <ul class="category-list">
+    {categories.map(cat => (
+      <li>
+        <a href={cat.href} class={`category-link ${activeCategory === cat.id ? 'active' : ''}`}>
+          {cat.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .category-nav {
+    margin-bottom: var(--space-8);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: var(--space-2);
+  }
+  .category-list {
+    display: flex;
+    gap: var(--space-3);
+    min-width: max-content;
+  }
+  .category-link {
+    display: block;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-container);
+    color: var(--color-on-surface);
+    text-decoration: none;
+    font-weight: var(--font-weight-bold);
+    transition: var(--transition-fast);
+  }
+  .category-link:hover {
+    background: var(--color-surface-variant);
+  }
+  .category-link.active {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+</style>

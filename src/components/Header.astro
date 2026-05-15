@@ -1,0 +1,53 @@
+---
+---
+<header class="global-header glass-surface">
+  <div class="container header-container">
+    <a href="/" class="logo">GoolAPP</a>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="/category/calculator">계산기</a></li>
+        <li><a href="/category/tool">유틸리티</a></li>
+        <li><a href="/category/quiz">퀴즈</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .global-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 50;
+    border-radius: 0;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 72px;
+  }
+  .logo {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .main-nav ul {
+    display: flex;
+    gap: var(--space-6);
+  }
+  .main-nav a {
+    color: var(--color-on-surface);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
+  }
+  .main-nav a:hover {
+    color: var(--color-primary);
+  }
+</style>

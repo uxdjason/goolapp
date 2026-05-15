@@ -29,3 +29,25 @@ const { title, description, shortDescription } = Astro.props;
 
   <AdUnit position="bottom" />
 </BaseLayout>
+
+<style>
+  .app-hero {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+  .app-description {
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-lg);
+  }
+  .app-container {
+    background: var(--color-surface-container-low);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    margin-bottom: var(--space-12);
+  }
+  .app-content {
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: var(--font-size-base);
+  }
+</style>

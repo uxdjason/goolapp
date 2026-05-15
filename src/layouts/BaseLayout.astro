@@ -35,9 +35,9 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
       <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`} crossorigin="anonymous"></script>
     )}
   </head>
-  <body>
+  <body class="global-layout">
     <Header />
-    <main><slot /></main>
+    <main class="global-main"><slot /></main>
     <Footer />
   </body>
 </html>

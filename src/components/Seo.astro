@@ -1,0 +1,37 @@
+---
+import { SEO } from 'astro-seo';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  canonicalUrl?: string;
+}
+const { title, description, ogImage = '/og/default.png', canonicalUrl } = Astro.props;
+
+// 기본 사이트 정보
+const siteName = 'GoolAPP';
+const fullUrl = canonicalUrl || Astro.url.href;
+---
+<SEO
+  title={title}
+  description={description}
+  canonical={fullUrl}
+  openGraph={{
+    basic: {
+      title,
+      type: 'website',
+      image: ogImage,
+    },
+    optional: {
+      description,
+      siteName,
+    }
+  }}
+  twitter={{
+    card: 'summary_large_image',
+    title,
+    description,
+    image: ogImage,
+  }}
+/>

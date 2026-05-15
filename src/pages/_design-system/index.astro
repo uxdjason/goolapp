@@ -1,0 +1,122 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import AppCard from '../../components/AppCard.astro';
+import CategoryNav from '../../components/CategoryNav.astro';
+import AdUnit from '../../components/AdUnit.astro';
+import Faq from '../../components/Faq.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const dummyApps = [
+  { slug: 'app1', title: '간단 계산기', shortDescription: '일상적인 사칙연산을 빠르게 수행합니다.', category: 'calculator' },
+  { slug: 'app2', title: 'MBTI 테스트', shortDescription: '나의 숨겨진 성향을 알아보세요.', category: 'quiz' },
+  { slug: 'app3', title: '단위 변환기', shortDescription: '길이, 무게, 온도 등 다양한 단위를 변환합니다.', category: 'converter' },
+];
+
+const dummyFaqs = [
+  { q: 'GoolAPP은 무료인가요?', a: '네, 모든 유틸리티는 완전 무료로 제공됩니다.' },
+  { q: '회원가입이 필요한가요?', a: '아니요, 로그인 없이 모든 기능을 이용하실 수 있습니다.' },
+];
+---
+<BaseLayout title="Design System" description="GoolAPP 디자인 시스템 데모 페이지입니다.">
+  <div class="container ds-container">
+    <div class="ds-header">
+      <h1>GoolAPP Design System</h1>
+      <p>김정철명조 & 글래스모피즘 기반의 UI/UX 컴포넌트 목록</p>
+    </div>
+
+    <section class="ds-section">
+      <h2>Typography</h2>
+      <div class="glass-surface p-6">
+        <h1>Heading 1 (48px) - 가장 큰 제목</h1>
+        <h2>Heading 2 (32px) - 섹션 제목</h2>
+        <h3>Heading 3 (24px) - 카드/앱 제목</h3>
+        <p>본문(Body) 텍스트입니다. 가독성을 높이기 위해 넉넉한 줄간격(1.6)과 부드러운 다크 토프(Dark Taupe) 색상을 사용합니다. <a href="#">링크 텍스트</a>는 프라이머리 컬러가 적용됩니다.</p>
+        <span class="category-chip">LABEL CAPS</span>
+      </div>
+    </section>
+
+    <section class="ds-section">
+      <h2>Color Palette</h2>
+      <div class="color-grid">
+        <div class="color-box" style="background: var(--color-primary); color: var(--color-on-primary);">Primary</div>
+        <div class="color-box" style="background: var(--color-secondary); color: var(--color-on-secondary);">Secondary</div>
+        <div class="color-box" style="background: var(--color-tertiary); color: var(--color-on-tertiary);">Tertiary</div>
+        <div class="color-box" style="background: var(--color-surface); color: var(--color-on-surface); border: 1px solid var(--color-outline-variant);">Surface</div>
+      </div>
+    </section>
+
+    <section class="ds-section">
+      <h2>CategoryNav Component</h2>
+      <div class="glass-surface p-6">
+        <CategoryNav activeCategory="tool" />
+      </div>
+    </section>
+
+    <section class="ds-section">
+      <h2>AppCard Component</h2>
+      <div class="grid-layout">
+        {dummyApps.map(app => <AppCard {...app} />)}
+      </div>
+    </section>
+
+    <section class="ds-section">
+      <h2>Faq Component</h2>
+      <div class="glass-surface p-6">
+        <Faq items={dummyFaqs} />
+      </div>
+    </section>
+
+    <section class="ds-section">
+      <h2>AdUnit Component</h2>
+      <div class="glass-surface p-6">
+        <AdUnit position="middle" />
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .ds-container {
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-12);
+  }
+  .ds-header {
+    margin-bottom: var(--space-12);
+    text-align: center;
+  }
+  .ds-header p {
+    color: var(--color-on-surface-variant);
+  }
+  .ds-section {
+    margin-bottom: var(--space-12);
+  }
+  .ds-section > h2 {
+    margin-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding-bottom: var(--space-2);
+  }
+  .p-6 {
+    padding: var(--space-6);
+  }
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--space-4);
+  }
+  .color-box {
+    height: 100px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-sm);
+  }
+  .grid-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-6);
+  }
+</style>

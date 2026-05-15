@@ -1,0 +1,170 @@
+@font-face {
+  font-family: 'KimjungchulMyungjo';
+  src: url('/fonts/KimjungchulMyungjo-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'KimjungchulMyungjo';
+  src: url('/fonts/KimjungchulMyungjo-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'KimjungchulMyungjo';
+  src: url('/fonts/KimjungchulMyungjo-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Colors - Luminous Utility Palette */
+  --color-surface: #fbf9f5;
+  --color-surface-dim: #dbdad6;
+  --color-surface-container-low: #f5f3ef;
+  --color-surface-container: #efeeea;
+  --color-surface-variant: #e4e2de;
+  --color-on-surface: #1b1c1a;
+  --color-on-surface-variant: #53433d;
+  --color-outline: #85736c;
+  --color-outline-variant: #d8c2b9;
+  
+  --color-primary: #8b4f32;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #f3a683;
+  --color-on-primary-container: #713a1f;
+  
+  --color-secondary: #5b5c7a;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #dadafe;
+  --color-on-secondary-container: #5d5e7d;
+
+  --color-tertiary: #516351;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #aabda8;
+  --color-on-tertiary-container: #3b4d3c;
+  
+  --color-background: #fbf9f5;
+  --color-on-background: #1b1c1a;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(251, 249, 245, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-blur: blur(12px);
+  --glass-shadow: 0 20px 40px rgba(74, 68, 63, 0.05);
+
+  /* Typography */
+  --font-family-base: 'KimjungchulMyungjo', serif;
+  --font-family-display: 'KimjungchulMyungjo', serif;
+  
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.875rem;  /* 14px */
+  --font-size-base: 1rem;    /* 16px */
+  --font-size-lg: 1.125rem;  /* 18px */
+  --font-size-xl: 1.5rem;    /* 24px */
+  --font-size-2xl: 2rem;     /* 32px */
+  --font-size-3xl: 3rem;     /* 48px */
+  
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-bold: 700;
+  
+  --line-height-tight: 1.2;
+  --line-height-base: 1.6;
+
+  /* Spacing */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-12: 3rem;    /* 48px */
+  --space-16: 4rem;    /* 64px */
+  --space-20: 5rem;    /* 80px */
+  
+  --container-max: 1200px;
+  --gutter: 24px;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem; /* 4px */
+  --radius-md: 0.5rem;  /* 8px */
+  --radius-lg: 1rem;    /* 16px */
+  --radius-xl: 1.5rem;  /* 24px */
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease-out;
+  --transition-base: 250ms ease-out;
+
+  /* AdSense */
+  --ad-min-height: 100px;
+  --ad-spacing: var(--space-6);
+}
+
+body {
+  font-family: var(--font-family-base);
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  line-height: var(--line-height-base);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glass Surface Utility */
+.glass-surface {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-lg);
+}
+
+/* Base Typo */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-4);
+}
+h1 { font-size: var(--font-size-3xl); letter-spacing: -0.02em; }
+h2 { font-size: var(--font-size-2xl); letter-spacing: -0.01em; }
+h3 { font-size: var(--font-size-xl); }
+p { margin-bottom: var(--space-4); }
+a { color: var(--color-primary); text-decoration: none; transition: color var(--transition-fast); }
+a:hover { color: var(--color-on-primary-container); }
+
+/* Containers */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.global-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.global-main {
+  flex: 1;
+  padding-top: calc(72px + var(--space-8));
+  padding-bottom: var(--space-12);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

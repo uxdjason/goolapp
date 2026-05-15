@@ -1,0 +1,61 @@
+---
+const currentYear = new Date().getFullYear();
+---
+<footer class="global-footer">
+  <div class="container footer-container">
+    <div class="footer-info">
+      <div class="footer-logo">GoolAPP</div>
+      <p>단순하고 직관적인 유틸리티 컬렉션</p>
+    </div>
+    <div class="footer-links">
+      <a href="/privacy">개인정보처리방침</a>
+      <a href="/terms">이용약관</a>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <p>&copy; {currentYear} GoolAPP. All rights reserved.</p>
+  </div>
+</footer>
+
+<style>
+  .global-footer {
+    background-color: var(--color-surface-variant);
+    padding: var(--space-12) 0 var(--space-6);
+    margin-top: var(--space-20);
+  }
+  .footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+    margin-bottom: var(--space-8);
+  }
+  .footer-logo {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+    margin-bottom: var(--space-2);
+  }
+  .footer-info p {
+    color: var(--color-on-surface-variant);
+  }
+  .footer-links {
+    display: flex;
+    gap: var(--space-4);
+  }
+  .footer-links a {
+    color: var(--color-on-surface-variant);
+    text-decoration: none;
+  }
+  .footer-links a:hover {
+    color: var(--color-primary);
+  }
+  .footer-bottom {
+    border-top: 1px solid var(--color-outline-variant);
+    padding-top: var(--space-6);
+    text-align: center;
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-sm);
+  }
+</style>
