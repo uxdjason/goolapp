@@ -1,5 +1,6 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { z } from 'astro:schema';
 
 const apps = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/apps" }),
@@ -8,7 +9,7 @@ const apps = defineCollection({
     slug: z.string(),
     description: z.string().max(160),
     shortDescription: z.string().max(80),
-    category: z.enum(['calculator', 'quiz', 'converter', 'tool', 'misc']),
+    category: z.enum(['calculator', 'quiz', 'datetime', 'tool', 'fun', 'finance']),
     primaryKeyword: z.string(),
     secondaryKeywords: z.array(z.string()).default([]),
     publishedAt: z.date(),

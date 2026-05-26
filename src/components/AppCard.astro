@@ -9,11 +9,11 @@ const { title, shortDescription, slug, category } = Astro.props;
 
 const categoryLabels: Record<string, string> = {
   calculator: '각종 계산기',
-  converter:  '날짜와 시간',
+  datetime:   '날짜와 시간',
   tool:       '편리한 도구들',
   quiz:       '학습 및 퀴즈',
   fun:        '심심풀이 Fun',
-  misc:       '기타',
+  finance:    '금융 재테크',
 };
 const catLabel = categoryLabels[category] ?? category;
 ---

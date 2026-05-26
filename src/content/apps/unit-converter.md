@@ -3,7 +3,7 @@ title: "단위 변환기"
 slug: "unit-converter"
 description: "길이, 무게, 부피, 온도 등 일상에서 필요한 다양한 단위들을 상호 변환해주는 간편한 단위 변환기입니다."
 shortDescription: "길이, 무게, 온도 등 단위 변환"
-category: "converter"
+category: "datetime"
 primaryKeyword: "단위 변환기"
 secondaryKeywords: ["길이 변환", "무게 변환", "온도 변환기"]
 publishedAt: 2026-05-15
