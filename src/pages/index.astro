@@ -63,6 +63,10 @@ const sortedApps = allApps.sort((a, b) =>
         ))}
       </div>
 
+      <div id="favorites-empty-state" class="empty-state glass-surface" style="display: none;">
+        <p>등록된 즐겨찾는 앱이 없습니다.</p>
+      </div>
+
       <!-- "더 꺼내기" button — from design spec -->
       <div class="load-more-wrap">
         <button class="load-more-btn">더 꺼내기</button>
@@ -173,6 +177,16 @@ const sortedApps = allApps.sort((a, b) =>
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
     margin-bottom: 48px;
+  }
+  .empty-state {
+    padding: var(--space-16);
+    text-align: center;
+    color: var(--color-on-surface-variant);
+    margin-bottom: 48px;
+    border-radius: var(--radius-2xl);
+    background: rgba(251, 249, 245, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0px 20px 40px rgba(74, 68, 63, 0.1);
   }
 
   /* "더 꺼내기" button — Gothic font, 16px bold */

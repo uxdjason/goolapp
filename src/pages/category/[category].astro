@@ -82,6 +82,10 @@ const showLoadMore = sortedApps.length > initialLimit;
         )}
       </div>
 
+      <div id="favorites-empty-state" class="empty-state glass-surface" style="display: none;">
+        <p>등록된 즐겨찾는 앱이 없습니다.</p>
+      </div>
+
       {showLoadMore && (
         <div class="load-more-wrap">
           <button class="load-more-btn">더 꺼내기</button>

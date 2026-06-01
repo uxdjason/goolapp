@@ -40,10 +40,8 @@ const catLabel = category ? (categoryLabels[category] ?? category) : '';
 
         <div class="app-title-row">
           <h1 class="app-title">{title}</h1>
-          <button class="fav-btn" aria-label="즐겨찾기">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
+          <button class="fav-btn" data-app-slug={Astro.params.slug} aria-label="즐겨찾기" title="즐겨찾기">
+            <img src="/img/star-btn-0.png" class="fav-icon" alt="즐겨찾기" width="32" height="32" />
           </button>
         </div>
 
@@ -123,12 +121,16 @@ const catLabel = category ? (categoryLabels[category] ?? category) : '';
     width: 40px; height: 40px;
     background: none;
     border: none;
-    color: var(--color-outline-variant);
     cursor: pointer;
     flex-shrink: 0;
-    transition: color var(--transition-fast);
+    padding: 0;
+    transition: transform var(--transition-fast);
   }
-  .fav-btn:hover { color: #ffd700; }
+  .fav-btn:hover { transform: scale(1.1); }
+  .fav-icon {
+    width: 100%;
+    height: auto;
+  }
 
   .app-description {
     /* from design: 18px, color #53433D, max-width 672px */

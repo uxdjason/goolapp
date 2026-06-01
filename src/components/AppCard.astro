@@ -17,24 +17,23 @@ const categoryLabels: Record<string, string> = {
 };
 const catLabel = categoryLabels[category] ?? category;
 ---
-<a href={`/${slug}`} class="app-card" aria-label={`${title} 열기`}>
+<article class="app-card" data-slug={slug}>
   <!-- Top row: category chip + favourite star -->
   <div class="card-top">
     <span class="cat-chip">
       {catLabel}
     </span>
-    <button class="fav-btn" aria-label="즐겨찾기" title="즐겨찾기" tabindex="-1">
-      <!-- Star icon: Larger and clearer -->
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-      </svg>
+    <button class="fav-btn" data-app-slug={slug} aria-label="즐겨찾기" title="즐겨찾기">
+      <img src="/img/star-btn-0.png" class="fav-icon" alt="즐겨찾기" width="24" height="24" />
     </button>
   </div>
 
   <!-- Card title + description -->
-  <h3 class="card-title">{title}</h3>
+  <h3 class="card-title">
+    <a href={`/${slug}`} class="app-link">{title}</a>
+  </h3>
   <p class="card-desc">{shortDescription}</p>
-</a>
+</article>
 
 <style>
   .app-card {
@@ -87,22 +86,32 @@ const catLabel = categoryLabels[category] ?? category;
     height: 32px;
     background: none;
     border: none;
-    color: var(--color-outline-variant);
     cursor: pointer;
     flex-shrink: 0;
     padding: 0;
-    transition: color var(--transition-fast);
+    transition: transform var(--transition-fast);
   }
-  .fav-btn:hover { color: #ffd700; } /* Gold color on hover for star */
+  .fav-btn:hover { transform: scale(1.1); }
+  
+  .fav-icon {
+    width: 100%;
+    height: auto;
+  }
 
   .card-title {
     font-family: var(--font-family-base);
     font-size: 24px;
     font-weight: 700;
     line-height: 31px;
-    color: #350f00;
     margin-bottom: 8px;
     margin-top: 0;
+  }
+  .app-link {
+    color: #350f00;
+    text-decoration: none;
+  }
+  .app-link:hover {
+    text-decoration: underline;
   }
 
   .card-desc {

@@ -6,7 +6,7 @@ const { activeCategory = 'all' } = Astro.props;
 
 const categories = [
   { id: 'all',        label: '모든 앱',    href: '/',                    star: false },
-  { id: 'favorites',  label: '즐겨찾는 앱', href: '#',                   star: true  },
+  { id: 'favorites',  label: '즐겨찾는 앱', href: '/#favorites',          star: true  },
   { id: 'calculator', label: '계산기',     href: '/category/calculator', star: false },
   { id: 'datetime',   label: '날짜/시간',  href: '/category/datetime',   star: false },
   { id: 'finance',    label: '금융재테크', href: '/category/finance',  star: false },
@@ -26,10 +26,7 @@ const categories = [
         >
           {cat.star && (
             <span class="star-mark" aria-hidden="true">
-              <!-- ★ 20×20 yellow fill, border #D8C2B9 — from design spec -->
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFF200" stroke="#c8a898" stroke-width="1.2" stroke-linejoin="round">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-              </svg>
+              <img src="/img/star-btn-1.png" alt="" width="16" height="16" style="display: block;" />
             </span>
           )}
           {cat.label}

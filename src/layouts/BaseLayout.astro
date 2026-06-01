@@ -40,5 +40,117 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
     <Header />
     <main class="global-main"><slot /></main>
     <Footer />
+    <script>
+      const FAV_KEY = 'goolapp_favorites';
+      
+      function getFavorites() {
+        try {
+          return JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
+        } catch {
+          return [];
+        }
+      }
+      
+      function setFavorites(favs: string[]) {
+        localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+      }
+      
+      function updateFavIcons() {
+        const favs = getFavorites();
+        document.querySelectorAll('.fav-btn').forEach(btn => {
+          const slug = btn.getAttribute('data-app-slug');
+          const isFav = slug && favs.includes(slug);
+          const img = btn.querySelector('img');
+          if (img) {
+            img.src = isFav ? '/img/star-btn-1.png' : '/img/star-btn-0.png';
+          }
+        });
+      }
+      
+      function applyFilter() {
+        const isFavoritesFilter = window.location.hash === '#favorites';
+        const favs = getFavorites();
+        
+        // Update nav links active state
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+          const href = btn.getAttribute('href');
+          if (href === '/#favorites') {
+            if (isFavoritesFilter) btn.classList.add('active');
+            else btn.classList.remove('active');
+          } else if (href === '/') {
+            if (isFavoritesFilter) btn.classList.remove('active');
+            else if (window.location.pathname === '/') btn.classList.add('active');
+          }
+        });
+        
+        let visibleCount = 0;
+        document.querySelectorAll('.app-card').forEach((el) => {
+          const card = el as HTMLElement;
+          const slug = card.getAttribute('data-slug');
+          if (isFavoritesFilter) {
+            if (slug && favs.includes(slug)) {
+              card.style.display = '';
+              visibleCount++;
+            } else {
+              card.style.display = 'none';
+            }
+          } else {
+            card.style.display = '';
+            visibleCount++;
+          }
+        });
+        
+        const emptyState = document.getElementById('favorites-empty-state');
+        const loadMore = document.querySelector('.load-more-wrap') as HTMLElement;
+        
+        if (emptyState) {
+          if (isFavoritesFilter && visibleCount === 0) {
+            emptyState.style.display = 'block';
+          } else {
+            emptyState.style.display = 'none';
+          }
+        }
+        
+        if (loadMore) {
+          if (isFavoritesFilter) {
+             loadMore.style.display = 'none';
+          } else {
+             loadMore.style.display = '';
+          }
+        }
+      }
+      
+      function handleFavClick(e: Event) {
+        const target = e.target as HTMLElement;
+        const btn = target.closest('.fav-btn');
+        if (!btn) return;
+        
+        e.preventDefault();
+        
+        const slug = btn.getAttribute('data-app-slug');
+        if (!slug) return;
+        
+        let favs = getFavorites();
+        if (favs.includes(slug)) {
+          favs = favs.filter((f: string) => f !== slug);
+        } else {
+          favs.push(slug);
+        }
+        
+        setFavorites(favs);
+        updateFavIcons();
+        if (window.location.hash === '#favorites') {
+          applyFilter();
+        }
+      }
+      
+      document.addEventListener('DOMContentLoaded', () => {
+        updateFavIcons();
+        applyFilter();
+        document.body.addEventListener('click', handleFavClick);
+      });
+      
+      window.addEventListener('hashchange', applyFilter);
+    </script>
   </body>
 </html>
