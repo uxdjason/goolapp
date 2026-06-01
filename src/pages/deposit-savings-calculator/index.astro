@@ -1,0 +1,434 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'deposit-savings-calculator');
+if (!entry) {
+  throw new Error("deposit-savings-calculator app entry not found");
+}
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({
+    title:            app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug:             app.data.slug,
+    category:         app.data.category,
+  }));
+
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({
+      title:            app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug:             app.data.slug,
+      category:         app.data.category,
+    }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.secondaryKeywords ?? []}
+>
+  <Fragment slot="app">
+    <div class="calculator-container glass-surface">
+      <div class="header">
+        <h2 class="label-caps" style="color: var(--color-primary); font-size: var(--font-size-sm); margin-bottom: var(--space-2);">금융 재테크</h2>
+        <h3 style="font-size: var(--font-size-2xl); margin-bottom: var(--space-2); color: var(--color-on-surface);">예적금 이자 계산기</h3>
+        <p>단리/복리와 세후 이자를 정확히 계산해 보세요.</p>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tab-nav">
+        <button class="tab-btn active" data-target="deposit-calc">정기예금</button>
+        <button class="tab-btn" data-target="saving-calc">정기적금</button>
+      </div>
+
+      <div class="input-section">
+        <div class="form-group">
+          <label id="amount-label" for="amount">예치 금액</label>
+          <div class="input-with-unit">
+            <input type="number" id="amount" placeholder="0" min="0">
+            <span class="unit">원</span>
+          </div>
+          <small id="amount-hint">한 번에 맡길 금액을 입력하세요.</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="months">예치 기간</label>
+            <div class="input-with-unit">
+              <input type="number" id="months" value="12" min="1">
+              <span class="unit">개월</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="rate">연 이자율</label>
+            <div class="input-with-unit">
+              <input type="number" id="rate" step="0.1" value="3.0" min="0.1">
+              <span class="unit">%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group radio-group-container">
+          <label>이자 계산 방식</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="interest-type" value="simple" checked>
+              <span class="radio-custom">단리</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="interest-type" value="compound">
+              <span class="radio-custom">월복리</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-section">
+        <div class="results-hero">
+          <p class="due-date-label label-caps">세후 만기 수령액 (15.4% 공제)</p>
+          <div class="due-date-value" id="total-received">0 원</div>
+          
+          <div class="results-details-cards">
+            <div class="info-card glass-surface-card">
+              <span>원금 총액</span>
+              <strong id="principal-total">0 원</strong>
+            </div>
+            <div class="info-card glass-surface-card">
+              <span>세전 이자</span>
+              <strong id="interest-pretax">0 원</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="disclaimer">본 계산 결과는 일반적인 세금(15.4%)을 기준으로 계산된 참고용이며, 우대 금리나 비과세 혜택 등 각 금융상품의 조건에 따라 실제 수령액과 약간의 차이가 있을 수 있습니다.</p>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <div class="prose">
+      <Content />
+    </div>
+    {related.length > 0 && <RelatedApps apps={related} />}
+  </Fragment>
+</AppLayout>
+
+<style>
+  .calculator-container {
+    padding: var(--space-8);
+    width: 100%;
+    box-sizing: border-box;
+    margin: var(--space-8) auto;
+  }
+  .header {
+    text-align: center;
+    border-bottom: 1px solid var(--glass-border-soft);
+    padding-bottom: var(--space-5);
+    margin-bottom: var(--space-6);
+  }
+  .header p {
+    margin: 0;
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-base);
+  }
+
+  .tab-nav {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+    background: var(--glass-bg-input);
+    padding: var(--space-1);
+    border-radius: var(--radius-lg);
+  }
+  .tab-btn {
+    flex: 1;
+    padding: var(--space-3) var(--space-4);
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-base);
+    color: var(--color-on-surface-variant);
+    cursor: pointer;
+    transition: var(--transition-fast);
+  }
+  .tab-btn.active {
+    background: var(--color-surface);
+    color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .input-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    background: var(--glass-bg-input);
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+  }
+  .form-row {
+    display: flex;
+    gap: var(--space-5);
+  }
+  .form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .form-group label {
+    margin-bottom: var(--space-2);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-on-surface);
+    font-size: var(--font-size-sm);
+  }
+  .input-with-unit {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .input-with-unit input {
+    width: 100%;
+    padding: var(--space-3);
+    padding-right: 48px; /* unit space */
+    border: 1px solid var(--glass-border-soft);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    box-sizing: border-box;
+    font-family: inherit;
+    color: var(--color-on-surface);
+    height: 56px;
+    transition: var(--transition-fast);
+  }
+  .input-with-unit input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+  .input-with-unit .unit {
+    position: absolute;
+    right: 16px;
+    color: var(--color-on-surface-variant);
+    font-weight: var(--font-weight-bold);
+    pointer-events: none;
+  }
+  .form-group small {
+    margin-top: var(--space-2);
+    color: var(--color-primary);
+    font-size: var(--font-size-xs);
+  }
+
+  .radio-group-container {
+    margin-top: var(--space-2);
+  }
+  .radio-group {
+    display: flex;
+    gap: var(--space-3);
+  }
+  .radio-label {
+    flex: 1;
+    position: relative;
+    cursor: pointer;
+    margin: 0 !important;
+  }
+  .radio-label input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .radio-custom {
+    display: block;
+    text-align: center;
+    padding: var(--space-3);
+    border: 1px solid var(--glass-border-soft);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-bold);
+    transition: var(--transition-fast);
+  }
+  .radio-label input:checked ~ .radio-custom {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border-color: var(--color-primary);
+  }
+
+  .results-section {
+    margin-top: var(--space-6);
+    animation: fadeIn var(--transition-base);
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .results-hero {
+    text-align: center;
+    background: var(--glass-bg-light);
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+  }
+  .due-date-label {
+    color: var(--color-on-surface-variant);
+    margin: 0;
+  }
+  .due-date-value {
+    font-size: 36px;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+    font-family: var(--font-family-base);
+    margin: var(--space-2) 0 var(--space-6);
+  }
+  
+  .results-details-cards {
+    display: flex;
+    gap: var(--space-4);
+  }
+  .glass-surface-card {
+    flex: 1;
+    background: var(--color-surface);
+    border: 1px solid var(--glass-border-soft);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-1);
+  }
+  .glass-surface-card span {
+    font-size: var(--font-size-sm);
+    color: var(--color-on-surface-variant);
+  }
+  .glass-surface-card strong {
+    font-size: var(--font-size-lg);
+    color: var(--color-on-surface);
+  }
+
+  .disclaimer {
+    text-align: center;
+    font-size: var(--font-size-xs);
+    color: var(--color-on-surface-variant);
+    margin-top: var(--space-8);
+    opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    .calculator-container { padding: var(--space-5); }
+    .input-section { padding: var(--space-5); }
+    .form-row { flex-direction: column; gap: var(--space-5); }
+    .results-details-cards { flex-direction: column; }
+    .due-date-value { font-size: 28px; }
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    let mode = 'deposit-calc'; // 'deposit-calc' or 'saving-calc'
+
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const amountLabel = document.getElementById('amount-label');
+    const amountHint = document.getElementById('amount-hint');
+    
+    const amountInput = document.getElementById('amount');
+    const monthsInput = document.getElementById('months');
+    const rateInput = document.getElementById('rate');
+    const radios = document.querySelectorAll('input[name="interest-type"]');
+    
+    const totalReceivedEl = document.getElementById('total-received');
+    const principalTotalEl = document.getElementById('principal-total');
+    const interestPretaxEl = document.getElementById('interest-pretax');
+
+    function calculate() {
+      const amount = parseFloat(amountInput.value) || 0;
+      const months = parseInt(monthsInput.value) || 0;
+      const rate = parseFloat(rateInput.value) || 0;
+      const type = document.querySelector('input[name="interest-type"]:checked').value;
+      
+      let interest = 0;
+      let totalPrincipal = 0;
+      
+      if (amount <= 0 || months <= 0 || rate <= 0) {
+        totalReceivedEl.textContent = '0 원';
+        principalTotalEl.textContent = '0 원';
+        interestPretaxEl.textContent = '0 원';
+        return;
+      }
+
+      if (mode === 'deposit-calc') { // 정기예금
+        totalPrincipal = amount;
+        const years = months / 12;
+        if (type === 'simple') {
+          interest = totalPrincipal * rate * years / 100;
+        } else { // compound
+          const frequency = 12; 
+          const compoundRate = rate / 100 / frequency;
+          const periods = frequency * years;
+          interest = totalPrincipal * (Math.pow(1 + compoundRate, periods) - 1);
+        }
+      } else { // 정기적금
+        totalPrincipal = amount * months;
+        if (type === 'simple') {
+          for (let i = 1; i <= months; i++) {
+            interest += amount * (rate / 100) * (i / 12);
+          }
+        } else { // compound
+          let totalAccumulated = 0;
+          for (let i = 0; i < months; i++) {
+            totalAccumulated = (totalAccumulated + amount) * (1 + rate / 100 / 12);
+          }
+          interest = totalAccumulated - totalPrincipal;
+        }
+      }
+
+      const afterTaxInterest = interest * 0.846; // 15.4% tax deduction
+      const totalReceived = totalPrincipal + afterTaxInterest;
+
+      totalReceivedEl.textContent = `${Math.round(totalReceived).toLocaleString()} 원`;
+      principalTotalEl.textContent = `${Math.round(totalPrincipal).toLocaleString()} 원`;
+      interestPretaxEl.textContent = `${Math.round(interest).toLocaleString()} 원`;
+    }
+
+    // Switch Tabs
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        mode = btn.dataset.target;
+        
+        if (mode === 'deposit-calc') {
+          amountLabel.textContent = '예치 금액';
+          amountHint.textContent = '한 번에 맡길 금액을 입력하세요.';
+        } else {
+          amountLabel.textContent = '매월 납입 금액';
+          amountHint.textContent = '매달 일정하게 저축할 금액을 입력하세요.';
+        }
+        calculate();
+      });
+    });
+
+    // Event Listeners for inputs
+    [amountInput, monthsInput, rateInput].forEach(input => {
+      input.addEventListener('input', calculate);
+    });
+    radios.forEach(radio => {
+      radio.addEventListener('change', calculate);
+    });
+    
+    // Initial Calculation
+    calculate();
+  });
+</script>
