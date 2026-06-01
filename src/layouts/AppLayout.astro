@@ -20,6 +20,9 @@ const categoryLabels: Record<string, string> = {
   finance:    '금융 재테크',
 };
 const catLabel = category ? (categoryLabels[category] ?? category) : '';
+
+// Ensure slug is always available even for explicitly created pages (not dynamic [slug].astro)
+const currentSlug = Astro.url.pathname.replace(/^\/|\/$/g, '').split('/').pop();
 ---
 <BaseLayout title={`${title} | GoolAPP`} description={description}>
   <article class="app-page">
@@ -40,7 +43,7 @@ const catLabel = category ? (categoryLabels[category] ?? category) : '';
 
         <div class="app-title-row">
           <h1 class="app-title">{title}</h1>
-          <button class="fav-btn" data-app-slug={Astro.params.slug} aria-label="즐겨찾기" title="즐겨찾기">
+          <button class="fav-btn" data-app-slug={currentSlug} aria-label="즐겨찾기" title="즐겨찾기">
             <img src="/img/star-btn-0.png" class="fav-icon" alt="즐겨찾기" width="32" height="32" />
           </button>
         </div>
