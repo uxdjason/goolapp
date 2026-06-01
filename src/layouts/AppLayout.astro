@@ -136,11 +136,11 @@ const currentSlug = Astro.url.pathname.replace(/^\/|\/$/g, '').split('/').pop();
   }
 
   .app-description {
-    /* from design: 18px, color #53433D, max-width 672px */
+    /* from design: 18px, color #53433D */
     font-size: var(--font-size-lg);
     color: var(--color-on-surface-variant);
-    max-width: 672px;
-    margin: 0;
+    width: 100%;
+    margin: 8px 0 0;
   }
 
   /* ── App UI glass panel ── */
@@ -164,8 +164,11 @@ const currentSlug = Astro.url.pathname.replace(/^\/|\/$/g, '').split('/').pop();
     font-size: var(--font-size-base);
     line-height: var(--line-height-base);
   }
-  .longform-section :global(h2) { margin-top: var(--space-8); }
+  .longform-section :global(h2) { margin-top: var(--space-8); margin-bottom: var(--space-4); }
+  .longform-section :global(h3) { margin-top: var(--space-6); margin-bottom: var(--space-3); }
   .longform-section :global(p)  { margin-bottom: var(--space-4); }
+  .longform-section :global(ul), .longform-section :global(ol) { margin-bottom: var(--space-4); padding-left: var(--space-6); }
+  .longform-section :global(li) { margin-bottom: var(--space-2); }
 
   /* Mobile */
   @media (max-width: 768px) {
