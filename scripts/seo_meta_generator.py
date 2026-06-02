@@ -39,7 +39,9 @@ def generate_seo_meta(slug: str) -> dict:
             if not all(k in obj for k in required_keys):
                 return False
             if not (10 <= len(obj['title']) <= 100): return False
-            if not (40 <= len(obj['description']) <= 200): return False
+            if not (80 <= len(obj['description']) <= 300): return False
+            if 'searchDescription' in obj and not (80 <= len(obj['searchDescription']) <= 300): return False
+            if not (80 <= len(obj['ogDescription']) <= 300): return False
             if not obj['canonicalPath'].startswith('/') or not obj['canonicalPath'].endswith('/'): return False
             return True
         except Exception:
