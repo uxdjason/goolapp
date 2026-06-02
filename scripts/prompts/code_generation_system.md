@@ -7,6 +7,47 @@
 3. Vanilla JavaScript를 `<script>` 태그 내에 작성하며, 외부 프레임워크(React, Vue 등)는 사용하지 않는다.
 4. Astro 환경의 특성상 `document.createElement`나 `element.innerHTML`로 동적으로 생성된 요소에는 Astro의 Scoped CSS가 자동 적용되지 않는다. 동적 요소의 스타일링을 위해 CSS 블록 내에서 `:global()`을 사용하거나 전역 유틸리티 클래스를 사용해야 한다.
 
+[AppLayout 사용 규칙 — 반드시 준수]
+AppLayout은 두 개의 Named Slot을 사용한다. 이 구조를 정확히 따르지 않으면 페이지에 아무것도 렌더링되지 않는다.
+
+반드시 아래 구조를 그대로 사용하라:
+
+---
+import { getEntry, render } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+
+const entry = await getEntry('apps', '{slug}');
+if (!entry) throw new Error('{slug} entry not found');
+const { Content } = await render(entry);
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <!-- 앱 UI (입력/계산/결과 영역) -->
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+  </Fragment>
+</AppLayout>
+
+규칙:
+- slot="app" : 앱의 실제 UI (입력, 버튼, 결과 출력 등)
+- slot="longform" : <Content /> 컴포넌트 하나만 넣는다
+- AppLayout 안에 직접 <div class="container"> 등을 넣는 것은 절대 금지 — Named Slot을 통해서만 콘텐츠를 전달한다
+- <style>과 <script> 태그는 AppLayout 밖, 파일 최하단에 위치한다
+
 [UI/UX 가이드라인 (최신 경험 반영)]
 1. **탭(Tab) 활성화 UI**:
    활성화된 탭 버튼은 단순히 텍스트 색상만 변경하지 말고, 배경색(Primary Color)을 적용하고 텍스트는 흰색이나 대비가 잘 되는 색상으로 설정하여 사용자가 명확하게 현재 활성 탭을 인지할 수 있도록 하라.

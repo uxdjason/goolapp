@@ -92,16 +92,21 @@ def generate_app(slug: str) -> None:
     """
 
     def validate_astro(text: str) -> bool:
-        if "<BaseLayout" in text or "<AppLayout" in text:
-            return True
-        return False
+        # Named Slot 구조 사용 여부 확인
+        if 'slot="app"' not in text and "slot='app'" not in text:
+            return False
+        # 파일이 잘리지 않았는지 확인 (마지막 토큰이 </script> 또는 </style> 또는 </AppLayout> 로 끝나야 함)
+        stripped = text.strip()
+        if not (stripped.endswith('</script>') or stripped.endswith('</style>') or stripped.endswith('</AppLayout>') or stripped.endswith('```')):
+            return False
+        return True
 
     text = ai_client.call(
         task="code_generation",
         system=system_prompt,
         user=user_prompt,
         validator=validate_astro,
-        max_tokens=4096,
+        max_tokens=8192,
         log_label=f"code_generation:{slug}"
     )
 
