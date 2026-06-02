@@ -6,6 +6,11 @@
 2. 모든 스타일링은 이미 정의된 글로벌 CSS 변수(`var(--color-primary)` 등)를 활용해야 하며, 임의의 하드코딩된 색상 사용은 지양한다.
 3. Vanilla JavaScript를 `<script>` 태그 내에 작성하며, 외부 프레임워크(React, Vue 등)는 사용하지 않는다.
 4. Astro 환경의 특성상 `document.createElement`나 `element.innerHTML`로 동적으로 생성된 요소에는 Astro의 Scoped CSS가 자동 적용되지 않는다. 동적 요소의 스타일링을 위해 CSS 블록 내에서 `:global()`을 사용하거나 전역 유틸리티 클래스를 사용해야 한다.
+5. `hidden` 속성을 초기 숨김 상태에 사용하는 요소(`모달`, `오버레이`, `다이얼로그` 등)에 `display: flex` 또는 `display: grid` 같은 CSS를 직접 지정하면, CSS specificity 때문에 `hidden`이 무시되어 항상 표시된다. 이를 방지하기 위해 반드시 아래 패턴을 사용하라:
+   ```css
+   .dialog-container { display: flex; /* ... */ }
+   .dialog-container[hidden] { display: none; }
+   ```
 
 [AppLayout 사용 규칙 — 반드시 준수]
 AppLayout은 두 개의 Named Slot을 사용한다. 이 구조를 정확히 따르지 않으면 페이지에 아무것도 렌더링되지 않는다.

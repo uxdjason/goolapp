@@ -51,7 +51,14 @@ def generate_app(slug: str) -> None:
 
     short_src = seo_meta.get("description", "")
     if len(short_src) > 80:
-        short_src = short_src[:80].rsplit(" ", 1)[0].rstrip(",. ")
+        # 80자 이하에서 첫 번째 문장 끝(. ! ?)을 찾아 거기서 자른다
+        import re as _re
+        m = _re.search(r'[.!?]\s', short_src[:80])
+        if m:
+            short_src = short_src[:m.end()].rstrip()
+        else:
+            # 문장 끝을 못 찾으면 80자 그대로 (차선책)
+            short_src = short_src[:80]
 
     frontmatter = {
         "title": app_meta.get("title", ""),
