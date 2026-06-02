@@ -1,6 +1,6 @@
 ---
 title: 알아두면 쓸모 없는 생일 정보
-slug: useless-birthday-information-calculator
+slug: birthday-information
 description: 생일 정보 계산기로 양력 생일을 입력하면 음력 날짜, 태어난 요일, 띠, 간지, 별자리는 물론 같은 별자리 유명인까지 알아볼
   수 있습니다. 결과를 바로 복사하세요.
 shortDescription: 양력 생일을 입력하면 음력, 띠, 간지, 별자리, 같은 별자리 유명인까지 한 번에 확인할 수 있습니다.
@@ -18,11 +18,11 @@ seo:
   title: 생일 정보 계산기 - 음력, 띠, 별자리, 간지 한눈에 확인
   description: 생일 정보 계산기로 양력 생일을 입력하면 음력 날짜, 태어난 요일, 띠, 간지, 별자리는 물론 같은 별자리 유명인까지 알아볼
     수 있습니다. 결과를 바로 복사하세요.
-  canonicalPath: /useless-birthday-information-calculator/
+  canonicalPath: /birthday-information/
   ogTitle: 생일의 모든 것을 알아보는 생일 정보 계산기
   ogDescription: 양력 생일 하나로 음력 날짜, 요일, 띠, 간지, 별자리 정보와 같은 별자리 유명인 목록까지 한 번에 확인하세요. 계산
     결과를 쉽게 복사할 수 있는 생일 정보 계산기입니다.
-  ogImage: /og/useless-birthday-information-calculator.png
+  ogImage: /og/birthday-information.png
   twitterCard: summary_large_image
   searchTitle: 생일 정보 계산기 - 음력, 띠, 별자리, 간지 한눈에 확인
   searchDescription: 생일 정보 계산기로 양력 생일을 입력하면 음력 날짜, 태어난 요일, 띠, 간지, 별자리는 물론 같은 별자리 유명인까지
@@ -45,9 +45,9 @@ seo:
   robots: index,follow
 ---
 
-## 알아두면 쓸모 없는 생일 정보란?
+## 생일 관련 정보 찾기
 
-**생일 정보 계산기**는 양력 생일 하나만 입력하면 음력 날짜, 태어난 요일, 띠, 간지, 별자리까지 한 번에 보여주는 도구입니다. 이름 그대로 "쓸모 없을 수도 있지만" 알면 왠지 흥미로운 정보들을 깔끔하게 정리해 줍니다. 생일 계산이 이렇게 재미있을 수 있다는 걸 경험해 보세요.
+**생일 관련 정보 찾기**는 양력 생일 하나만 입력하면 음력 날짜, 태어난 요일, 띠, 간지, 별자리까지 한 번에 보여주는 도구입니다. 알면 왠지 흥미로운 정보들을 깔끔하게 정리해 줍니다.
 
 ---
 
@@ -88,7 +88,7 @@ seo:
 
 ## 자주 묻는 질문 (FAQ)
 
-### 생일 정보 계산기는 어떻게 사용하나요?
+### 생일 관련 정보 찾기는 어떻게 사용하나요?
 
 양력 기준 생년월일을 입력하면 됩니다. 입력 즉시 음력 날짜, 태어난 요일, 띠, 간지, 별자리, 같은 별자리 유명인 목록이 한 화면에 표시됩니다. 결과는 복사 버튼으로 바로 가져갈 수 있습니다.
 

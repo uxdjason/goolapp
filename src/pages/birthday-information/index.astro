@@ -1,31 +1,31 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'useless-birthday-information-calculator');
-if (!entry) throw new Error('useless-birthday-information-calculator entry not found');
+const entry = await getEntry("apps", "birthday-information");
+if (!entry) throw new Error("birthday-information entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({
-    title:            app.data.title,
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
     shortDescription: app.data.shortDescription,
-    slug:             app.data.slug,
-    category:         app.data.category,
+    slug: app.data.slug,
+    category: app.data.category,
   }));
 
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({
-      title:            app.data.title,
+    .map((app) => ({
+      title: app.data.title,
       shortDescription: app.data.shortDescription,
-      slug:             app.data.slug,
-      category:         app.data.category,
+      slug: app.data.slug,
+      category: app.data.category,
     }));
 }
 ---
@@ -45,9 +45,13 @@ if (related.length === 0) {
   <Fragment slot="app">
     <div class="app-inner">
       <section id="input-section">
-        <label for="birth-date" class="input-label">양력 생일을 선택해주세요</label>
+        <label for="birth-date" class="input-label"
+          >양력 생일을 선택해주세요</label
+        >
         <input id="birth-date" type="date" lang="ko-KR" />
-        <button id="submit-btn" class="btn btn-primary" disabled>결과 확인</button>
+        <button id="submit-btn" class="btn btn-primary" disabled
+          >결과 확인</button
+        >
       </section>
 
       <section id="result-section" class="hidden">
@@ -81,8 +85,12 @@ if (related.length === 0) {
         </div>
 
         <div class="button-group">
-          <button id="copy-btn" class="btn btn-secondary">📋 결과 복사하기</button>
-          <button id="reset-btn" class="btn btn-outline">🔄 다른 날짜 확인하기</button>
+          <button id="copy-btn" class="btn btn-secondary"
+            >📋 결과 복사하기</button
+          >
+          <button id="reset-btn" class="btn btn-outline"
+            >🔄 다른 날짜 확인하기</button
+          >
         </div>
       </section>
 
@@ -270,58 +278,94 @@ if (related.length === 0) {
 
 <script>
   (function () {
-    const GAN = ['갑', '을', '병', '정', '무', '기', '경', '신', '임', '계'];
-    const JI = ['자', '축', '인', '묘', '진', '사', '오', '미', '신', '유', '술', '해'];
-    const DDI = ['쥐', '소', '호랑이', '토끼', '용', '뱀', '말', '양', '원숭이', '닭', '개', '돼지'];
+    const GAN = ["갑", "을", "병", "정", "무", "기", "경", "신", "임", "계"];
+    const JI = [
+      "자",
+      "축",
+      "인",
+      "묘",
+      "진",
+      "사",
+      "오",
+      "미",
+      "신",
+      "유",
+      "술",
+      "해",
+    ];
+    const DDI = [
+      "쥐",
+      "소",
+      "호랑이",
+      "토끼",
+      "용",
+      "뱀",
+      "말",
+      "양",
+      "원숭이",
+      "닭",
+      "개",
+      "돼지",
+    ];
 
     const HOROSCOPES = [
-      { name: '염소자리', start: '01-01' },
-      { name: '물병자리', start: '01-20' },
-      { name: '물고기자리', start: '02-19' },
-      { name: '양자리', start: '03-21' },
-      { name: '황소자리', start: '04-20' },
-      { name: '쌍둥이자리', start: '05-21' },
-      { name: '게자리', start: '06-22' },
-      { name: '사자자리', start: '07-23' },
-      { name: '처녀자리', start: '08-23' },
-      { name: '천칭자리', start: '09-23' },
-      { name: '전갈자리', start: '10-23' },
-      { name: '사수자리', start: '11-23' },
-      { name: '염소자리', start: '12-22' },
+      { name: "염소자리", start: "01-01" },
+      { name: "물병자리", start: "01-20" },
+      { name: "물고기자리", start: "02-19" },
+      { name: "양자리", start: "03-21" },
+      { name: "황소자리", start: "04-20" },
+      { name: "쌍둥이자리", start: "05-21" },
+      { name: "게자리", start: "06-22" },
+      { name: "사자자리", start: "07-23" },
+      { name: "처녀자리", start: "08-23" },
+      { name: "천칭자리", start: "09-23" },
+      { name: "전갈자리", start: "10-23" },
+      { name: "사수자리", start: "11-23" },
+      { name: "염소자리", start: "12-22" },
     ];
 
     const FAMOUS: Record<string, string[]> = {
-      '염소자리': ['아이유', '엘비스 프레슬리', '김유정', '데이비드 보위'],
-      '물병자리': ['오프라 윈프리', '에디슨', '제니퍼 애니스턴', '강호동'],
-      '물고기자리': ['스티브 잡스', '아인슈타인', '리한나', '박나래'],
-      '양자리': ['빈센트 반 고흐', '레이디 가가', '박보검', '조지프 퓰리처'],
-      '황소자리': ['셰익스피어', '데이비드 베컴', '아델', '안유진'],
-      '쌍둥이자리': ['조니 뎁', '안젤리나 졸리', '메릴린 먼로', '유재석'],
-      '게자리': ['톰 행크스', '엘론 머스크', '톰 크루즈', '설현'],
-      '사자자리': ['오바마', '마돈나', '제니퍼 로페즈', '공유'],
-      '처녀자리': ['비욘세', '키아누 리브스', '마이클 잭슨', '이병헌'],
-      '천칭자리': ['존 레논', '윌 스미스', '킴 카다시안', '현빈'],
-      '전갈자리': ['빌 게이츠', '레오나르도 디카프리오', '케이티 페리', '송중기'],
-      '사수자리': ['브래드 피트', '월트 디즈니', '테일러 스위프트', '강다니엘'],
+      염소자리: ["아이유", "엘비스 프레슬리", "김유정", "데이비드 보위"],
+      물병자리: ["오프라 윈프리", "에디슨", "제니퍼 애니스턴", "강호동"],
+      물고기자리: ["스티브 잡스", "아인슈타인", "리한나", "박나래"],
+      양자리: ["빈센트 반 고흐", "레이디 가가", "박보검", "조지프 퓰리처"],
+      황소자리: ["셰익스피어", "데이비드 베컴", "아델", "안유진"],
+      쌍둥이자리: ["조니 뎁", "안젤리나 졸리", "메릴린 먼로", "유재석"],
+      게자리: ["톰 행크스", "엘론 머스크", "톰 크루즈", "설현"],
+      사자자리: ["오바마", "마돈나", "제니퍼 로페즈", "공유"],
+      처녀자리: ["비욘세", "키아누 리브스", "마이클 잭슨", "이병헌"],
+      천칭자리: ["존 레논", "윌 스미스", "킴 카다시안", "현빈"],
+      전갈자리: ["빌 게이츠", "레오나르도 디카프리오", "케이티 페리", "송중기"],
+      사수자리: ["브래드 피트", "월트 디즈니", "테일러 스위프트", "강다니엘"],
     };
 
-    const DAYS = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    const DAYS = [
+      "일요일",
+      "월요일",
+      "화요일",
+      "수요일",
+      "목요일",
+      "금요일",
+      "토요일",
+    ];
 
-    const dateInput = document.getElementById('birth-date') as HTMLInputElement;
-    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
-    const copyBtn = document.getElementById('copy-btn') as HTMLButtonElement;
-    const resetBtn = document.getElementById('reset-btn') as HTMLButtonElement;
-    const inputSection = document.getElementById('input-section')!;
-    const resultSection = document.getElementById('result-section')!;
-    const toast = document.getElementById('toast')!;
+    const dateInput = document.getElementById("birth-date") as HTMLInputElement;
+    const submitBtn = document.getElementById(
+      "submit-btn",
+    ) as HTMLButtonElement;
+    const copyBtn = document.getElementById("copy-btn") as HTMLButtonElement;
+    const resetBtn = document.getElementById("reset-btn") as HTMLButtonElement;
+    const inputSection = document.getElementById("input-section")!;
+    const resultSection = document.getElementById("result-section")!;
+    const toast = document.getElementById("toast")!;
 
-    const elSummary = document.getElementById('result-date-summary')!;
-    const elDay = document.getElementById('result-day-of-week')!;
-    const elLunar = document.getElementById('result-lunar-date')!;
-    const elDdi = document.getElementById('result-ddi')!;
-    const elGanja = document.getElementById('result-ganja')!;
-    const elHoro = document.getElementById('result-horoscope')!;
-    const elFamous = document.getElementById('result-famous-horoscope')!;
+    const elSummary = document.getElementById("result-date-summary")!;
+    const elDay = document.getElementById("result-day-of-week")!;
+    const elLunar = document.getElementById("result-lunar-date")!;
+    const elDdi = document.getElementById("result-ddi")!;
+    const elGanja = document.getElementById("result-ganja")!;
+    const elHoro = document.getElementById("result-horoscope")!;
+    const elFamous = document.getElementById("result-famous-horoscope")!;
 
     function getDayOfWeek(date: Date) {
       return DAYS[date.getDay()];
@@ -329,17 +373,19 @@ if (related.length === 0) {
 
     function getLunarDate(date: Date) {
       try {
-        const fmt = new Intl.DateTimeFormat('ko-KR-u-ca-chinese', {
-          year: 'numeric', month: 'long', day: 'numeric'
+        const fmt = new Intl.DateTimeFormat("ko-KR-u-ca-chinese", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
         return fmt.format(date);
       } catch {
-        return '계산 불가';
+        return "계산 불가";
       }
     }
 
     function getGanja(year: number) {
-      return GAN[(year + 6) % 10] + JI[(year + 8) % 12] + '년';
+      return GAN[(year + 6) % 10] + JI[(year + 8) % 12] + "년";
     }
 
     function getDdi(year: number) {
@@ -347,19 +393,19 @@ if (related.length === 0) {
     }
 
     function getHoroscope(month: number, day: number): string {
-      const dateStr = `${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-      let result = '염소자리';
+      const dateStr = `${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
+      let result = "염소자리";
       for (const h of HOROSCOPES) {
         if (dateStr >= h.start) result = h.name;
       }
       return result;
     }
 
-    dateInput.addEventListener('change', () => {
+    dateInput.addEventListener("change", () => {
       submitBtn.disabled = !dateInput.value;
     });
 
-    submitBtn.addEventListener('click', () => {
+    submitBtn.addEventListener("click", () => {
       if (!dateInput.value) return;
       const date = new Date(dateInput.value);
       const year = date.getFullYear();
@@ -367,7 +413,7 @@ if (related.length === 0) {
       const day = date.getDate();
 
       elSummary.textContent = `${year}년 ${month}월 ${day}일`;
-      elDay.textContent = getDayOfWeek(date) + '에 태어나셨네요!';
+      elDay.textContent = getDayOfWeek(date) + "에 태어나셨네요!";
       elLunar.textContent = getLunarDate(date);
       elDdi.textContent = getDdi(year);
       elGanja.textContent = getGanja(year);
@@ -375,32 +421,32 @@ if (related.length === 0) {
       const horo = getHoroscope(month, day);
       elHoro.textContent = horo;
 
-      elFamous.innerHTML = '';
+      elFamous.innerHTML = "";
       (FAMOUS[horo] ?? []).forEach((name: string) => {
-        const li = document.createElement('li');
+        const li = document.createElement("li");
         li.textContent = name;
         elFamous.appendChild(li);
       });
 
-      inputSection.classList.add('hidden');
-      resultSection.classList.remove('hidden');
+      inputSection.classList.add("hidden");
+      resultSection.classList.remove("hidden");
     });
 
-    resetBtn.addEventListener('click', () => {
-      dateInput.value = '';
+    resetBtn.addEventListener("click", () => {
+      dateInput.value = "";
       submitBtn.disabled = true;
-      resultSection.classList.add('hidden');
-      inputSection.classList.remove('hidden');
+      resultSection.classList.add("hidden");
+      inputSection.classList.remove("hidden");
     });
 
-    copyBtn.addEventListener('click', async () => {
+    copyBtn.addEventListener("click", async () => {
       const text = `🎂 내 생일 정보\n날짜: ${elSummary.textContent}\n요일: ${elDay.textContent}\n음력: ${elLunar.textContent}\n띠: ${elDdi.textContent}\n간지: ${elGanja.textContent}\n별자리: ${elHoro.textContent}`;
       try {
         await navigator.clipboard.writeText(text);
-        toast.classList.remove('hidden');
-        setTimeout(() => toast.classList.add('hidden'), 2000);
+        toast.classList.remove("hidden");
+        setTimeout(() => toast.classList.add("hidden"), 2000);
       } catch {
-        alert('복사에 실패했습니다.');
+        alert("복사에 실패했습니다.");
       }
     });
   })();
