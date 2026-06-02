@@ -10,7 +10,7 @@ sys.path.insert(0, str(root_dir))
 from scripts import legacy_extractor, seo_meta_generator, longform_writer, blog_writer, app_generator
 import scripts.lib.ai_client as ai_client
 
-COMPLETED_APPS = ["timer-app", "deposit-savings-calculator", "due-date-calculator", "birthday-information", "simple-memo"]
+COMPLETED_APPS = ["timer-app", "deposit-savings-calculator", "due-date-calculator", "birthday-information", "simple-memo", "qr-code-generator"]
 
 def judge_app(slug: str):
     print(f"[*] 자체 검수 진행 중: {slug}...")
