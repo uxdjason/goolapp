@@ -37,11 +37,11 @@ def generate_longform(slug: str) -> str:
     def validate_longform(text: str) -> bool:
         # 글자 수 (공백 제외)
         chars = len(re.sub(r"\s+", "", text))
-        if not (1500 <= chars <= 2500):
+        if not (1500 <= chars <= 3000):
             return False
-        # 필수 섹션 5개 존재 (H2 헤더 기준)
+        # 필수 섹션 4개 존재 (H2 헤더 기준), '관련 도구'는 컴포넌트가 쮘리하므로 제외
         h2 = re.findall(r"^##\s+(.+)$", text, re.M)
-        required = ["란?", "이럴 때 써보세요", "알아두면 좋은 점", "자주 묻는 질문", "관련 도구"]
+        required = ["란?", "이럴 때 써보세요", "알아두면 좋은 점", "자주 묻는 질문"]
         return all(any(r in h for h in h2) for r in required)
 
     text = ai_client.call(

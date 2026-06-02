@@ -49,11 +49,15 @@ def generate_app(slug: str) -> None:
     if cat not in ["calculator", "quiz", "datetime", "tool", "fun", "finance"]:
         cat = "tool"
 
+    short_src = seo_meta.get("description", "")
+    if len(short_src) > 80:
+        short_src = short_src[:80].rsplit(" ", 1)[0].rstrip(",. ")
+
     frontmatter = {
         "title": app_meta.get("title", ""),
         "slug": slug,
         "description": seo_meta.get("description", ""),
-        "shortDescription": seo_meta.get("ogDescription", seo_meta.get("description", "")),
+        "shortDescription": short_src,
         "category": cat,
         "primaryKeyword": seo_meta.get("primaryKeyword", ""),
         "secondaryKeywords": list(seo_meta.get("secondaryKeywords", [])),
@@ -88,6 +92,7 @@ def generate_app(slug: str) -> None:
     {json.dumps(parsed.get('interactive', {}), ensure_ascii=False, indent=2)}
     
     위 데이터를 기반으로 `src/pages/{slug}/index.astro` 파일을 작성해줘.
+    slug는 정확히 "{slug}" 이므로, frontmatter의 getEntry 호출에서 반드시 getEntry('apps', '{slug}')를 사용해야 해.
     Astro 소스코드만 출력해.
     """
 
