@@ -327,3 +327,76 @@ const description = "양력 생일을 입력하면 음력 날짜, 요일, 띠, �
         return '계산 불가';
       }
     }
+
+    function getGanja(year: number) {
+      return GAN[(year + 6) % 10] + JI[(year + 8) % 12] + '년';
+    }
+
+    function getDdi(year: number) {
+      return DDI[(year + 8) % 12];
+    }
+
+    function getHoroscope(month: number, day: number) {
+      const dateStr = `${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+      for (let i = HOROSCOPES.length - 1; i >= 0; i--) {
+        if (dateStr >= HOROSCOPES[i].start || i === 0) {
+          return HOROSCOPES[i].name;
+        }
+      }
+      return '염소자리';
+    }
+
+    dateInput.addEventListener('change', () => {
+      submitBtn.disabled = !dateInput.value;
+    });
+
+    submitBtn.addEventListener('click', () => {
+      if (!dateInput.value) return;
+      
+      const date = new Date(dateInput.value);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      
+      elSummary.textContent = `${year}년 ${month}월 ${day}일 생일 정보`;
+      elDay.textContent = getDayOfWeek(date) + '에 태어나셨네요!';
+      
+      elLunar.textContent = getLunarDate(date);
+      elDdi.textContent = getDdi(year);
+      elGanja.textContent = getGanja(year);
+      
+      const horo = getHoroscope(month, day);
+      elHoro.textContent = horo;
+      
+      elFamous.innerHTML = '';
+      if (FAMOUS_HOROSCOPE[horo]) {
+        FAMOUS_HOROSCOPE[horo].forEach((name: string) => {
+          const li = document.createElement('li');
+          li.textContent = name;
+          elFamous.appendChild(li);
+        });
+      }
+      
+      inputSection.classList.add('hidden');
+      resultSection.classList.remove('hidden');
+    });
+
+    resetBtn.addEventListener('click', () => {
+      dateInput.value = '';
+      submitBtn.disabled = true;
+      resultSection.classList.add('hidden');
+      inputSection.classList.remove('hidden');
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      const textToCopy = `🎂 내 생일 정보\n양력: ${elSummary.textContent}\n요일: ${elDay.textContent}\n음력: ${elLunar.textContent}\n띠: ${elDdi.textContent}\n간지: ${elGanja.textContent}\n별자리: ${elHoro.textContent}`;
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 2000);
+      } catch (err) {
+        alert('복사에 실패했습니다.');
+      }
+    });
+  })();
+</script>
