@@ -264,7 +264,7 @@ if (related.length === 0) {
     color: var(--color-on-primary);
   }
   .btn-primary:hover {
-    background: var(--color-primary-dark);
+    filter: brightness(0.9);
   }
 
   .btn-secondary {
@@ -482,7 +482,7 @@ if (related.length === 0) {
       cdTotalSeconds = 0;
       updateCdDisplay();
       
-      cdInputs.style.display = 'flex';
+      cdInputs.style.display = 'block';
       cdStartBtn.style.display = 'block';
       cdStartBtn.textContent = '시작';
       cdStopBtn.style.display = 'none';
@@ -572,6 +572,13 @@ if (related.length === 0) {
       swStopBtn.style.display = 'none';
       swResetBtn.style.display = 'block';
       swLapBtn.style.display = 'none';
+    });
+
+    // Auto-select input text on focus
+    [cdH, cdM, cdS].forEach(input => {
+      input.addEventListener('focus', function() {
+        this.select();
+      });
     });
 
     // Initialization
