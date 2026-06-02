@@ -53,7 +53,7 @@ def generate_app(slug: str) -> None:
         "title": app_meta.get("title", ""),
         "slug": slug,
         "description": seo_meta.get("description", ""),
-        "shortDescription": app_meta.get("shortDescription", seo_meta.get("description", "")[:80]),
+        "shortDescription": seo_meta.get("ogDescription", seo_meta.get("description", "")),
         "category": cat,
         "primaryKeyword": seo_meta.get("primaryKeyword", ""),
         "secondaryKeywords": list(seo_meta.get("secondaryKeywords", [])),

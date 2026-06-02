@@ -1,10 +1,33 @@
 ---
-import { getEntry, render } from 'astro:content';
+import { getEntry, render, getCollection } from 'astro:content';
 import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
 
 const entry = await getEntry('apps', 'useless-birthday-information-calculator');
 if (!entry) throw new Error('useless-birthday-information-calculator entry not found');
 const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({
+    title:            app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug:             app.data.slug,
+    category:         app.data.category,
+  }));
+
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({
+      title:            app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug:             app.data.slug,
+      category:         app.data.category,
+    }));
+}
 ---
 
 <AppLayout
@@ -69,6 +92,7 @@ const { Content } = await render(entry);
 
   <Fragment slot="longform">
     <Content />
+    <RelatedApps apps={related} />
   </Fragment>
 </AppLayout>
 
