@@ -1,324 +1,312 @@
 ---
 import AppLayout from '../../layouts/AppLayout.astro';
 
-const title = '알아두면 쓸모 없는 생일 정보';
-const description = '양력 생일을 입력하면 요일, 음력 날짜, 띠, 간지, 별자리, 같은 별자리 유명인까지 한 번에 확인할 수 있습니다.';
+const title = "알아두면 쓸모 없는 생일 정보";
+const description = "양력 생일을 입력하면 요일, 음력 날짜, 띠, 간지, 별자리, 같은 별자리 유명인 정보를 알려드립니다.";
+
+const GAN = ['갑', '을', '병', '정', '무', '기', '경', '신', '임', '계'];
+const JI = ['자', '축', '인', '묘', '진', '사', '오', '미', '신', '유', '술', '해'];
+const DDI = ['쥐', '소', '호랑이', '토끼', '용', '뱀', '말', '양', '원숭이', '닭', '개', '돼지'];
+const WEEKDAYS = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+
+const HOROSCOPES = [
+  { name: '염소자리', start: '01-01' },
+  { name: '물병자리', start: '01-20' },
+  { name: '물고기자리', start: '02-19' },
+  { name: '양자리', start: '03-21' },
+  { name: '황소자리', start: '04-20' },
+  { name: '쌍둥이자리', start: '05-21' },
+  { name: '게자리', start: '06-22' },
+  { name: '사자자리', start: '07-23' },
+  { name: '처녀자리', start: '08-23' },
+  { name: '천칭자리', start: '09-23' },
+  { name: '전갈자리', start: '10-23' },
+  { name: '사수자리', start: '11-23' },
+  { name: '염소자리', start: '12-22' }
+];
+
+const FAMOUS_HOROSCOPE: Record<string, string[]> = {
+  '염소자리': ['김연아', '아이유', '박지성', '엘비스 프레슬리', '미셸 오바마'],
+  '물병자리': ['오프라 윈프리', '제니퍼 애니스턴, ', '에드 시런', '크리스티아누 호날두', '엠마 로버츠'],
+  '물고기자리': ['저스틴 비버', '리한나', '다니엘 크레이그', '스티브 잡스', '아인슈타인'],
+  '양자리': ['레이디 가가', '엠마 왓슨', '로버트 다우니 주니어', '머라이어 캐리', '빈센트 반 고흐'],
+  '황소자리': ['데이비드 베컴', '아델', '드웨인 존슨', '윌리엄 셰익스피어', '오드리 햅번'],
+  '쌍둥이자리': ['안젤리나 졸리', '조니 뎁', '카니예 웨스트', '마릴린 먼로', '존 F. 케네디'],
+  '게자리': ['톰 행크스', '다이애나 비', '아리아나 그란데', '엘론 머스크', '메릴 스트립'],
+  '사자자리': ['바락 오바마', '마돈나', '제니퍼 로페즈', '나폴레옹', '코코 샤넬'],
+  '처녀자리': ['비욘세', '키아누 리브스', '카메론 디아즈', '마더 테레사', '프레디 머큐리'],
+  '천칭자리': ['윌 스미스', '킴 카다시안', '존 레논', '간디', '귀네스 팰트로'],
+  '전갈자리': ['빌 게이츠', '레오나르도 디카프리오', '케이티 페리', '파블로 피카소', '앤 해서웨이'],
+  '사수자리': ['브래드 피트', '브리트니 스피어스', '월트 디즈니', '테일러 스위프트', '제이지']
+};
 ---
 
 <AppLayout title={title} description={description}>
-  <div class="birthday-app">
+  <div class="app-container">
     <header class="app-header">
       <h1>🎂 알아두면 쓸모 없는 생일 정보</h1>
-      <p class="subtitle">양력 생일을 입력하면 요일, 음력, 띠, 간지, 별자리, 같은 별자리 유명인까지 알려드립니다.</p>
+      <p class="subtitle">생일에 숨겨진 흥미로운 정보를 확인해보세요</p>
     </header>
 
     <section id="input-section" class="card">
-      <label for="birth-date" class="label">양력 생일</label>
-      <input id="birth-date" lang="ko-KR" type="date" class="date-input" />
-      <button id="submit-btn" class="btn btn-primary" disabled>결과 확인</button>
+      <label for="birth-date" class="input-label">양력 생일을 선택하세요</label>
+      <input id="birth-date" type="date" lang="ko-KR" />
+      <button id="submit-btn" class="primary-btn" disabled>결과 확인</button>
     </section>
 
-    <section id="results-section" class="card hidden">
-      <h2 class="result-title">🎉 당신의 생일 정보</h2>
-
-      <div class="result-grid">
-        <div class="result-item">
-          <span class="result-label">태어난 요일</span>
-          <span class="result-value" id="result-day"></span>
-        </div>
-        <div class="result-item">
-          <span class="result-label">음력 생일</span>
-          <span class="result-value" id="result-lunar"></span>
-        </div>
-        <div class="result-item">
-          <span class="result-label">띠</span>
-          <span class="result-value" id="result-ddi"></span>
-        </div>
-        <div class="result-item">
-          <span class="result-label">간지</span>
-          <span class="result-value" id="result-ganji"></span>
-        </div>
-        <div class="result-item full">
-          <span class="result-label">별자리</span>
-          <span class="result-value" id="result-horoscope"></span>
-        </div>
-        <div class="result-item full">
-          <span class="result-label">같은 별자리 유명인</span>
-          <span class="result-value" id="result-famous"></span>
+    <section id="result-section" class="hidden">
+      <div class="card result-card">
+        <h2>🎉 생일 정보</h2>
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="label">📅 양력</span>
+            <span class="value" id="result-solar">-</span>
+          </div>
+          <div class="result-item">
+            <span class="label">🗓️ 요일</span>
+            <span class="value" id="result-weekday">-</span>
+          </div>
+          <div class="result-item">
+            <span class="label">🌙 음력</span>
+            <span class="value" id="result-lunar">-</span>
+          </div>
+          <div class="result-item">
+            <span class="label">🐾 띠</span>
+            <span class="value" id="result-ddi">-</span>
+          </div>
+          <div class="result-item">
+            <span class="label">📜 간지</span>
+            <span class="value" id="result-ganji">-</span>
+          </div>
+          <div class="result-item">
+            <span class="label">⭐ 별자리</span>
+            <span class="value" id="result-horoscope">-</span>
+          </div>
         </div>
       </div>
 
-      <div class="btn-row">
-        <button id="copy-btn" class="btn btn-secondary">📋 결과 복사하기</button>
-        <button id="reset-btn" class="btn btn-outline">🔄 다른 날짜 확인하기</button>
+      <div class="card famous-card">
+        <h2>🌟 같은 별자리 유명인</h2>
+        <ul id="famous-list" class="famous-list"></ul>
+      </div>
+
+      <div class="button-row">
+        <button id="copy-btn" class="secondary-btn">📋 결과 복사하기</button>
+        <button id="reset-btn" class="tertiary-btn">🔄 다른 날짜 확인하기</button>
       </div>
     </section>
 
-    <div id="toast" class="toast">클립보드에 복사되었습니다!</div>
+    <div id="toast" class="toast hidden">클립보드에 복사되었습니다!</div>
   </div>
-</AppLayout>
 
-<style>
-  .birthday-app {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 1.25rem;
-  }
+  <style>
+    .app-container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem;
+    }
 
-  .app-header {
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
+    .app-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
 
-  .app-header h1 {
-    font-size: 1.6rem;
-    margin: 0 0 0.5rem;
-    color: var(--color-text);
-  }
+    .app-header h1 {
+      font-size: 1.6rem;
+      margin: 0 0 0.5rem 0;
+      color: var(--color-text);
+    }
 
-  .subtitle {
-    font-size: 0.95rem;
-    color: var(--color-text-muted, #666);
-    margin: 0;
-    line-height: 1.5;
-  }
+    .subtitle {
+      color: var(--color-text-secondary);
+      margin: 0;
+      font-size: 0.95rem;
+    }
 
-  .card {
-    background: var(--color-surface, #fff);
-    border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  }
+    .card {
+      background: var(--color-surface);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border);
+    }
 
-  .hidden {
-    display: none !important;
-  }
+    .input-label {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
 
-  .label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: var(--color-text);
-  }
+    #birth-date {
+      width: 100%;
+      padding: 0.85rem;
+      font-size: 1rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      background: var(--color-background);
+      color: var(--color-text);
+      box-sizing: border-box;
+      margin-bottom: 1rem;
+    }
 
-  .date-input {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    border: 1px solid var(--color-border, #d1d5db);
-    border-radius: 8px;
-    background: var(--color-bg, #fff);
-    color: var(--color-text);
-    box-sizing: border-box;
-    margin-bottom: 1rem;
-  }
+    #birth-date:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
 
-  .date-input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
-  }
+    .primary-btn {
+      width: 100%;
+      padding: 0.9rem;
+      font-size: 1rem;
+      font-weight: 600;
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
 
-  .btn {
-    display: inline-block;
-    padding: 0.75rem 1.25rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    width: 100%;
-  }
+    .primary-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
 
-  .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+    .primary-btn:not(:disabled):hover {
+      opacity: 0.9;
+    }
 
-  .btn-primary {
-    background: var(--color-primary);
-    color: var(--color-on-primary, #fff);
-  }
+    .result-card h2,
+    .famous-card h2 {
+      font-size: 1.15rem;
+      margin: 0 0 1rem 0;
+      color: var(--color-text);
+    }
 
-  .btn-primary:hover:not(:disabled) {
-    opacity: 0.9;
-  }
-
-  .btn-secondary {
-    background: var(--color-secondary, var(--color-primary));
-    color: var(--color-on-primary, #fff);
-  }
-
-  .btn-outline {
-    background: transparent;
-    color: var(--color-text);
-    border: 1px solid var(--color-border, #d1d5db);
-  }
-
-  .btn-outline:hover {
-    background: var(--color-bg-muted, #f3f4f6);
-  }
-
-  .result-title {
-    text-align: center;
-    font-size: 1.25rem;
-    margin: 0 0 1.25rem;
-    color: var(--color-text);
-  }
-
-  .result-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .result-item {
-    display: flex;
-    flex-direction: column;
-    padding: 0.85rem 1rem;
-    background: var(--color-bg-muted, #f9fafb);
-    border-radius: 8px;
-    border: 1px solid var(--color-border, #e5e7eb);
-  }
-
-  .result-item.full {
-    grid-column: 1 / -1;
-  }
-
-  .result-label {
-    font-size: 0.8rem;
-    color: var(--color-text-muted, #666);
-    margin-bottom: 0.35rem;
-  }
-
-  .result-value {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--color-text);
-    line-height: 1.5;
-    word-break: keep-all;
-  }
-
-  .btn-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-  }
-
-  .toast {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    padding: 0.75rem 1.25rem;
-    border-radius: 999px;
-    font-size: 0.9rem;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease;
-    z-index: 9999;
-  }
-
-  .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  @media (max-width: 480px) {
     .result-grid {
+      display: grid;
       grid-template-columns: 1fr;
-    }
-  }
-</style>
-
-<script is:inline>
-  (function () {
-    const GAN = ['갑', '을', '병', '정', '무', '기', '경', '신', '임', '계'];
-    const JI = ['자', '축', '인', '묘', '진', '사', '오', '미', '신', '유', '술', '해'];
-    const DDI = ['쥐', '소', '호랑이', '토끼', '용', '뱀', '말', '양', '원숭이', '닭', '개', '돼지'];
-    const DAYS = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-
-    const HOROSCOPES = [
-      { name: '염소자리', start: '01-01' },
-      { name: '물병자리', start: '01-20' },
-      { name: '물고기자리', start: '02-19' },
-      { name: '양자리', start: '03-21' },
-      { name: '황소자리', start: '04-20' },
-      { name: '쌍둥이자리', start: '05-21' },
-      { name: '게자리', start: '06-22' },
-      { name: '사자자리', start: '07-23' },
-      { name: '처녀자리', start: '08-23' },
-      { name: '천칭자리', start: '09-23' },
-      { name: '전갈자리', start: '10-24' },
-      { name: '사수자리', start: '11-23' },
-      { name: '염소자리', start: '12-22' },
-    ];
-
-    const FAMOUS_HOROSCOPE = {
-      염소자리: ['김연아', '이병헌', '아이유'],
-      물병자리: ['오프라 윈프리', '제니퍼 애니스턴', '엘리샤 키스'],
-      물고기자리: ['스티브 잡스', '리한나', '저스틴 비버'],
-      양자리: ['레이디 가가', '엠마 왓슨', '로버트 다우니 주니어'],
-      황소자리: ['데이비드 베컴', '마크 저커버그', '아델'],
-      쌍둥이자리: ['안젤리나 졸리', '조니 뎁', '도널드 트럼프'],
-      게자리: ['톰 크루즈', '메릴 스트립', '셀레나 고메즈'],
-      사자자리: ['바락 오바마', '마돈나', '제니퍼 로페즈'],
-      처녀자리: ['마이클 잭슨', '비욘세', '키아누 리브스'],
-      천칭자리: ['김희철', '윌 스미스', '귀네스 팰트로'],
-      전갈자리: ['빌 게이츠', '레오나르도 디카프리오', '케이티 페리'],
-      사수자리: ['브래드 피트', '테일러 스위프트', '월트 디즈니'],
-    };
-
-    const dateInput = document.getElementById('birth-date');
-    const submitBtn = document.getElementById('submit-btn');
-    const resetBtn = document.getElementById('reset-btn');
-    const copyBtn = document.getElementById('copy-btn');
-    const inputSection = document.getElementById('input-section');
-    const resultsSection = document.getElementById('results-section');
-    const toast = document.getElementById('toast');
-
-    const elDay = document.getElementById('result-day');
-    const elLunar = document.getElementById('result-lunar');
-    const elDdi = document.getElementById('result-ddi');
-    const elGanji = document.getElementById('result-ganji');
-    const elHoroscope = document.getElementById('result-horoscope');
-    const elFamous = document.getElementById('result-famous');
-
-    function getDayOfWeek(date) {
-      return DAYS[date.getDay()];
+      gap: 0.75rem;
     }
 
-    function getLunarDate(date) {
-      try {
-        const fmt = new Intl.DateTimeFormat('ko-KR-u-ca-chinese', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        });
-        return fmt.format(date);
-      } catch (e) {
-        return '계산 불가';
+    @media (min-width: 480px) {
+      .result-grid {
+        grid-template-columns: 1fr 1fr;
       }
     }
 
-    function getGanjaAndDdi(year) {
-      const baseYear = 1984; // 갑자년
-      const yearDiff = year - baseYear;
-      const ganIdx = ((yearDiff % 10) + 10) % 10;
-      const jiIdx = ((yearDiff % 12) + 12) % 12;
-      return {
-        ganji: GAN[ganIdx] + JI[jiIdx] + '년',
-        ddi: DDI[jiIdx] + '띠',
-      };
+    .result-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 0.85rem;
+      background: var(--color-background);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--color-border);
     }
 
-    function getHoroscope(month, day) {
-      const mm = String(month).padStart(2, '0');
-      const dd = String(day).padStart(2, '0');
-      const dateSt
+    .result-item .label {
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+    }
+
+    .result-item .value {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .famous-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .famous-list li {
+      background: var(--color-background);
+      padding: 0.4rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .secondary-btn,
+    .tertiary-btn {
+      flex: 1;
+      min-width: 140px;
+      padding: 0.85rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: opacity 0.2s;
+      border: 1px solid var(--color-border);
+    }
+
+    .secondary-btn {
+      background: var(--color-primary);
+      color: #fff;
+      border-color: var(--color-primary);
+    }
+
+    .tertiary-btn {
+      background: var(--color-surface);
+      color: var(--color-text);
+    }
+
+    .secondary-btn:hover,
+    .tertiary-btn:hover {
+      opacity: 0.85;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-text);
+      color: var(--color-surface);
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--border-radius);
+      font-size: 0.9rem;
+      box-shadow: var(--shadow-md);
+      z-index: 1000;
+    }
+  </style>
+
+  <script define:vars={{ GAN, JI, DDI, WEEKDAYS, HOROSCOPES, FAMOUS_HOROSCOPE }}>
+    (function () {
+      const dateInput = document.getElementById('birth-date');
+      const submitBtn = document.getElementById('submit-btn');
+      const inputSection = document.getElementById('input-section');
+      const resultSection = document.getElementById('result-section');
+      const copyBtn = document.getElementById('copy-btn');
+      const resetBtn = document.getElementById('reset-btn');
+      const toast = document.getElementById('toast');
+
+      const resultSolar = document.getElementById('result-solar');
+      const resultWeekday = document.getElementById('result-weekday');
+      const resultLunar = document.getElementById('result-lunar');
+      const resultDdi = document.getElementById('result-ddi');
+      const resultGanji = document.getElementById('result-ganji');
+      const resultHoroscope = document.getElementById('result-horoscope');
+      const famousList = document.getElementById('famous-list');
+
+      dateInput.addEventListener

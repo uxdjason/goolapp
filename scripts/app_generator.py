@@ -31,21 +31,37 @@ def generate_app(slug: str) -> None:
     analysis = app_data.get("analysis", {})
 
     # 2. Markdown 콘텐츠 파일 생성 (Frontmatter + 본문)
+    import yaml
+    
+    class NoAliasDumper(yaml.SafeDumper):
+        def ignore_aliases(self, data):
+            return True
+
+    cat_raw = app_meta.get("category", "tool").split(",")[0].strip()
+    cat_map = {
+        "엔터테인먼트": "fun",
+        "학습 및 퀴즈": "quiz",
+        "재무 및 금융": "finance",
+        "날짜 및 시간": "datetime",
+        "계산기": "calculator"
+    }
+    cat = cat_map.get(cat_raw, cat_raw)
+    if cat not in ["calculator", "quiz", "datetime", "tool", "fun", "finance"]:
+        cat = "tool"
+
     frontmatter = {
         "title": app_meta.get("title", ""),
         "slug": slug,
         "description": seo_meta.get("description", ""),
         "shortDescription": app_meta.get("shortDescription", seo_meta.get("description", "")[:80]),
-        "category": app_meta.get("category", "tool").split(",")[0].strip() if app_meta.get("category") else "tool",
+        "category": cat,
         "primaryKeyword": seo_meta.get("primaryKeyword", ""),
-        "secondaryKeywords": seo_meta.get("secondaryKeywords", []),
-        "publishedAt": datetime.datetime.utcnow().isoformat() + "Z",
+        "secondaryKeywords": list(seo_meta.get("secondaryKeywords", [])),
+        "publishedAt": datetime.datetime.utcnow().date(),
         "seo": seo_meta
     }
     
-    # YAML 형식으로 직렬화하기 위해 pyyaml 사용
-    import yaml
-    yaml_str = yaml.dump(frontmatter, allow_unicode=True, default_flow_style=False, sort_keys=False)
+    yaml_str = yaml.dump(frontmatter, Dumper=NoAliasDumper, allow_unicode=True, default_flow_style=False, sort_keys=False)
     
     md_content = f"---\n{yaml_str}---\n\n{longform}"
     

@@ -67,7 +67,7 @@ def judge_app(slug: str):
     except Exception as e:
         print(f"[-] 검수 중 오류 발생: {e}")
 
-def run_bulk():
+def run_bulk(app_slug=None):
     inventory_path = pathlib.Path("references/apps-inventory.yaml")
     data = yaml.safe_load(inventory_path.read_text(encoding="utf-8"))
     
@@ -75,7 +75,12 @@ def run_bulk():
     
     pending_apps = [app for app in apps if app.get("slug") not in COMPLETED_APPS]
     
-    print(f"총 {len(pending_apps)}개의 앱 대량 마이그레이션을 시작합니다.")
+    if app_slug:
+        pending_apps = [app for app in pending_apps if app.get("slug") == app_slug]
+    else:
+        pending_apps.reverse() # 옛날 것부터 역순으로 마이그레이션
+    
+    print(f"총 {len(pending_apps)}개의 앱 마이그레이션을 시작합니다.")
     
     for i, app in enumerate(pending_apps):
         slug = app.get("slug")
@@ -124,7 +129,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1].startswith("--app="):
         app_slug = sys.argv[1].split("=")[1]
         print(f"단일 앱 마이그레이션 모드: {app_slug}")
-        # 임시로 pending_apps 리스트 대신 하나만 실행할 수 있지만
-        # 여기서는 바로 bulk 실행 로직 안에서 처리하도록 하거나 개별 래퍼 사용 가능
+        run_bulk(app_slug)
     else:
         run_bulk()
