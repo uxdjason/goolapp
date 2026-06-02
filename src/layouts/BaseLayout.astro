@@ -9,9 +9,47 @@ interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  ogType?: 'website' | 'article';
+  ogTitle?: string;
+  ogDescription?: string;
   canonicalUrl?: string;
+  keywords?: string[];
+  publishedAt?: Date;
+  updatedAt?: Date;
+  /** 페이지별 추가 JSON-LD (직렬화된 JSON 문자열) */
+  jsonLd?: string;
 }
-const { title, description, ogImage, canonicalUrl } = Astro.props;
+const {
+  title,
+  description,
+  ogImage,
+  ogType,
+  ogTitle,
+  ogDescription,
+  canonicalUrl,
+  keywords,
+  publishedAt,
+  updatedAt,
+  jsonLd,
+} = Astro.props;
+
+// WebSite JSON-LD (모든 페이지 공통)
+const websiteJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'GoolAPP',
+  url: 'https://goolapp.com',
+  description: 'GoolAPP — 계산기, 날짜/시간 도구, 퀴즈 등 일상에서 바로 꺼내 쓸 수 있는 무료 웹앱 컬렉션',
+  inLanguage: 'ko-KR',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: 'https://goolapp.com/?q={search_term_string}',
+    },
+    'query-input': 'required name=search_term_string',
+  },
+});
 
 // AdSense는 (1) 환경변수 enable 플래그가 켜져 있고 (2) client ID가 있을 때만 출력.
 // 도메인 이전 전까지는 PUBLIC_ADSENSE_ENABLED=false 로 두어 ad request 자체를 회피한다.
@@ -30,8 +68,25 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content={robotsContent} />
+    {/* 브라우저 UI 색상 (Chrome Android, Safari) */}
+    <meta name="theme-color" content="#8B4F32" />
+    {/* 파비콘 & 홈 화면 아이콘 */}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <Seo title={title} description={description} ogImage={ogImage} canonicalUrl={canonicalUrl} />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <Seo
+      title={title}
+      description={description}
+      ogImage={ogImage}
+      ogType={ogType}
+      ogTitle={ogTitle}
+      ogDescription={ogDescription}
+      canonicalUrl={canonicalUrl}
+      keywords={keywords}
+      publishedAt={publishedAt}
+      updatedAt={updatedAt}
+      jsonLd={jsonLd ?? websiteJsonLd}
+    />
     {showAdsense && (
       <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`} crossorigin="anonymous"></script>
     )}

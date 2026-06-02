@@ -8,8 +8,26 @@ interface Props {
   shortDescription: string;
   category?: string;
   keywords?: string[];
+  ogImage?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  canonicalUrl?: string;
+  publishedAt?: Date;
+  updatedAt?: Date;
 }
-const { title, description, shortDescription, category, keywords = [] } = Astro.props;
+const {
+  title,
+  description,
+  shortDescription,
+  category,
+  keywords = [],
+  ogImage,
+  ogTitle,
+  ogDescription,
+  canonicalUrl,
+  publishedAt,
+  updatedAt,
+} = Astro.props;
 
 const categoryLabels: Record<string, string> = {
   calculator: '각종 계산기',
@@ -23,8 +41,47 @@ const catLabel = category ? (categoryLabels[category] ?? category) : '';
 
 // Ensure slug is always available even for explicitly created pages (not dynamic [slug].astro)
 const currentSlug = Astro.url.pathname.replace(/^\/|\/$/g, '').split('/').pop();
+
+// SoftwareApplication JSON-LD (Google Rich Results 지원)
+const appCategory = category ? (categoryLabels[category] ?? category) : '유틸리티';
+const canonicalHref = canonicalUrl || `https://goolapp.com/${currentSlug}/`;
+const appJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: title,
+  description: description,
+  applicationCategory: 'WebApplication',
+  operatingSystem: 'Any',
+  url: canonicalHref,
+  inLanguage: 'ko-KR',
+  isAccessibleForFree: true,
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'KRW',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'GoolAPP',
+    url: 'https://goolapp.com',
+  },
+  ...(publishedAt && { datePublished: publishedAt.toISOString() }),
+  ...(updatedAt && { dateModified: updatedAt.toISOString() }),
+});
 ---
-<BaseLayout title={`${title} | GoolAPP`} description={description}>
+<BaseLayout
+  title={`${title} | GoolAPP`}
+  description={description}
+  ogType="article"
+  ogImage={ogImage}
+  ogTitle={ogTitle}
+  ogDescription={ogDescription}
+  canonicalUrl={canonicalUrl || `https://goolapp.com/${currentSlug}/`}
+  keywords={keywords}
+  publishedAt={publishedAt}
+  updatedAt={updatedAt}
+  jsonLd={appJsonLd}
+>
   <article class="app-page">
     <div class="container">
 

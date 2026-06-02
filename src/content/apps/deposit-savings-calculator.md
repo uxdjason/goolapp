@@ -14,7 +14,7 @@ seo:
   canonicalPath: "/deposit-savings-calculator/"
   ogTitle: "예적금 이자 계산기 - 세후 이자율 한눈에"
   ogDescription: "적금 예금 가입 전 필수! 이자소득세 15.4%를 공제한 세후 만기 수령액과 단리 복리 차이를 즉각적으로 계산해 드립니다. 원금, 납입 개월 수, 이자율만 입력하면 가장 정확한 결과를 1초 만에 확인하실 수 있습니다."
-  ogImage: "/og/deposit-savings-calculator.png"
+  ogImage: "/og/GoolAPP-deposit-savings-calculator.webp"
   twitterCard: "summary_large_image"
   searchTitle: "예적금 이자 계산기 - 단리 복리 세후 실수령액 한눈에 확인"
   searchDescription: "정기예금과 정기적금의 단리, 복리 이자를 세전/세후 기준으로 정확하게 계산해주는 무료 계산기입니다. 원금, 월납입금, 이자율, 개월 수를 입력하여 수령액을 즉시 확인해보세요."

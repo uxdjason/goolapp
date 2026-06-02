@@ -1,37 +1,102 @@
 ---
-import { SEO } from 'astro-seo';
+/**
+ * Seo.astro — GoolAPP 공통 SEO/OG/Twitter 메타 컴포넌트
+ *
+ * 적용 기준:
+ *  - Open Graph 1.0 spec (ogp.me)
+ *  - Twitter Card spec
+ *  - Google Search Console 권장사항
+ *  - OG Debugger (Facebook / LinkedIn / Twitter) pass 기준
+ *
+ * 주의: ogImage는 반드시 절대 URL이어야 합니다 (OG spec 필수).
+ * ogImage prop이 상대 경로로 들어오면 이 컴포넌트가 절대 URL로 변환합니다.
+ */
 
 interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  ogType?: 'website' | 'article';
+  ogTitle?: string;
+  ogDescription?: string;
   canonicalUrl?: string;
+  twitterCard?: 'summary' | 'summary_large_image';
+  keywords?: string[];
+  publishedAt?: Date;
+  updatedAt?: Date;
+  /** JSON-LD structured data (직렬화된 JSON 문자열) */
+  jsonLd?: string;
 }
-const { title, description, ogImage = '/og/default.png', canonicalUrl } = Astro.props;
+
+const {
+  title,
+  description,
+  ogImage = '/og/default.webp',
+  ogType = 'website',
+  ogTitle,
+  ogDescription,
+  canonicalUrl,
+  twitterCard = 'summary_large_image',
+  keywords = [],
+  publishedAt,
+  updatedAt,
+  jsonLd,
+} = Astro.props;
 
 // 기본 사이트 정보
-const siteName = 'GoolAPP';
-const fullUrl = canonicalUrl || Astro.url.href;
+const SITE_NAME = 'GoolAPP';
+const SITE_ORIGIN = 'https://goolapp.com'; // astro.config.mjs site와 동일하게 유지
+
+// Canonical URL — 전달된 값 우선, 없으면 현재 요청 URL
+const canonical = canonicalUrl || Astro.url.href;
+
+// OG 이미지 절대 URL 보장 (OG 스펙: 반드시 절대 URL)
+const ogImageAbsolute = ogImage.startsWith('http')
+  ? ogImage
+  : `${SITE_ORIGIN}${ogImage}`;
+
+// OG title / description — 별도 제공 시 우선, 없으면 기본값 사용
+const resolvedOgTitle = ogTitle || title;
+const resolvedOgDescription = ogDescription || description;
+
+// Twitter image alt — OG 이미지 경로에서 추출하거나 사이트 이름 사용
+const twitterImageAlt = `${resolvedOgTitle} - ${SITE_NAME}`;
 ---
-<SEO
-  title={title}
-  description={description}
-  canonical={fullUrl}
-  openGraph={{
-    basic: {
-      title,
-      type: 'website',
-      image: ogImage,
-    },
-    optional: {
-      description,
-      siteName,
-    }
-  }}
-  twitter={{
-    card: 'summary_large_image',
-    title,
-    description,
-    image: ogImage,
-  }}
-/>
+
+{/* ── Canonical ── */}
+<link rel="canonical" href={canonical} />
+
+{/* ── Basic SEO ── */}
+<title>{title}</title>
+<meta name="description" content={description} />
+{keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
+
+{/* ── Open Graph (ogp.me 스펙 완전 준수) ── */}
+<meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:type" content={ogType} />
+<meta property="og:url" content={canonical} />
+<meta property="og:title" content={resolvedOgTitle} />
+<meta property="og:description" content={resolvedOgDescription} />
+<meta property="og:image" content={ogImageAbsolute} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={twitterImageAlt} />
+<meta property="og:locale" content="ko_KR" />
+
+{/* ── Article 전용 메타 (앱 상세 페이지) ── */}
+{ogType === 'article' && publishedAt && (
+  <meta property="article:published_time" content={publishedAt.toISOString()} />
+)}
+{ogType === 'article' && updatedAt && (
+  <meta property="article:modified_time" content={updatedAt.toISOString()} />
+)}
+
+{/* ── Twitter Card (X.com 포함) ── */}
+<meta name="twitter:card" content={twitterCard} />
+<meta name="twitter:title" content={resolvedOgTitle} />
+<meta name="twitter:description" content={resolvedOgDescription} />
+<meta name="twitter:image" content={ogImageAbsolute} />
+<meta name="twitter:image:alt" content={twitterImageAlt} />
+
+{/* ── JSON-LD Structured Data ── */}
+{jsonLd && <script type="application/ld+json" set:html={jsonLd} />}

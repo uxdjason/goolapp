@@ -34,10 +34,16 @@ if (related.length === 0) {
 
 <AppLayout
   title={entry.data.title}
-  description={entry.data.description}
+  description={entry.data.seo.description}
   shortDescription={entry.data.shortDescription}
   category={entry.data.category}
-  keywords={entry.data.secondaryKeywords ?? []}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+  updatedAt={entry.data.updatedAt}
 >
   <Fragment slot="app">
     <div class="dd-calculator-container glass-surface">
