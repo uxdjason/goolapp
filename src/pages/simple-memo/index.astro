@@ -197,6 +197,10 @@ const { Content } = await render(entry);
     text-align: center;
   }
 
+  .empty-state[hidden] {
+    display: none;
+  }
+
   .empty-icon { color: var(--color-border, #ccc); margin-bottom: 0.75rem; }
   .empty-title { font-size: 1rem; font-weight: 600; margin: 0 0 0.25rem; color: var(--color-text, #444); }
   .empty-desc { font-size: 0.85rem; margin: 0; }
@@ -209,6 +213,10 @@ const { Content } = await render(entry);
     background: var(--color-surface, #fff);
     border: 1px solid var(--color-border, #e5e7eb);
     border-radius: 12px;
+  }
+
+  .memo-editor[hidden] {
+    display: none;
   }
 
   .editor-header {
