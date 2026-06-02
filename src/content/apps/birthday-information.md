@@ -1,11 +1,11 @@
 ---
-title: 알아두면 쓸모 없는 생일 정보
+title: 생일 관련 정보 찾기
 slug: birthday-information
-description: 생일 정보 계산기로 양력 생일을 입력하면 음력 날짜, 태어난 요일, 띠, 간지, 별자리는 물론 같은 별자리 유명인까지 알아볼
+description: 생일 관련 정보 찾기로 양력 생일을 입력하면 음력 날짜, 태어난 요일, 띠, 간지, 별자리는 물론 같은 별자리 유명인까지 알아볼
   수 있습니다. 결과를 바로 복사하세요.
 shortDescription: 양력 생일을 입력하면 음력, 띠, 간지, 별자리, 같은 별자리 유명인까지 한 번에 확인할 수 있습니다.
 category: tool
-primaryKeyword: 생일 정보 계산기
+primaryKeyword: 생일 관련 정보 찾기
 secondaryKeywords:
 - 생일 계산
 - 음력 변환
@@ -15,20 +15,20 @@ secondaryKeywords:
 - 유명인 별자리
 publishedAt: 2026-06-02
 seo:
-  title: 생일 정보 계산기 - 음력, 띠, 별자리, 간지 한눈에 확인
-  description: 생일 정보 계산기로 양력 생일을 입력하면 음력 날짜, 태어난 요일, 띠, 간지, 별자리는 물론 같은 별자리 유명인까지 알아볼
+  title: 생일 관련 정보 찾기 - 음력, 띠, 별자리, 간지 한눈에 확인
+  description: 생일 관련 정보 찾기로 양력 생일을 입력하면 음력 날짜, 태어난 요일, 띠, 간지, 별자리는 물론 같은 별자리 유명인까지 알아볼
     수 있습니다. 결과를 바로 복사하세요.
   canonicalPath: /birthday-information/
-  ogTitle: 생일의 모든 것을 알아보는 생일 정보 계산기
+  ogTitle: 생일의 모든 것을 알아보는 생일 관련 정보 찾기
   ogDescription: 양력 생일 하나로 음력 날짜, 요일, 띠, 간지, 별자리 정보와 같은 별자리 유명인 목록까지 한 번에 확인하세요. 계산
-    결과를 쉽게 복사할 수 있는 생일 정보 계산기입니다.
+    결과를 쉽게 복사할 수 있는 생일 관련 정보 찾기입니다.
   ogImage: /og/birthday-information.png
   twitterCard: summary_large_image
-  searchTitle: 생일 정보 계산기 - 음력, 띠, 별자리, 간지 한눈에 확인
-  searchDescription: 생일 정보 계산기로 양력 생일을 입력하면 음력 날짜, 태어난 요일, 띠, 간지, 별자리는 물론 같은 별자리 유명인까지
+  searchTitle: 생일 관련 정보 찾기 - 음력, 띠, 별자리, 간지 한눈에 확인
+  searchDescription: 생일 관련 정보 찾기로 양력 생일을 입력하면 음력 날짜, 태어난 요일, 띠, 간지, 별자리는 물론 같은 별자리 유명인까지
     알아볼 수 있습니다. 결과를 바로 복사하세요.
   intent: transactional
-  primaryKeyword: 생일 정보 계산기
+  primaryKeyword: 생일 관련 정보 찾기
   secondaryKeywords:
   - 생일 계산
   - 음력 변환
