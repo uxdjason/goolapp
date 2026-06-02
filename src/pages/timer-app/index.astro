@@ -328,9 +328,9 @@ if (related.length === 0) {
     margin: 0;
   }
 
-  .lap-item {
+  :global(.lap-item) {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     padding: var(--space-3) 0;
     border-bottom: 1px solid var(--glass-border-soft);
@@ -338,24 +338,10 @@ if (related.length === 0) {
     font-family: var(--font-family-base);
     font-variant-numeric: tabular-nums;
     width: 100%;
+    font-size: var(--font-size-lg);
   }
-  .lap-item:last-child {
+  :global(.lap-item:last-child) {
     border-bottom: none;
-  }
-  .lap-index {
-    color: var(--color-on-surface-variant);
-    font-weight: var(--font-weight-bold);
-    flex: 1;
-  }
-  .lap-split {
-    color: var(--color-primary);
-    flex: 1;
-    text-align: center;
-  }
-  .lap-total {
-    font-weight: var(--font-weight-bold);
-    flex: 1;
-    text-align: right;
   }
 
   /* Custom Scrollbar for lap container */
@@ -560,27 +546,10 @@ if (related.length === 0) {
         lapContainer.style.display = 'block';
         swLaps.slice().reverse().forEach((lap, idx) => {
           const originalIndex = swLaps.length - 1 - idx;
-          const previousLapTime = originalIndex > 0 ? swLaps[originalIndex - 1] : 0;
-          const splitTime = lap - previousLapTime;
 
           const li = document.createElement('li');
           li.className = 'lap-item';
-          
-          const idxSpan = document.createElement('span');
-          idxSpan.className = 'lap-index';
-          idxSpan.textContent = `랩 ${originalIndex + 1}`;
-          
-          const splitSpan = document.createElement('span');
-          splitSpan.className = 'lap-split';
-          splitSpan.textContent = `+ ${formatStopwatchTime(splitTime)}`;
-          
-          const totalSpan = document.createElement('span');
-          totalSpan.className = 'lap-total';
-          totalSpan.textContent = formatStopwatchTime(lap);
-          
-          li.appendChild(idxSpan);
-          li.appendChild(splitSpan);
-          li.appendChild(totalSpan);
+          li.textContent = `${originalIndex + 1} - ${formatStopwatchTime(lap)}`;
           lapList.appendChild(li);
         });
       } else {
