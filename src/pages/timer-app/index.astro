@@ -61,8 +61,7 @@ if (related.length === 0) {
 
       <!-- Countdown View -->
       <div id="countdown-view" class="app-view">
-        <div class="state-label">남은 시간</div>
-        <div class="time-display cd-text" id="cd-display">00:00:00</div>
+        <div class="state-label" id="cd-state-label" style="visibility: hidden;">남은 시간</div>
         
         <div class="input-section glass-surface-card" id="cd-inputs">
           <div class="time-inputs">
@@ -244,6 +243,19 @@ if (related.length === 0) {
     border-color: var(--color-primary);
   }
   
+  .time-input-group input:focus::placeholder {
+    color: transparent;
+  }
+
+  .time-input-group input:disabled {
+    background: transparent;
+    color: var(--color-primary);
+    border-color: transparent;
+    -webkit-text-fill-color: var(--color-primary);
+    opacity: 1;
+    box-shadow: none;
+  }
+  
   .time-input-group span {
     font-size: var(--font-size-sm);
     color: var(--color-on-surface-variant);
@@ -376,7 +388,7 @@ if (related.length === 0) {
     const swView = document.getElementById('stopwatch-view');
 
     // Countdown elements
-    const cdDisplay = document.getElementById('cd-display');
+    const cdStateLabel = document.getElementById('cd-state-label');
     const cdInputs = document.getElementById('cd-inputs');
     const cdH = document.getElementById('cd-h');
     const cdM = document.getElementById('cd-m');
@@ -458,7 +470,15 @@ if (related.length === 0) {
 
     // === Countdown Logic ===
     function updateCdDisplay() {
-      cdDisplay.textContent = formatTime(cdRemaining);
+      if (cdIsRunning || cdRemaining > 0) {
+        const h = Math.floor(cdRemaining / 3600);
+        const m = Math.floor((cdRemaining % 3600) / 60);
+        const s = cdRemaining % 60;
+        
+        cdH.value = h > 0 ? h : '0';
+        cdM.value = m > 0 || h > 0 ? m : '0';
+        cdS.value = s;
+      }
     }
 
     function parseCdInputs() {
@@ -477,7 +497,9 @@ if (related.length === 0) {
         
         if (cdRemaining > 0) {
           cdIsRunning = true;
-          cdInputs.style.display = 'none';
+          [cdH, cdM, cdS].forEach(el => el.disabled = true);
+          cdStateLabel.style.visibility = 'visible';
+          
           cdStartBtn.style.display = 'none';
           cdStopBtn.style.display = 'block';
           
@@ -513,9 +535,10 @@ if (related.length === 0) {
       cdIsRunning = false;
       cdRemaining = 0;
       cdTotalSeconds = 0;
-      updateCdDisplay();
       
-      cdInputs.style.display = 'block';
+      [cdH, cdM, cdS].forEach(el => el.disabled = false);
+      cdStateLabel.style.visibility = 'hidden';
+      
       cdStartBtn.style.display = 'block';
       cdStartBtn.textContent = '시작';
       cdStopBtn.style.display = 'none';
