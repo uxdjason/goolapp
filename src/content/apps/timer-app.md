@@ -3,7 +3,7 @@ title: "타이머"
 description: "웹 브라우저에서 바로 사용할 수 있는 무료 타이머 및 스톱워치 앱입니다. 공부, 요리, 운동 등 시간 관리가 필요한 모든 순간에 활용해 보세요."
 shortDescription: "웹 브라우저에서 바로 사용할 수 있는 간편한 카운트다운 타이머 및 스톱워치입니다."
 slug: "timer-app"
-category: "date-time"
+category: "datetime"
 primaryKeyword: "타이머"
 relatedSlugs: ["time-interval-calculator", "date-time-interval-calculator"]
 secondaryKeywords: ["온라인 타이머", "스톱워치", "카운트다운", "공부 타이머"]
@@ -12,7 +12,7 @@ seo:
   title: "타이머 및 스톱워치 - 무료 온라인 카운트다운"
   description: "웹 브라우저에서 바로 사용할 수 있는 무료 타이머 및 스톱워치 앱입니다. 공부, 요리, 운동 등 시간 관리가 필요한 모든 순간에 활용해 보세요."
   canonicalPath: "/timer-app/"
-  ogTitle: "간편한 온라인 타이머 & 스톱워치"
+  ogTitle: "간편하고 직관적인 온라인 무료 타이머 및 스톱워치"
   ogDescription: "앱 설치 없이 브라우저에서 바로 실행 가능한 무료 타이머입니다. 카운트다운 설정부터 스톱워치 기능까지 일상 속 시간 관리를 스마트하게 도와드립니다."
   ogImage: "/og/GoolAPP-timer-app.webp"
   twitterCard: "summary_large_image"
