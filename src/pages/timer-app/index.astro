@@ -61,7 +61,8 @@ if (related.length === 0) {
 
       <!-- Countdown View -->
       <div id="countdown-view" class="app-view">
-        <div class="time-display" id="cd-display">00:00:00</div>
+        <div class="state-label">남은 시간</div>
+        <div class="time-display cd-text" id="cd-display">00:00:00</div>
         
         <div class="input-section glass-surface-card" id="cd-inputs">
           <div class="time-inputs">
@@ -91,7 +92,8 @@ if (related.length === 0) {
 
       <!-- Stopwatch View -->
       <div id="stopwatch-view" class="app-view" style="display:none;">
-        <div class="time-display" id="sw-display">00:00:00.00</div>
+        <div class="state-label">진행 시간</div>
+        <div class="time-display sw-text" id="sw-display">00:00:00.00</div>
         
         <div class="controls">
           <button class="btn btn-secondary" id="sw-reset">초기화</button>
@@ -155,9 +157,9 @@ if (related.length === 0) {
     transition: var(--transition-fast);
   }
   .tab-btn.active {
-    background: var(--color-surface);
-    color: var(--color-primary);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
 
   .app-view {
@@ -172,15 +174,32 @@ if (related.length === 0) {
     to { opacity: 1; transform: translateY(0); }
   }
 
+  .state-label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-on-surface-variant);
+    margin-bottom: -var(--space-4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: var(--space-4);
+  }
+
   .time-display {
     font-size: 64px;
     font-weight: var(--font-weight-bold);
-    color: var(--color-primary);
     font-family: var(--font-family-base);
     margin: var(--space-6) 0;
     text-align: center;
     font-variant-numeric: tabular-nums;
     letter-spacing: 2px;
+  }
+
+  .cd-text {
+    color: var(--color-primary);
+  }
+
+  .sw-text {
+    color: var(--color-on-surface);
   }
 
   .glass-surface-card {
@@ -300,17 +319,31 @@ if (related.length === 0) {
   .lap-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: var(--space-3) 0;
     border-bottom: 1px solid var(--glass-border-soft);
     color: var(--color-on-surface);
     font-family: var(--font-family-base);
     font-variant-numeric: tabular-nums;
+    width: 100%;
   }
   .lap-item:last-child {
     border-bottom: none;
   }
-  .lap-item .lap-index {
+  .lap-index {
     color: var(--color-on-surface-variant);
+    font-weight: var(--font-weight-bold);
+    flex: 1;
+  }
+  .lap-split {
+    color: var(--color-primary);
+    flex: 1;
+    text-align: center;
+  }
+  .lap-total {
+    font-weight: var(--font-weight-bold);
+    flex: 1;
+    text-align: right;
   }
 
   /* Custom Scrollbar for lap container */
@@ -502,19 +535,29 @@ if (related.length === 0) {
       lapList.innerHTML = '';
       if (swLaps.length > 0) {
         lapContainer.style.display = 'block';
-        swLaps.slice().reverse().forEach((lap, index) => {
+        swLaps.slice().reverse().forEach((lap, idx) => {
+          const originalIndex = swLaps.length - 1 - idx;
+          const previousLapTime = originalIndex > 0 ? swLaps[originalIndex - 1] : 0;
+          const splitTime = lap - previousLapTime;
+
           const li = document.createElement('li');
           li.className = 'lap-item';
           
           const idxSpan = document.createElement('span');
           idxSpan.className = 'lap-index';
-          idxSpan.textContent = `구간 ${swLaps.length - index}`;
+          idxSpan.textContent = `랩 ${originalIndex + 1}`;
           
-          const timeSpan = document.createElement('span');
-          timeSpan.textContent = formatStopwatchTime(lap);
+          const splitSpan = document.createElement('span');
+          splitSpan.className = 'lap-split';
+          splitSpan.textContent = `+ ${formatStopwatchTime(splitTime)}`;
+          
+          const totalSpan = document.createElement('span');
+          totalSpan.className = 'lap-total';
+          totalSpan.textContent = formatStopwatchTime(lap);
           
           li.appendChild(idxSpan);
-          li.appendChild(timeSpan);
+          li.appendChild(splitSpan);
+          li.appendChild(totalSpan);
           lapList.appendChild(li);
         });
       } else {
@@ -574,10 +617,19 @@ if (related.length === 0) {
       swLapBtn.style.display = 'none';
     });
 
-    // Auto-select input text on focus
+    // Better input focus logic
     [cdH, cdM, cdS].forEach(input => {
       input.addEventListener('focus', function() {
-        this.select();
+        if (this.value === '0' || this.value === '00') {
+          this.value = '';
+        } else {
+          this.select();
+        }
+      });
+      input.addEventListener('blur', function() {
+        if (this.value === '') {
+          this.value = ''; // Leave it blank, placeholder '0' will show
+        }
       });
     });
 
