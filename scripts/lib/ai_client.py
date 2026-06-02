@@ -8,6 +8,9 @@
 from __future__ import annotations
 from typing import Callable
 import json, os, time, pathlib, datetime as dt
+from dotenv import load_dotenv
+
+load_dotenv()
 
 LOG_DIR = pathlib.Path("references/ai-call-logs")
 LOG_DIR.mkdir(parents=True, exist_ok=True)

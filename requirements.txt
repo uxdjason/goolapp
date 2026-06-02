@@ -3,3 +3,4 @@ beautifulsoup4
 pyyaml
 anthropic
 google-generativeai
+python-dotenv
