@@ -21,7 +21,7 @@ seo:
   ogTitle: 초간단 보안 메모장 - 개인정보 보호 메모앱
   ogDescription: 브라우저 로컬저장소만 사용하는 보안 메모장으로, 메모 내용이 외부 서버나 클라우드에 절대 저장되지 않습니다. 개인정보
     유출과 사생활 노출의 걱정 없이 안전하게 메모를 관리하세요.
-  ogImage: /og/simple-memo.png
+  ogImage: /og/GoolAPP-simple-memo.webp
   twitterCard: summary_large_image
   searchTitle: 초간단 보안 메모장 | 브라우저 로컬저장소 메모앱
   searchDescription: 개인정보 유출 걱정 없는 보안 메모장입니다. 메모가 브라우저 로컬저장소에만 저장되어 외부 서버에 전송되지 않습니다.

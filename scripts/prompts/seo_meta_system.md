@@ -7,7 +7,7 @@
 - canonicalPath:      "/{slug}/" 형식
 - ogTitle:            20~70자, title과 거의 동일하게 (단, 약간의 카피 변형 허용)
 - ogDescription:      100~200자, description의 확장 버전 (절대 80자 이상)
-- ogImage:            "/og/{slug}.png" 또는 "/og/default.png"
+- ogImage:            "/og/GoolAPP-{slug}.webp" 또는 "/og/default.png"
 - twitterCard:        "summary_large_image"
 - searchTitle:        title과 동일하게 (별도 차별화 필요 시에만 변경)
 - searchDescription:  description과 동일하게 (절대 80자 이상)
