@@ -1,0 +1,362 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'qr-code-generator');
+if (!entry) throw new Error('qr-code-generator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="qr-app">
+      <div class="input-section">
+        <label for="urlInput" class="input-label">URL 또는 텍스트 입력</label>
+        <input
+          type="text"
+          id="urlInput"
+          class="text-input"
+          placeholder="예: https://goolapp.com"
+          autocomplete="off"
+        />
+        <p class="input-hint">URL, 앱 링크, 일반 텍스트 등 어떤 내용이든 입력할 수 있습니다.</p>
+      </div>
+
+      <div class="button-group">
+        <button type="button" id="generateButton" class="btn btn-primary">
+          QR 코드 생성
+        </button>
+        <button type="button" id="saveButton" class="btn btn-secondary" hidden>
+          QR 코드 저장 (PNG)
+        </button>
+      </div>
+
+      <div class="result-section" id="resultSection" hidden>
+        <div class="qr-wrapper">
+          <div id="qrcode" class="qrcode-container"></div>
+        </div>
+        <p class="result-hint">QR 코드를 스캔하여 내용을 확인하거나 저장 버튼을 눌러 이미지로 저장하세요.</p>
+      </div>
+
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">📱</div>
+        <p>위 입력란에 URL 또는 텍스트를 입력한 뒤<br />[QR 코드 생성] 버튼을 눌러주세요.</p>
+      </div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<script>
+  // QRCode.js 라이브러리 동적 로드
+  function loadQRCodeLib(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if ((window as any).QRCode) {
+        resolve();
+        return;
+      }
+      const existing = document.querySelector('script[data-qrcodejs]');
+      if (existing) {
+        existing.addEventListener('load', () => resolve());
+        existing.addEventListener('error', () => reject(new Error('QRCode lib load failed')));
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+      script.async = true;
+      script.dataset.qrcodejs = 'true';
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('QRCode lib load failed'));
+      document.head.appendChild(script);
+    });
+  }
+
+  function initApp() {
+    const urlInput = document.getElementById('urlInput') as HTMLInputElement | null;
+    const generateButton = document.getElementById('generateButton') as HTMLButtonElement | null;
+    const saveButton = document.getElementById('saveButton') as HTMLButtonElement | null;
+    const qrcodeContainer = document.getElementById('qrcode');
+    const resultSection = document.getElementById('resultSection');
+    const emptyState = document.getElementById('emptyState');
+
+    if (!urlInput || !generateButton || !saveButton || !qrcodeContainer || !resultSection || !emptyState) return;
+
+    async function generateQRCode() {
+      const value = urlInput!.value.trim();
+      if (!value) {
+        alert('URL 또는 텍스트를 입력해주세요.');
+        urlInput!.focus();
+        return;
+      }
+
+      try {
+        await loadQRCodeLib();
+      } catch (err) {
+        alert('QR 코드 생성 라이브러리를 불러오지 못했습니다. 네트워크 상태를 확인해주세요.');
+        return;
+      }
+
+      qrcodeContainer!.innerHTML = '';
+
+      const QRCode = (window as any).QRCode;
+      new QRCode(qrcodeContainer, {
+        text: value,
+        width: 220,
+        height: 220,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H,
+      });
+
+      emptyState!.hidden = true;
+      resultSection!.hidden = false;
+
+      setTimeout(() => {
+        saveButton!.hidden = false;
+      }, 200);
+    }
+
+    function saveQRCode() {
+      const canvas = qrcodeContainer!.querySelector('canvas') as HTMLCanvasElement | null;
+      if (!canvas) {
+        alert('먼저 QR 코드를 생성해주세요.');
+        return;
+      }
+
+      try {
+        const dataURL = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'qrcode.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        alert('QR 코드 저장 중 오류가 발생했습니다.');
+      }
+    }
+
+    generateButton.addEventListener('click', generateQRCode);
+    saveButton.addEventListener('click', saveQRCode);
+
+    urlInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        generateQRCode();
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+  } else {
+    initApp();
+  }
+</script>
+
+<style>
+  .qr-app {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  }
+
+  .input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .input-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .text-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid var(--color-border, #e5e7eb);
+    border-radius: var(--radius-md, 8px);
+    background: var(--color-background, #ffffff);
+    color: var(--color-text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+  }
+
+  .text-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-soft, rgba(59, 130, 246, 0.15));
+  }
+
+  .input-hint {
+    font-size: 0.85rem;
+    color: var(--color-text-muted, #6b7280);
+    margin: 0;
+  }
+
+  .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .btn {
+    flex: 1 1 auto;
+    min-width: 140px;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md, 8px);
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.2s ease, background 0.2s ease;
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: var(--color-on-primary, #ffffff);
+  }
+
+  .btn-primary:hover {
+    background: var(--color-primary-dark, var(--color-primary));
+    opacity: 0.95;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+  }
+
+  .btn-secondary:hover {
+    background: var(--color-primary-soft, rgba(59, 130, 246, 0.08));
+  }
+
+  .btn[hidden] {
+    display: none;
+  }
+
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--color-background, #f9fafb);
+    border-radius: var(--radius-md, 8px);
+  }
+
+  .result-section[hidden] {
+    display: none;
+  }
+
+  .qr-wrapper {
+    padding: 1rem;
+    background: #ffffff;
+    border-radius: var(--radius-md, 8px);
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  }
+
+  .qrcode-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 220px;
+    min-height: 220px;
+  }
+
+  .qrcode-container :global(canvas),
+  .qrcode-container :global(img) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .result-hint {
+    font-size: 0.9rem;
+    color: var(--color-text-muted, #6b7280);
+    text-align: center;
+    margin: 0;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--color-text-muted, #6b7280);
+    background: var(--color-background, #f9fafb);
+    border: 2px dashed var(--color-border, #e5e7eb);
+    border-radius: var(--radius-md, 8px);
+  }
+
+  .empty-state[hidden] {
+    display: none;
+  }
+
+  .empty-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+
+  .empty-state p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 480px) {
+    .qr-app {
+      padding: 1rem;
+    }
+
+    .button-group {
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+    }
+  }
+</style>
