@@ -11,7 +11,7 @@
 - twitterCard:        "summary_large_image"
 - searchTitle:        title과 동일하게 (별도 차별화 필요 시에만 변경)
 - searchDescription:  description과 동일하게 (절대 80자 이상)
-- intent:             "informational" | "transactional" | "navigational"
+- intent:             "informational" | "transactional" | "navigational" (절대 이 3가지 외의 값, 예: educational 등을 사용하지 마라)
 - primaryKeyword:     입력 그대로 또는 더 자연스러운 형태로 1개
 - secondaryKeywords:  3~6개 배열
 - lsiKeywords:        3~5개 배열 (의미 연관어, primary/secondary와 중복 금지)

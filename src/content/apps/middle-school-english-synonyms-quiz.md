@@ -26,7 +26,7 @@ seo:
   searchTitle: 중학교 영단어 동의어 맞추기 퀴즈 – 무료 어휘 학습
   searchDescription: 중학교 수준의 영단어 동의어를 4지선다 퀴즈로 배우세요. 자투리 시간에 가볍게 즐기며 어휘 실력을 키우는 무료
     영어 학습 앱입니다. 즉시 정답 확인 및 성과 점수 제공.
-  intent: educational
+  intent: informational
   primaryKeyword: 중학교 영단어 동의어 퀴즈
   secondaryKeywords:
   - 영단어 동의어 맞추기
