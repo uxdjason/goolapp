@@ -1,0 +1,549 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'age-difference-calculator');
+if (!entry) throw new Error('age-difference-calculator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="calc-wrap">
+      <!-- 스텝 인디케이터 -->
+      <div class="step-indicator">
+        <div class="step active" id="step-ind-1"><span>1</span><label>첫 번째</label></div>
+        <div class="step-line"></div>
+        <div class="step" id="step-ind-2"><span>2</span><label>두 번째</label></div>
+        <div class="step-line"></div>
+        <div class="step" id="step-ind-3"><span>3</span><label>결과</label></div>
+      </div>
+
+      <!-- Screen 1: 첫번째 사람 -->
+      <section class="screen" id="screen1">
+        <h2 class="screen-title">첫 번째 사람의 생년월일</h2>
+        <p class="screen-desc">정확한 나이 차이 계산을 위해 생년월일을 입력해주세요.</p>
+
+        <div class="dob-grid">
+          <div class="field">
+            <label for="y1">생년 (년)</label>
+            <input id="y1" type="number" min="1" step="1" placeholder="예: 1990" />
+          </div>
+          <div class="field">
+            <label for="mo1">생월 (월)</label>
+            <input id="mo1" type="number" min="1" max="12" step="1" placeholder="1~12" />
+          </div>
+          <div class="field">
+            <label for="d1">생일 (일)</label>
+            <input id="d1" type="number" min="1" max="31" step="1" placeholder="1~31" />
+          </div>
+        </div>
+
+        <div class="error-msg" id="err1" hidden>올바른 생년월일을 입력해주세요.</div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="btn-next1">두 번째 사람 입력 →</button>
+        </div>
+      </section>
+
+      <!-- Screen 2: 두번째 사람 -->
+      <section class="screen" id="screen2" hidden>
+        <h2 class="screen-title">두 번째 사람의 생년월일</h2>
+        <p class="screen-desc">비교할 다른 사람의 생년월일을 입력해주세요.</p>
+
+        <div class="dob-grid">
+          <div class="field">
+            <label for="y2">생년 (년)</label>
+            <input id="y2" type="number" min="1" step="1" placeholder="예: 1995" />
+          </div>
+          <div class="field">
+            <label for="mo2">생월 (월)</label>
+            <input id="mo2" type="number" min="1" max="12" step="1" placeholder="1~12" />
+          </div>
+          <div class="field">
+            <label for="d2">생일 (일)</label>
+            <input id="d2" type="number" min="1" max="31" step="1" placeholder="1~31" />
+          </div>
+        </div>
+
+        <div class="error-msg" id="err2" hidden>올바른 생년월일을 입력해주세요.</div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="btn-compare">나이 차이 계산하기</button>
+          <button class="btn btn-text" id="btn-back1">← 뒤로 가기</button>
+        </div>
+      </section>
+
+      <!-- Screen 3: 결과 -->
+      <section class="screen" id="screen3" hidden>
+        <h2 class="screen-title">나이 차이 결과</h2>
+
+        <div class="result-card highlight">
+          <div class="result-label">먼저 태어난 사람</div>
+          <p class="result-value" id="r-first"></p>
+        </div>
+
+        <div class="result-card">
+          <div class="result-label">생일 차이</div>
+          <p class="result-value" id="r-diff"></p>
+          <p class="result-sub" id="r-diff-total"></p>
+        </div>
+
+        <div class="result-row">
+          <div class="result-card small">
+            <div class="result-label">첫 번째 사람</div>
+            <p class="result-value" id="r-age1"></p>
+          </div>
+          <div class="result-card small">
+            <div class="result-label">두 번째 사람</div>
+            <p class="result-value" id="r-age2"></p>
+          </div>
+        </div>
+
+        <div class="result-card">
+          <div class="result-label">한국 나이 차이</div>
+          <p class="result-value" id="r-korea-diff"></p>
+        </div>
+
+        <div class="result-card">
+          <div class="result-label">만 나이 차이</div>
+          <p class="result-value" id="r-man-diff"></p>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="btn-copy">📋 결과 복사하기</button>
+          <button class="btn btn-secondary" id="btn-back2">← 뒤로 가기</button>
+          <button class="btn btn-text" id="btn-reset">처음부터 다시</button>
+        </div>
+
+        <div class="toast" id="toast" hidden>클립보드에 복사되었습니다!</div>
+      </section>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .calc-wrap {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* Step Indicator */
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+  }
+  .step.active { opacity: 1; }
+  .step span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-surface-alt, #f1f5f9);
+    color: var(--color-text, #1f2937);
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: 2px solid transparent;
+  }
+  .step.active span {
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .step label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #6b7280);
+  }
+  .step-line {
+    flex: 0 1 40px;
+    height: 2px;
+    background: var(--color-border, #e5e7eb);
+  }
+
+  /* Screen */
+  .screen {
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    padding: 1.75rem 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .screen[hidden] { display: none; }
+
+  .screen-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: var(--color-text, #1f2937);
+  }
+  .screen-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted, #6b7280);
+    margin: 0 0 1.5rem;
+  }
+
+  /* Form */
+  .dob-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .field label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text, #1f2937);
+  }
+  .field input {
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    font-size: 1rem;
+    border: 2px solid var(--color-border, #d1d5db);
+    border-radius: 8px;
+    background: var(--color-surface, #fff);
+    color: var(--color-text, #1f2937);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -moz-appearance: textfield;
+  }
+  .field input::-webkit-outer-spin-button,
+  .field input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  .error-msg {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    padding: 0.7rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  .error-msg[hidden] { display: none; }
+
+  /* Actions */
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+  }
+  .btn {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .btn-primary:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-text, #1f2937);
+    border: 2px solid var(--color-border, #d1d5db);
+  }
+  .btn-secondary:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .btn-text {
+    background: transparent;
+    color: var(--color-text-muted, #6b7280);
+    padding: 0.6rem;
+  }
+  .btn-text:hover {
+    color: var(--color-text, #1f2937);
+  }
+
+  /* Result */
+  .result-card {
+    background: var(--color-surface-alt, #f8fafc);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+  .result-card.highlight {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+  .result-card.highlight .result-label { color: rgba(255,255,255,0.85); }
+  .result-card.highlight .result-value { color: #fff; }
+
+  .result-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  .result-row .result-card { margin-bottom: 0; }
+
+  .result-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted, #6b7280);
+    margin-bottom: 0.35rem;
+  }
+  .result-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text, #1f2937);
+    margin: 0;
+    line-height: 1.4;
+  }
+  .result-sub {
+    font-size: 0.85rem;
+    color: var(--color-text-muted, #6b7280);
+    margin: 0.35rem 0 0;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f2937;
+    color: #fff;
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    z-index: 9999;
+  }
+  .toast[hidden] { display: none; }
+
+  @media (max-width: 480px) {
+    .dob-grid { grid-template-columns: 1fr 1fr 1fr; }
+    .screen { padding: 1.25rem 1rem; }
+  }
+</style>
+
+<script>
+  // ===== DOM 헬퍼 =====
+  const $ = (id: string) => document.getElementById(id) as HTMLElement;
+  const $i = (id: string) => document.getElementById(id) as HTMLInputElement;
+
+  // ===== 화면 전환 =====
+  function goTo(n: number) {
+    [1, 2, 3].forEach(i => {
+      const sec = $(`screen${i}`);
+      const ind = $(`step-ind-${i}`);
+      if (sec) sec.hidden = (i !== n);
+      if (ind) ind.classList.toggle('active', i <= n);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ===== 유효성 검사 =====
+  function validateDOB(yid: string, moid: string, did: string) {
+    const y = parseInt($i(yid).value, 10);
+    const m = parseInt($i(moid).value, 10);
+    const d = parseInt($i(did).value, 10);
+    if (!y || !m || !d) return null;
+    if (y < 1 || m < 1 || m > 12 || d < 1 || d > 31) return null;
+    const dt = new Date(y, m - 1, d);
+    if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
+    return { y, m, d, date: dt };
+  }
+
+  // ===== 나이 계산 =====
+  function calcKoreaAge(y: number) {
+    return new Date().getFullYear() - y + 1;
+  }
+  function calcManAge(b: { y: number; m: number; d: number }) {
+    const now = new Date();
+    let age = now.getFullYear() - b.y;
+    const hasPassed =
+      now.getMonth() + 1 > b.m ||
+      (now.getMonth() + 1 === b.m && now.getDate() >= b.d);
+    if (!hasPassed) age -= 1;
+    return age;
+  }
+
+  // ===== Step 1 → Step 2 =====
+  $('btn-next1').addEventListener('click', () => {
+    const res = validateDOB('y1', 'mo1', 'd1');
+    const err = $('err1');
+    if (!res) {
+      err.hidden = false;
+      return;
+    }
+    err.hidden = true;
+    goTo(2);
+  });
+
+  // ===== Step 2 → 계산 =====
+  $('btn-compare').addEventListener('click', () => {
+    const b1 = validateDOB('y1', 'mo1', 'd1');
+    const b2 = validateDOB('y2', 'mo2', 'd2');
+    const err = $('err2');
+    if (!b1 || !b2) {
+      err.hidden = false;
+      return;
+    }
+    err.hidden = true;
+    compare(b1, b2);
+  });
+
+  $('btn-back1').addEventListener('click', () => goTo(1));
+  $('btn-back2').addEventListener('click', () => goTo(2));
+  $('btn-reset').addEventListener('click', () => {
+    ['y1','mo1','d1','y2','mo2','d2'].forEach(id => { $i(id).value = ''; });
+    goTo(1);
+  });
+
+  // ===== 비교 로직 =====
+  function compare(
+    b1: { y: number; m: number; d: number; date: Date },
+    b2: { y: number; m: number; d: number; date: Date }
+  ) {
+    const a1 = b1.date;
+    const a2 = b2.date;
+
+    const isSame = a1.getTime() === a2.getTime();
+    const first = a1 <= a2 ? a1 : a2;
+    const second = a1 <= a2 ? a2 : a1;
+    const firstLabel = a1 <= a2 ? '첫 번째 사람' : '두 번째 사람';
+
+    const diffMs = second.getTime() - first.getTime();
+    const daysTotal = Math.floor(diffMs / 86400000);
+    const yrs = Math.floor(daysTotal / 365);
+    const remD = daysTotal % 365;
+    const mons = Math.floor(remD / 30);
+    const remDays = remD % 30;
+    const totalMons = yrs * 12 + mons;
+
+    const k1 = calcKoreaAge(b1.y);
+    const k2 = calcKoreaAge(b2.y);
+    const m1 = calcManAge(b1);
+    const m2 = calcManAge(b2);
+    const koreaDiff = Math.abs(k1 - k2);
+    const manDiff = Math.abs(m1 - m2);
+
+    // 결과 출력
+    if (isSame) {
+      $('r-first').innerText = '두 사람은 같은 날에 태어났습니다 🎉';
+      $('r-diff').innerText = '0년 0개월 0일';
+      $('r-diff-total').innerText = '총 0개월 / 총 0일';
+    } else {
+      $('r-first').innerText = `${firstLabel}이(가) 먼저 태어났어요`;
+      $('r-diff').innerText = `${yrs}년 ${mons}개월 ${remDays}일 먼저 태어남`;
+      $('r-diff-total').innerText = `총 ${totalMons}개월 / 총 ${daysTotal.toLocaleString()}일`;
+    }
+
+    $('r-age1').innerText = `한국 나이 ${k1}세 · 만 ${m1}세`;
+    $('r-age2').innerText = `한국 나이 ${k2}세 · 만 ${m2}세`;
+
+    $('r-korea-diff').innerText =
+      koreaDiff === 0 ? '동갑입니다' : `${koreaDiff}살 차이`;
+    $('r-man-diff').innerText =
+      manDiff === 0 ? '동갑입니다' : `${manDiff}살 차이`;
+
+    goTo(3);
+  }
+
+  // ===== 클립보드 복사 =====
+  $('btn-copy').addEventListener('click', async () => {
+    const lines = [
+      '[나이 차이 계산 결과]',
+      `먼저 태어난 사람: ${$('r-first').innerText}`,
+      `생일 차이: ${$('r-diff').innerText}`,
+      `${$('r-diff-total').innerText}`,
+      `첫 번째 사람: ${$('r-age1').innerText}`,
+      `두 번째 사람: ${$('r-age2').innerText}`,
+      `한국 나이 차이: ${$('r-korea-diff').innerText}`,
+      `만 나이 차이: ${$('r-man-diff').innerText}`,
+      '',
+      'via goolapp.com'
+    ];
+    const text = lines.join('\n');
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const toast = $('toast');
+      toast.hidden = false;
+      setTimeout(() => { toast.hidden = true; }, 1800);
+    } catch (e) {
+      alert('복사에 실패했습니다. 직접 선택하여 복사해주세요.');
+    }
+  });
+
+  // 포커스 시 placeholder만 보이도록 (기존 값 그대로 두되, 0 입력 방지 등은 사용자 판단)
+  ['y1','mo1','d1','y2','mo2','d2'].forEach(id => {
+    const el = $i(id);
+    if (!el) return;
+    el.addEventListener('focus', () => { el.select(); });
+  });
+</script>

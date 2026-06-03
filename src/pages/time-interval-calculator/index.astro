@@ -1,0 +1,498 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'time-interval-calculator');
+if (!entry) throw new Error('time-interval-calculator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="time-app">
+      <!-- 화면 1: 시작 시간 입력 -->
+      <section class="screen" id="screen1">
+        <h2 class="screen-title">시작 시간 입력</h2>
+        <p class="screen-desc">차이를 계산할 시작 시간을 입력하세요.</p>
+
+        <div class="time-inputs">
+          <div class="input-group">
+            <label for="startHour">시 (0~23)</label>
+            <input type="number" id="startHour" min="0" max="23" placeholder="0" />
+          </div>
+          <div class="input-group">
+            <label for="startMin">분 (0~59)</label>
+            <input type="number" id="startMin" min="0" max="59" placeholder="0" />
+          </div>
+          <div class="input-group">
+            <label for="startSec">초 (0~59)</label>
+            <input type="number" id="startSec" min="0" max="59" placeholder="0" />
+          </div>
+        </div>
+
+        <p class="error-msg" id="error1" hidden></p>
+
+        <button class="btn btn-primary" id="btnNext1">다음</button>
+      </section>
+
+      <!-- 화면 2: 종료 시간 입력 -->
+      <section class="screen" id="screen2" hidden>
+        <h2 class="screen-title">종료 시간 입력</h2>
+        <p class="screen-desc">차이를 계산할 종료 시간을 입력하세요.</p>
+
+        <div class="time-inputs">
+          <div class="input-group">
+            <label for="endHour">시 (0~23)</label>
+            <input type="number" id="endHour" min="0" max="23" placeholder="0" />
+          </div>
+          <div class="input-group">
+            <label for="endMin">분 (0~59)</label>
+            <input type="number" id="endMin" min="0" max="59" placeholder="0" />
+          </div>
+          <div class="input-group">
+            <label for="endSec">초 (0~59)</label>
+            <input type="number" id="endSec" min="0" max="59" placeholder="0" />
+          </div>
+        </div>
+
+        <p class="error-msg" id="error2" hidden></p>
+
+        <div class="action-row">
+          <button class="btn btn-secondary" id="btnBack2">이전</button>
+          <button class="btn btn-primary" id="btnNext2">계산하기</button>
+        </div>
+      </section>
+
+      <!-- 화면 3: 결과 -->
+      <section class="screen" id="screen3" hidden>
+        <h2 class="screen-title">계산 결과</h2>
+
+        <div class="result-card" id="result">
+          <div class="result-main">
+            <span class="result-label">시간 차이</span>
+            <span class="result-value" id="resultMain">-</span>
+          </div>
+          <div class="result-grid">
+            <div class="result-item">
+              <span class="result-label">시작 시간</span>
+              <span class="result-sub" id="resultStart">-</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">종료 시간</span>
+              <span class="result-sub" id="resultEnd">-</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">소수점 시간</span>
+              <span class="result-sub" id="resultDecimal">-</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">총 분 (반올림)</span>
+              <span class="result-sub" id="resultMinutes">-</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">총 초</span>
+              <span class="result-sub" id="resultSeconds">-</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="copy-feedback" id="copyFeedback" hidden>클립보드에 복사되었습니다 ✓</p>
+
+        <div class="action-row">
+          <button class="btn btn-secondary" id="btnCopy">클립보드 복사</button>
+          <button class="btn btn-primary" id="btnReset">처음으로</button>
+        </div>
+      </section>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .time-app {
+    width: 100%;
+  }
+
+  .screen {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+  }
+
+  .screen[hidden] {
+    display: none;
+  }
+
+  .screen-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .screen-desc {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  .time-inputs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .input-group label {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    font-size: 1rem;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-background);
+    color: var(--color-text);
+    transition: border-color 0.15s ease;
+    box-sizing: border-box;
+  }
+
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .error-msg {
+    color: var(--color-error, #dc2626);
+    font-size: 0.9rem;
+    margin: 0;
+    padding: 0.6rem 0.8rem;
+    background: rgba(220, 38, 38, 0.08);
+    border-radius: var(--radius-md);
+  }
+
+  .error-msg[hidden] {
+    display: none;
+  }
+
+  .btn {
+    padding: 0.85rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.15s ease;
+    width: 100%;
+  }
+
+  .btn:hover {
+    opacity: 0.92;
+  }
+
+  .btn:active {
+    transform: translateY(1px);
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-text);
+    border: 2px solid var(--color-border);
+  }
+
+  .action-row {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .action-row .btn {
+    flex: 1;
+  }
+
+  .result-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: var(--color-background);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+  }
+
+  .result-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .result-label {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .result-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+  }
+
+  .result-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.6rem 0.75rem;
+    background: var(--color-surface);
+    border-radius: var(--radius-sm, 6px);
+  }
+
+  .result-sub {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .copy-feedback {
+    margin: 0;
+    padding: 0.6rem 0.8rem;
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .copy-feedback[hidden] {
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    .screen {
+      padding: 1.1rem;
+    }
+    .result-grid {
+      grid-template-columns: 1fr;
+    }
+    .result-value {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    const $ = (id: string) => document.getElementById(id) as HTMLElement;
+    const $i = (id: string) => document.getElementById(id) as HTMLInputElement;
+
+    const screen1 = $('screen1');
+    const screen2 = $('screen2');
+    const screen3 = $('screen3');
+
+    const error1 = $('error1');
+    const error2 = $('error2');
+
+    let startTime = { h: 0, m: 0, s: 0 };
+    let endTime = { h: 0, m: 0, s: 0 };
+
+    function showScreen(n: number) {
+      screen1.hidden = n !== 1;
+      screen2.hidden = n !== 2;
+      screen3.hidden = n !== 3;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showError(el: HTMLElement, msg: string) {
+      el.textContent = msg;
+      el.hidden = false;
+    }
+
+    function hideError(el: HTMLElement) {
+      el.hidden = true;
+      el.textContent = '';
+    }
+
+    function parseTimeInput(hId: string, mId: string, sId: string) {
+      const hRaw = $i(hId).value.trim();
+      const mRaw = $i(mId).value.trim();
+      const sRaw = $i(sId).value.trim();
+
+      const h = hRaw === '' ? 0 : Number(hRaw);
+      const m = mRaw === '' ? 0 : Number(mRaw);
+      const s = sRaw === '' ? 0 : Number(sRaw);
+
+      if (Number.isNaN(h) || Number.isNaN(m) || Number.isNaN(s)) {
+        return { ok: false, msg: '숫자만 입력해주세요.', h: 0, m: 0, s: 0 };
+      }
+      if (h < 0 || h > 23) return { ok: false, msg: '시(時)는 0~23 범위여야 합니다.', h: 0, m: 0, s: 0 };
+      if (m < 0 || m > 59) return { ok: false, msg: '분(分)은 0~59 범위여야 합니다.', h: 0, m: 0, s: 0 };
+      if (s < 0 || s > 59) return { ok: false, msg: '초(秒)는 0~59 범위여야 합니다.', h: 0, m: 0, s: 0 };
+
+      return { ok: true, msg: '', h, m, s };
+    }
+
+    function pad2(n: number) {
+      return String(n).padStart(2, '0');
+    }
+
+    function formatTime(t: { h: number; m: number; s: number }) {
+      return `${pad2(t.h)}:${pad2(t.m)}:${pad2(t.s)}`;
+    }
+
+    $('btnNext1').addEventListener('click', () => {
+      const res = parseTimeInput('startHour', 'startMin', 'startSec');
+      if (!res.ok) {
+        showError(error1, res.msg);
+        return;
+      }
+      hideError(error1);
+      startTime = { h: res.h, m: res.m, s: res.s };
+      showScreen(2);
+    });
+
+    $('btnBack2').addEventListener('click', () => {
+      hideError(error2);
+      showScreen(1);
+    });
+
+    $('btnNext2').addEventListener('click', () => {
+      const res = parseTimeInput('endHour', 'endMin', 'endSec');
+      if (!res.ok) {
+        showError(error2, res.msg);
+        return;
+      }
+      endTime = { h: res.h, m: res.m, s: res.s };
+
+      const startSec = startTime.h * 3600 + startTime.m * 60 + startTime.s;
+      const endSec = endTime.h * 3600 + endTime.m * 60 + endTime.s;
+
+      if (endSec <= startSec) {
+        showError(error2, '종료 시간은 시작 시간보다 늦어야 합니다. (같은 날 기준)');
+        return;
+      }
+
+      hideError(error2);
+
+      const diffSec = endSec - startSec;
+      const diffH = Math.floor(diffSec / 3600);
+      const diffM = Math.floor((diffSec % 3600) / 60);
+      const diffS = diffSec % 60;
+      const diffDecimal = (diffSec / 3600).toFixed(2);
+      const diffMinutes = Math.round(diffSec / 60);
+
+      $('resultMain').textContent = `${diffH}시간 ${diffM}분 ${diffS}초`;
+      $('resultStart').textContent = formatTime(startTime);
+      $('resultEnd').textContent = formatTime(endTime);
+      $('resultDecimal').textContent = `${diffDecimal} 시간`;
+      $('resultMinutes').textContent = `${diffMinutes.toLocaleString()} 분`;
+      $('resultSeconds').textContent = `${diffSec.toLocaleString()} 초`;
+
+      showScreen(3);
+    });
+
+    $('btnCopy').addEventListener('click', async () => {
+      const text =
+        `[시간 차이 계산 결과]\n` +
+        `시작 시간: ${formatTime(startTime)}\n` +
+        `종료 시간: ${formatTime(endTime)}\n` +
+        `시간 차이: ${$('resultMain').textContent}\n` +
+        `소수점 시간: ${$('resultDecimal').textContent}\n` +
+        `총 분: ${$('resultMinutes').textContent}\n` +
+        `총 초: ${$('resultSeconds').textContent}`;
+
+      const feedback = $('copyFeedback');
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        feedback.textContent = '클립보드에 복사되었습니다 ✓';
+        feedback.hidden = false;
+        setTimeout(() => { feedback.hidden = true; }, 1800);
+      } catch (e) {
+        feedback.textContent = '복사에 실패했습니다. 브라우저 설정을 확인해주세요.';
+        feedback.hidden = false;
+      }
+    });
+
+    $('btnReset').addEventListener('click', () => {
+      ['startHour', 'startMin', 'startSec', 'endHour', 'endMin', 'endSec'].forEach(id => {
+        $i(id).value = '';
+      });
+      hideError(error1);
+      hideError(error2);
+      $('copyFeedback').hidden = true;
+      startTime = { h: 0, m: 0, s: 0 };
+      endTime = { h: 0, m: 0, s: 0 };
+      showScreen(1);
+    });
+
+    // 숫자 입력 필드 포커스 시 0이면 비우기 (UX 개선)
+    ['startHour', 'startMin', 'startSec', 'endHour', 'endMin', 'endSec'].forEach(id => {
+      const el = $i(id);
+      el.addEventListener('focus', () => {
+        if (el.value === '0') el.value = '';
+      });
+    });
+  })();
+</script>

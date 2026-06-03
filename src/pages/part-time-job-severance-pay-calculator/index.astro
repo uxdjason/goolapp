@@ -1,0 +1,455 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'part-time-job-severance-pay-calculator');
+if (!entry) throw new Error('part-time-job-severance-pay-calculator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="severance-app">
+      <section class="date-section">
+        <h2 class="section-title">📅 재직 기간</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="start-date">입사일</label>
+            <input class="calc-input" id="start-date" type="date" />
+          </div>
+          <div class="form-group">
+            <label for="end-date">퇴사일 (마지막 근무일)</label>
+            <input class="calc-input" id="end-date" type="date" />
+          </div>
+        </div>
+        <p class="hint" id="period-info">입사일과 퇴사일을 입력해 주세요.</p>
+      </section>
+
+      <section class="salary-section" id="salary-section" hidden>
+        <h2 class="section-title">💰 퇴사 직전 3개월 급여 (세전)</h2>
+        <p class="hint">평균 임금 계산을 위해 퇴사일 기준 직전 3개월의 세전 월급을 입력하세요.</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="month-1-salary" id="month-1-label">1개월 전 월급 (원)</label>
+            <input class="calc-input" id="month-1-salary" placeholder="예: 2100000" type="number" inputmode="numeric" />
+          </div>
+          <div class="form-group">
+            <label for="month-2-salary" id="month-2-label">2개월 전 월급 (원)</label>
+            <input class="calc-input" id="month-2-salary" placeholder="예: 2100000" type="number" inputmode="numeric" />
+          </div>
+          <div class="form-group">
+            <label for="month-3-salary" id="month-3-label">3개월 전 월급 (원)</label>
+            <input class="calc-input" id="month-3-salary" placeholder="예: 2100000" type="number" inputmode="numeric" />
+          </div>
+          <div class="form-group">
+            <label for="annual-bonus">지난 1년간 총 상여금 (원, 선택)</label>
+            <input class="calc-input" id="annual-bonus" placeholder="0" type="number" inputmode="numeric" value="0" />
+          </div>
+        </div>
+      </section>
+
+      <section class="result-section" id="result-section" hidden>
+        <h2 class="section-title">📊 계산 결과</h2>
+        <div class="result-card" id="result-card">
+          <div class="result-label">예상 퇴직금</div>
+          <div class="result-main" id="severance-amount">0원</div>
+        </div>
+        <div class="result-details" id="calc-details"></div>
+        <div class="warning-box" id="warning-box" hidden></div>
+      </section>
+
+      <div class="actions">
+        <button id="reset-btn" class="btn-reset" type="button">초기화</button>
+      </div>
+
+      <p class="disclaimer">
+        ⚠️ 본 계산기는 근로기준법상 평균임금 기준 퇴직금을 추산하는 도구로, 실제 지급액과 차이가 있을 수 있습니다.
+        주 15시간 이상, 1년 이상 근무한 근로자가 지급 대상이며, 정확한 금액은 사업장이나 노무사를 통해 확인하시기 바랍니다.
+      </p>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .severance-app {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
+    color: var(--color-text);
+  }
+
+  .date-section,
+  .salary-section,
+  .result-section {
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .salary-section[hidden],
+  .result-section[hidden] {
+    display: none;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.875rem;
+  }
+
+  @media (max-width: 520px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .calc-input {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1.5px solid var(--color-border, #d1d5db);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--color-bg, #fff);
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-sizing: border-box;
+  }
+
+  .calc-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-soft, rgba(59, 130, 246, 0.15));
+  }
+
+  .hint {
+    font-size: 0.85rem;
+    color: var(--color-text-muted, #6b7280);
+    margin: 0.5rem 0 0 0;
+  }
+
+  .result-card {
+    background: var(--color-primary-soft, #eff6ff);
+    border: 1.5px solid var(--color-primary, #3b82f6);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: center;
+  }
+
+  .result-label {
+    font-size: 0.9rem;
+    color: var(--color-text-muted, #6b7280);
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+
+  .result-main {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--color-primary, #3b82f6);
+    letter-spacing: -0.02em;
+  }
+
+  .result-details {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .result-details :global(.detail-row) {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.55rem 0.75rem;
+    background: var(--color-surface-alt, #f9fafb);
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+
+  .result-details :global(.detail-row .label) {
+    color: var(--color-text-muted, #6b7280);
+  }
+
+  .result-details :global(.detail-row .value) {
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .result-details :global(.ineligible-msg) {
+    text-align: center;
+    padding: 1rem;
+    color: var(--color-text);
+    font-weight: 600;
+    background: var(--color-surface-alt, #fef3c7);
+    border-radius: 8px;
+  }
+
+  .warning-box {
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    border-radius: 6px;
+    color: #92400e;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .warning-box[hidden] {
+    display: none;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: center;
+  }
+
+  .btn-reset {
+    padding: 0.7rem 1.5rem;
+    background: var(--color-surface-alt, #f3f4f6);
+    color: var(--color-text);
+    border: 1.5px solid var(--color-border, #d1d5db);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .btn-reset:hover {
+    background: var(--color-border, #e5e7eb);
+    border-color: var(--color-text-muted, #9ca3af);
+  }
+
+  .disclaimer {
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #6b7280);
+    line-height: 1.6;
+    padding: 0.85rem 1rem;
+    background: var(--color-surface-alt, #f9fafb);
+    border-radius: 8px;
+    margin: 0;
+  }
+</style>
+
+<script>
+  // ===== 상수 (2025년 기준) =====
+  const MIN_HOURLY_WAGE = 10030;        // 2025년 최저시급
+  const MIN_DAILY_WAGE = MIN_HOURLY_WAGE * 8; // 80,240원 (8시간 기준 최저 일급)
+  const ONE_DAY_MS = 1000 * 60 * 60 * 24;
+
+  // ===== DOM =====
+  const startDateEl = document.getElementById('start-date') as HTMLInputElement;
+  const endDateEl = document.getElementById('end-date') as HTMLInputElement;
+  const periodInfoEl = document.getElementById('period-info') as HTMLElement;
+
+  const salarySection = document.getElementById('salary-section') as HTMLElement;
+  const resultSection = document.getElementById('result-section') as HTMLElement;
+
+  const m1Label = document.getElementById('month-1-label') as HTMLElement;
+  const m2Label = document.getElementById('month-2-label') as HTMLElement;
+  const m3Label = document.getElementById('month-3-label') as HTMLElement;
+
+  const s1El = document.getElementById('month-1-salary') as HTMLInputElement;
+  const s2El = document.getElementById('month-2-salary') as HTMLInputElement;
+  const s3El = document.getElementById('month-3-salary') as HTMLInputElement;
+  const bonusEl = document.getElementById('annual-bonus') as HTMLInputElement;
+
+  const severanceAmountEl = document.getElementById('severance-amount') as HTMLElement;
+  const calcDetailsEl = document.getElementById('calc-details') as HTMLElement;
+  const warningBoxEl = document.getElementById('warning-box') as HTMLElement;
+  const resetBtn = document.getElementById('reset-btn') as HTMLButtonElement;
+
+  // ===== Utils =====
+  const fmt = (n: number) => Math.floor(n).toLocaleString('ko-KR');
+
+  function updateSalaryLabels(endDate: Date) {
+    // endDate 기준으로 -1, -2, -3개월의 월을 구함
+    const mk = (offset: number) => {
+      const d = new Date(endDate.getFullYear(), endDate.getMonth() - offset, 1);
+      return `${d.getFullYear()}년 ${d.getMonth() + 1}월`;
+    };
+    m1Label.textContent = `1개월 전 월급 — ${mk(1)} (원)`;
+    m2Label.textContent = `2개월 전 월급 — ${mk(2)} (원)`;
+    m3Label.textContent = `3개월 전 월급 — ${mk(3)} (원)`;
+  }
+
+  function hideResults() {
+    salarySection.hidden = true;
+    resultSection.hidden = true;
+  }
+
+  function showIneligible(totalDays: number) {
+    salarySection.hidden = true;
+    resultSection.hidden = false;
+    severanceAmountEl.textContent = '지급 대상 아님';
+    calcDetailsEl.innerHTML = `
+      <div class="ineligible-msg">
+        총 재직일수가 <strong>${totalDays}일</strong>로 1년(365일) 미만입니다.<br/>
+        근로기준법상 퇴직금 지급 대상이 아닙니다.
+      </div>
+    `;
+    warningBoxEl.hidden = true;
+  }
+
+  function calculate() {
+    const startVal = startDateEl.value;
+    const endVal = endDateEl.value;
+
+    if (!startVal || !endVal) {
+      periodInfoEl.textContent = '입사일과 퇴사일을 입력해 주세요.';
+      hideResults();
+      return;
+    }
+
+    const startDate = new Date(startVal);
+    const endDate = new Date(endVal);
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || startDate > endDate) {
+      periodInfoEl.textContent = '⚠️ 퇴사일은 입사일보다 같거나 이후여야 합니다.';
+      hideResults();
+      return;
+    }
+
+    // 퇴사일 포함 총 재직일수
+    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / ONE_DAY_MS) + 1;
+    const years = (totalDays / 365).toFixed(2);
+    periodInfoEl.textContent = `총 재직일수: ${totalDays.toLocaleString('ko-KR')}일 (약 ${years}년)`;
+
+    if (totalDays < 365) {
+      showIneligible(totalDays);
+      return;
+    }
+
+    // 1년 이상 → 급여 입력 섹션 표시
+    salarySection.hidden = false;
+    updateSalaryLabels(endDate);
+
+    const s1 = parseFloat(s1El.value) || 0;
+    const s2 = parseFloat(s2El.value) || 0;
+    const s3 = parseFloat(s3El.value) || 0;
+    const bonus = parseFloat(bonusEl.value) || 0;
+
+    if (s1 <= 0 || s2 <= 0 || s3 <= 0) {
+      resultSection.hidden = true;
+      return;
+    }
+
+    // 직전 3개월의 실제 일수
+    const dateBefore3Months = new Date(endDate);
+    dateBefore3Months.setMonth(dateBefore3Months.getMonth() - 3);
+    const daysIn3MonthPeriod = Math.max(
+      1,
+      Math.round((endDate.getTime() - dateBefore3Months.getTime()) / ONE_DAY_MS)
+    );
+
+    const totalSalary = s1 + s2 + s3;
+    const bonusForAvg = bonus * (3 / 12); // 상여금 3개월치 환산
+    const totalAmountForAvg = totalSalary + bonusForAvg;
+    const avgDailyWage = totalAmountForAvg / daysIn3MonthPeriod;
+
+    let finalDailyWage = avgDailyWage;
+    let warningMsg = '';
+
+    if (avgDailyWage < MIN_DAILY_WAGE) {
+      finalDailyWage = MIN_DAILY_WAGE;
+      warningMsg = `📌 계산된 평균 일급(${fmt(avgDailyWage)}원)이 2025년 기준 최저 일급(${fmt(MIN_DAILY_WAGE)}원, 시급 ${fmt(MIN_HOURLY_WAGE)}원 × 8시간)보다 낮아, 최저임금 기준으로 자동 상향 조정되었습니다.`;
+    }
+
+    const severancePay = finalDailyWage * 30 * (totalDays / 365);
+
+    resultSection.hidden = false;
+    severanceAmountEl.textContent = `${fmt(severancePay)}원`;
+    calcDetailsEl.innerHTML = `
+      <div class="detail-row"><span class="label">총 재직일수</span><span class="value">${totalDays.toLocaleString('ko-KR')}일</span></div>
+      <div class="detail-row"><span class="label">3개월 평균 일급 (계산값)</span><span class="value">${fmt(avgDailyWage)}원</span></div>
+      <div class="detail-row"><span class="label">적용 1일 평균 임금</span><span class="value">${fmt(finalDailyWage)}원</span></div>
+      <div class="detail-row"><span class="label">계산식</span><span class="value">${fmt(finalDailyWage)} × 30 × (${totalDays}/365)</span></div>
+    `;
+
+    if (warningMsg) {
+      warningBoxEl.hidden = false;
+      warningBoxEl.textContent = warningMsg;
+    } else {
+      warningBoxEl.hidden = true;
+      warningBoxEl.textContent = '';
+    }
+  }
+
+  function resetAll() {
+    startDateEl.value = '';
+    endDateEl.value = '';
+    s1El.value = '';
+    s2El.value = '';
+    s3El.value = '';
+    bonusEl.value = '0';
+    periodInfoEl.textContent = '입사일과 퇴사일을 입력해 주세요.';
+    salarySection.hidden = true;
+    resultSection.hidden = true;
+    warningBoxEl.hidden = true;
+  }
+
+  // ===== 이벤트 바인딩 =====
+  [startDateEl, endDateEl, s1El, s2El, s3El, bonusEl].forEach((el) => {
+    el.addEventListener('input', calculate);
+    el.addEventListener('change', calculate);
+  });
+
+  // 숫자 입력 필드: 포커스 시 기본값 '0'이면 비우기
+  [bonusEl].forEach((el) => {
+    el.addEventListener('focus', () => {
+      if (el.value === '0') el.value = '';
+    });
+    el.addEventListener('blur', () => {
+      if (el.value.trim() === '') el.value = '0';
+    });
+  });
+
+  resetBtn.addEventListener('click', resetAll);
+</script>

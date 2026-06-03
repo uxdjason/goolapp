@@ -1,0 +1,429 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'age-calculator');
+if (!entry) throw new Error('age-calculator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="age-app">
+      <!-- 입력 화면 -->
+      <section id="screen-input" class="screen">
+        <h2 class="section-title">생년월일 입력</h2>
+        <p class="section-desc">태어난 연/월/일을 입력하면 한국 나이와 만 나이를 계산해 드립니다.</p>
+
+        <div class="date-inputs">
+          <div class="field">
+            <label for="year">년</label>
+            <input id="year" type="number" min="1" step="1" placeholder="예: 1990" inputmode="numeric" />
+          </div>
+          <div class="field">
+            <label for="month">월</label>
+            <input id="month" type="number" min="1" max="12" step="1" placeholder="1-12" inputmode="numeric" />
+          </div>
+          <div class="field">
+            <label for="day">일</label>
+            <input id="day" type="number" min="1" max="31" step="1" placeholder="1-31" inputmode="numeric" />
+          </div>
+        </div>
+
+        <p id="err-msg" class="err-msg" hidden></p>
+
+        <button id="btn-calc" class="btn btn-primary" type="button">나이 계산</button>
+      </section>
+
+      <!-- 결과 화면 -->
+      <section id="screen-result" class="screen" hidden>
+        <h2 class="section-title">나이 계산 결과</h2>
+
+        <div class="result-grid">
+          <div class="result-card highlight">
+            <span class="result-label">만 나이</span>
+            <span class="result-value"><span id="manAge">0</span>세</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">한국 나이</span>
+            <span class="result-value"><span id="koreaAge">0</span>세</span>
+          </div>
+        </div>
+
+        <div class="lifespan-box">
+          <span class="lifespan-label">지금까지 살아온 기간</span>
+          <span id="lifespan" class="lifespan-value">- 년 - 개월 - 일</span>
+        </div>
+
+        <button id="btn-reset" class="btn btn-primary" type="button">다시 하기</button>
+      </section>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .age-app {
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .screen {
+    display: block;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  .screen[hidden] {
+    display: none;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .section-desc {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .date-inputs {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .field label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  .field input {
+    width: 100%;
+    padding: 0.75rem 0.85rem;
+    font-size: 1rem;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-background);
+    color: var(--color-text);
+    transition: border-color 0.15s ease;
+    box-sizing: border-box;
+  }
+
+  .field input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  /* number input 화살표 제거 (모바일 UX) */
+  .field input::-webkit-outer-spin-button,
+  .field input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .field input[type='number'] {
+    -moz-appearance: textfield;
+  }
+
+  .err-msg {
+    display: block;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    margin: 0 0 1rem 0;
+  }
+  .err-msg[hidden] {
+    display: none;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.05s ease;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    background: var(--color-primary-dark, var(--color-primary));
+    filter: brightness(0.95);
+  }
+
+  .btn-primary:active {
+    transform: translateY(1px);
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .result-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 1.25rem 0.75rem;
+    border: 2px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-background);
+  }
+
+  .result-card.highlight {
+    border-color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 8%, var(--color-background));
+  }
+
+  .result-label {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+
+  .result-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .lifespan-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem;
+    border-radius: 10px;
+    background: var(--color-background);
+    border: 1px dashed var(--color-border);
+    margin-bottom: 1.25rem;
+    text-align: center;
+  }
+
+  .lifespan-label {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+
+  .lifespan-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  @media (max-width: 480px) {
+    .date-inputs {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    .result-value {
+      font-size: 1.35rem;
+    }
+  }
+</style>
+
+<script>
+  function $(id: string) {
+    return document.getElementById(id) as HTMLElement | null;
+  }
+
+  function showError(msg: string) {
+    const el = $('err-msg') as HTMLParagraphElement | null;
+    if (!el) return;
+    el.textContent = msg;
+    el.hidden = false;
+  }
+
+  function clearError() {
+    const el = $('err-msg') as HTMLParagraphElement | null;
+    if (!el) return;
+    el.textContent = '';
+    el.hidden = true;
+  }
+
+  function goTo(screen: 1 | 2) {
+    const s1 = $('screen-input');
+    const s2 = $('screen-result');
+    if (!s1 || !s2) return;
+    if (screen === 1) {
+      s1.hidden = false;
+      s2.hidden = true;
+    } else {
+      s1.hidden = true;
+      s2.hidden = false;
+    }
+  }
+
+  function isValidDate(y: number, m: number, d: number): boolean {
+    const dt = new Date(y, m - 1, d);
+    return (
+      dt.getFullYear() === y &&
+      dt.getMonth() === m - 1 &&
+      dt.getDate() === d
+    );
+  }
+
+  function calculateAge() {
+    clearError();
+
+    const yEl = $('year') as HTMLInputElement | null;
+    const mEl = $('month') as HTMLInputElement | null;
+    const dEl = $('day') as HTMLInputElement | null;
+    if (!yEl || !mEl || !dEl) return;
+
+    const y = parseInt(yEl.value, 10);
+    const m = parseInt(mEl.value, 10);
+    const d = parseInt(dEl.value, 10);
+
+    if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) {
+      showError('연, 월, 일을 모두 숫자로 입력해 주세요.');
+      return;
+    }
+    if (y < 1) {
+      showError('태어난 해를 올바르게 입력해 주세요.');
+      return;
+    }
+    if (m < 1 || m > 12) {
+      showError('월은 1~12 사이로 입력해 주세요.');
+      return;
+    }
+    if (d < 1 || d > 31) {
+      showError('일은 1~31 사이로 입력해 주세요.');
+      return;
+    }
+    if (!isValidDate(y, m, d)) {
+      showError('존재하지 않는 날짜입니다. 다시 확인해 주세요.');
+      return;
+    }
+
+    const today = new Date();
+    const birth = new Date(y, m - 1, d);
+
+    if (birth.getTime() > today.getTime()) {
+      showError('미래 날짜는 입력할 수 없습니다.');
+      return;
+    }
+
+    // 한국 나이
+    const koreaAge = today.getFullYear() - y + 1;
+
+    // 만 나이
+    let manAge = today.getFullYear() - y;
+    const beforeBirthday =
+      today.getMonth() < m - 1 ||
+      (today.getMonth() === m - 1 && today.getDate() < d);
+    if (beforeBirthday) manAge -= 1;
+
+    // 생존 기간 (정확도 개선: 윤년/월별 일수 반영)
+    let yrs = today.getFullYear() - birth.getFullYear();
+    let mons = today.getMonth() - birth.getMonth();
+    let days = today.getDate() - birth.getDate();
+
+    if (days < 0) {
+      mons -= 1;
+      // 이전 달의 마지막 날
+      const prevMonthLastDay = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        0
+      ).getDate();
+      days += prevMonthLastDay;
+    }
+    if (mons < 0) {
+      yrs -= 1;
+      mons += 12;
+    }
+
+    const koreaAgeEl = $('koreaAge');
+    const manAgeEl = $('manAge');
+    const lifespanEl = $('lifespan');
+
+    if (koreaAgeEl) koreaAgeEl.textContent = String(koreaAge);
+    if (manAgeEl) manAgeEl.textContent = String(Math.max(0, manAge));
+    if (lifespanEl)
+      lifespanEl.textContent = `${yrs}년 ${mons}개월 ${days}일`;
+
+    goTo(2);
+  }
+
+  function init() {
+    const btnCalc = $('btn-calc');
+    const btnReset = $('btn-reset');
+    btnCalc?.addEventListener('click', calculateAge);
+    btnReset?.addEventListener('click', () => {
+      clearError();
+      goTo(1);
+    });
+
+    // Enter 키로 계산
+    ['year', 'month', 'day'].forEach((id) => {
+      const el = $(id) as HTMLInputElement | null;
+      el?.addEventListener('keydown', (e) => {
+        if ((e as KeyboardEvent).key === 'Enter') {
+          e.preventDefault();
+          calculateAge();
+        }
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+</script>

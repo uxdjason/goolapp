@@ -1,0 +1,311 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'roll-2-dice');
+if (!entry) throw new Error('roll-2-dice entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    {/*
+      외부 리소스 안내:
+      주사위 이미지는 기존 https://goolapp.com/wp-content/app-image/dice/dice01.png ~ dice06.png 를
+      프로젝트의 public/images/dice/dice01.png ~ dice06.png 로 복사해두어야 한다.
+    */}
+    <div class="dice-app">
+      <div class="dice-stage">
+        <div class="cube" id="cube1" data-cube>
+          <div class="face face-front"></div>
+          <div class="face face-back"></div>
+          <div class="face face-right"></div>
+          <div class="face face-left"></div>
+          <div class="face face-top"></div>
+          <div class="face face-bottom"></div>
+        </div>
+        <div class="cube" id="cube2" data-cube>
+          <div class="face face-front"></div>
+          <div class="face face-back"></div>
+          <div class="face face-right"></div>
+          <div class="face face-left"></div>
+          <div class="face face-top"></div>
+          <div class="face face-bottom"></div>
+        </div>
+      </div>
+
+      <button class="roll-button" id="rollButton" type="button">
+        🎲 둘 다 굴려요!
+      </button>
+
+      <div class="result-box" id="resultBox" hidden>
+        <div class="result-row">
+          <span class="result-label">주사위 1</span>
+          <span class="result-value" id="result1">-</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">주사위 2</span>
+          <span class="result-value" id="result2">-</span>
+        </div>
+        <div class="result-row total-row">
+          <span class="result-label">합계</span>
+          <span class="result-value" id="resultTotal">-</span>
+        </div>
+      </div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .dice-app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem 1rem;
+  }
+
+  .dice-stage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    perspective: 800px;
+    width: 100%;
+    min-height: 180px;
+    padding: 1.5rem 0;
+  }
+
+  .cube {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    transform-style: preserve-3d;
+    transform: rotateX(0deg) rotateY(0deg);
+    transition: transform 1s cubic-bezier(0.25, 0.8, 0.4, 1);
+  }
+
+  .face {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+    background-color: #fff;
+  }
+
+  .face-front  { transform: translateZ(50px); }
+  .face-back   { transform: rotateY(180deg) translateZ(50px); }
+  .face-right  { transform: rotateY(90deg) translateZ(50px); }
+  .face-left   { transform: rotateY(-90deg) translateZ(50px); }
+  .face-top    { transform: rotateX(90deg) translateZ(50px); }
+  .face-bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+  .roll-button {
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .roll-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .roll-button:active {
+    transform: translateY(0);
+  }
+
+  .roll-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .result-box {
+    width: 100%;
+    max-width: 360px;
+    background: var(--color-surface, #f9fafb);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .result-box[hidden] {
+    display: none;
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0;
+  }
+
+  .result-label {
+    color: var(--color-text-muted, #6b7280);
+    font-size: 0.95rem;
+  }
+
+  .result-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text, #111827);
+  }
+
+  .total-row {
+    border-top: 1px dashed var(--color-border, #e5e7eb);
+    margin-top: 0.25rem;
+    padding-top: 0.75rem;
+  }
+
+  .total-row .result-value {
+    color: var(--color-primary);
+    font-size: 1.35rem;
+  }
+
+  @media (max-width: 480px) {
+    .dice-stage {
+      gap: 2rem;
+    }
+    .cube, .face {
+      width: 80px;
+      height: 80px;
+    }
+    .face-front  { transform: translateZ(40px); }
+    .face-back   { transform: rotateY(180deg) translateZ(40px); }
+    .face-right  { transform: rotateY(90deg) translateZ(40px); }
+    .face-left   { transform: rotateY(-90deg) translateZ(40px); }
+    .face-top    { transform: rotateX(90deg) translateZ(40px); }
+    .face-bottom { transform: rotateX(-90deg) translateZ(40px); }
+  }
+</style>
+
+<script>
+  // 주사위 숫자 → 회전각 매핑
+  const rotations: Record<number, { x: number; y: number }> = {
+    1: { x: 0,   y: 0 },
+    2: { x: -90, y: 0 },
+    3: { x: 0,   y: -90 },
+    4: { x: 0,   y: 90 },
+    5: { x: 90,  y: 0 },
+    6: { x: 0,   y: 180 },
+  };
+
+  // 면 순서: front, back, right, left, top, bottom
+  // 위 rotations 매핑에 따라 화면에 보이는 면(눈):
+  // 1=front, 2=top, 3=right, 4=left, 5=bottom, 6=back
+  // 따라서 각 face에 매핑할 dice 이미지 번호:
+  // front=1, back=6, right=3, left=4, top=2, bottom=5
+  const faceImageOrder = [1, 6, 3, 4, 2, 5];
+
+  function setupCube(cube: HTMLElement) {
+    const faces = cube.querySelectorAll<HTMLElement>('.face');
+    faces.forEach((face, idx) => {
+      const num = faceImageOrder[idx];
+      const padded = String(num).padStart(2, '0');
+      face.style.backgroundImage = `url('/images/dice/dice${padded}.png')`;
+    });
+  }
+
+  function randomInt(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function rollCube(cube: HTMLElement): number {
+    const result = randomInt(1, 6);
+    const { x, y } = rotations[result];
+    const spins = randomInt(3, 4);
+    const targetX = x + 360 * spins;
+    const targetY = y + 360 * spins;
+
+    cube.style.transition = 'transform 1s cubic-bezier(0.25, 0.8, 0.4, 1)';
+    cube.style.transform = `rotateX(${targetX}deg) rotateY(${targetY}deg)`;
+
+    window.setTimeout(() => {
+      cube.style.transition = 'none';
+      cube.style.transform = `rotateX(${x}deg) rotateY(${y}deg)`;
+      window.setTimeout(() => {
+        cube.style.transition = 'transform 1s cubic-bezier(0.25, 0.8, 0.4, 1)';
+      }, 50);
+    }, 1000);
+
+    return result;
+  }
+
+  function init() {
+    const cube1 = document.getElementById('cube1');
+    const cube2 = document.getElementById('cube2');
+    const button = document.getElementById('rollButton') as HTMLButtonElement | null;
+    const resultBox = document.getElementById('resultBox');
+    const result1El = document.getElementById('result1');
+    const result2El = document.getElementById('result2');
+    const resultTotalEl = document.getElementById('resultTotal');
+
+    if (!cube1 || !cube2 || !button || !resultBox || !result1El || !result2El || !resultTotalEl) return;
+
+    setupCube(cube1);
+    setupCube(cube2);
+
+    button.addEventListener('click', () => {
+      button.disabled = true;
+      const r1 = rollCube(cube1);
+      const r2 = rollCube(cube2);
+
+      window.setTimeout(() => {
+        result1El.textContent = String(r1);
+        result2El.textContent = String(r2);
+        resultTotalEl.textContent = String(r1 + r2);
+        resultBox.hidden = false;
+        button.disabled = false;
+      }, 1050);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+</script>

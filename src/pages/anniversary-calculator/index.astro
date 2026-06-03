@@ -1,0 +1,442 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'anniversary-calculator');
+if (!entry) throw new Error('anniversary-calculator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+
+const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1500, 2000, 3000, 4000, 5000, 6000, 7000, 7777, 8000, 9000, 10000];
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="anniversary-app">
+      <!-- 입력 화면 -->
+      <section class="screen" id="screen1">
+        <p class="intro">기준이 되는 날짜를 입력하면, 50일, 100일, 1000일 등 다양한 기념일을 한 번에 계산해드려요.</p>
+
+        <div class="input-grid">
+          <div class="input-field">
+            <label for="baseYear">연도</label>
+            <input id="baseYear" type="number" min="0" max="9999" placeholder="yyyy" />
+          </div>
+          <div class="input-field">
+            <label for="baseMonth">월</label>
+            <input id="baseMonth" type="number" min="1" max="12" placeholder="mm" />
+          </div>
+          <div class="input-field">
+            <label for="baseDay">일</label>
+            <input id="baseDay" type="number" min="1" max="31" placeholder="dd" />
+          </div>
+        </div>
+
+        <p class="error-msg" id="errorMsg" hidden></p>
+
+        <button class="btn-primary" id="calcBtn" type="button">기념일 계산</button>
+
+        <div class="quick-tip">
+          💡 연인의 첫 만남, 결혼, 출산, 입사일 등 의미 있는 날짜를 입력해보세요.
+        </div>
+      </section>
+
+      <!-- 결과 화면 -->
+      <section class="screen" id="screen2" hidden>
+        <div class="result-header" id="resultHeader"></div>
+
+        <div class="table-wrapper">
+          <table class="result-table" id="resultTable">
+            <thead>
+              <tr>
+                <th>기념일</th>
+                <th>날짜</th>
+                <th>요일</th>
+              </tr>
+            </thead>
+            <tbody id="resultBody"></tbody>
+          </table>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn-secondary" id="copyBtn" type="button">📋 클립보드로 복사</button>
+          <button class="btn-primary" id="resetBtn" type="button">처음으로</button>
+        </div>
+
+        <p class="copy-feedback" id="copyFeedback" hidden>✅ 복사되었습니다!</p>
+      </section>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .anniversary-app {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .screen {
+    display: block;
+  }
+  .screen[hidden] {
+    display: none;
+  }
+
+  .intro {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary, #555);
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+  }
+
+  .input-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .input-field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .input-field label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text, #222);
+    margin-bottom: 0.4rem;
+  }
+
+  .input-field input {
+    padding: 0.7rem 0.75rem;
+    font-size: 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .input-field input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+  }
+
+  .error-msg {
+    color: #d32f2f;
+    background: #fff0f0;
+    border: 1px solid #ffcdd2;
+    padding: 0.6rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .error-msg[hidden] {
+    display: none;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    padding: 0.95rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.15s, background 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  .btn-secondary {
+    background: #f3f4f6;
+    color: var(--color-text, #222);
+    border: 2px solid #d1d5db;
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-1px);
+    background: #e5e7eb;
+  }
+
+  .quick-tip {
+    margin-top: 1.25rem;
+    padding: 0.85rem 1rem;
+    background: #f9fafb;
+    border-left: 3px solid var(--color-primary);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--color-text-secondary, #555);
+    line-height: 1.5;
+  }
+
+  .result-header {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 1rem 1.25rem;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+  }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+
+  .result-table thead {
+    background: #f3f4f6;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 0.75rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .result-table th {
+    font-weight: 600;
+    color: var(--color-text, #222);
+  }
+
+  .result-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .result-table tbody tr:hover {
+    background: #fafafa;
+  }
+
+  .result-table .day-cell {
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .copy-feedback {
+    margin-top: 0.85rem;
+    text-align: center;
+    color: #2e7d32;
+    background: #e8f5e9;
+    padding: 0.6rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    display: block;
+  }
+  .copy-feedback[hidden] {
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    .input-grid {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    .result-table th,
+    .result-table td {
+      padding: 0.6rem 0.5rem;
+      font-size: 0.88rem;
+    }
+  }
+</style>
+
+<script is:inline define:vars={{ daysList }}>
+  (function () {
+    const screen1 = document.getElementById('screen1');
+    const screen2 = document.getElementById('screen2');
+    const yearEl = document.getElementById('baseYear');
+    const monthEl = document.getElementById('baseMonth');
+    const dayEl = document.getElementById('baseDay');
+    const errorMsg = document.getElementById('errorMsg');
+    const calcBtn = document.getElementById('calcBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultHeader = document.getElementById('resultHeader');
+    const resultBody = document.getElementById('resultBody');
+    const copyFeedback = document.getElementById('copyFeedback');
+
+    const weekdayNames = ['일', '월', '화', '수', '목', '금', '토'];
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.hidden = false;
+    }
+
+    function clearError() {
+      errorMsg.textContent = '';
+      errorMsg.hidden = true;
+    }
+
+    function formatDate(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${dd}`;
+    }
+
+    function formatDay(n) {
+      return n.toLocaleString('ko-KR') + '일';
+    }
+
+    function calculate() {
+      clearError();
+
+      const y = parseInt(yearEl.value, 10);
+      const m = parseInt(monthEl.value, 10);
+      const d = parseInt(dayEl.value, 10);
+
+      if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) {
+        showError('연/월/일을 모두 숫자로 입력해주세요.');
+        return;
+      }
+
+      if (y < 0 || y > 9999 || m < 1 || m > 12 || d < 1 || d > 31) {
+        showError('올바른 범위의 날짜를 입력해주세요.');
+        return;
+      }
+
+      const baseDate = new Date(y, m - 1, d);
+      if (
+        baseDate.getFullYear() !== y ||
+        baseDate.getMonth() !== m - 1 ||
+        baseDate.getDate() !== d
+      ) {
+        showError('존재하지 않는 날짜입니다. 다시 확인해주세요.');
+        return;
+      }
+
+      resultHeader.textContent = `📅 기준일: ${formatDate(baseDate)} (${weekdayNames[baseDate.getDay()]}요일)`;
+
+      resultBody.innerHTML = '';
+      daysList.forEach((n) => {
+        const target = new Date(baseDate.getTime());
+        target.setDate(target.getDate() + n);
+
+        const tr = document.createElement('tr');
+        const tdDay = document.createElement('td');
+        tdDay.className = 'day-cell';
+        tdDay.textContent = formatDay(n);
+
+        const tdDate = document.createElement('td');
+        tdDate.textContent = formatDate(target);
+
+        const tdWeek = document.createElement('td');
+        tdWeek.textContent = weekdayNames[target.getDay()] + '요일';
+
+        tr.appendChild(tdDay);
+        tr.appendChild(tdDate);
+        tr.appendChild(tdWeek);
+        resultBody.appendChild(tr);
+      });
+
+      screen1.hidden = true;
+      screen2.hidden = false;
+      copyFeedback.hidden = true;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function reset() {
+      screen2.hidden = true;
+      screen1.hidden = false;
+      copyFeedback.hidden = true;
+    }
+
+    async function copyResult() {
+      let text = resultHeader.textContent + '\n\n';
+      const rows = resultBody.querySelectorAll('tr');
+      rows.forEach((row) => {
+        const cells = row.querySelectorAll('td');
+        const parts = [];
+        cells.forEach((c) => parts.push(c.textContent.trim()));
+        text += parts.join(' | ') + '\n';
+      });
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        copyFeedback.hidden = false;
+        setTimeout(() => {
+          copyFeedback.hidden = true;
+        }, 2000);
+      } catch (e) {
+        alert('복사에 실패했습니다. 브라우저 설정을 확인해주세요.');
+      }
+    }
+
+    calcBtn.addEventListener('click', calculate);
+    resetBtn.addEventListener('click', reset);
+    copyBtn.addEventListener('click', copyResult);
+
+    [yearEl, monthEl, dayEl].forEach((el) => {
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') calculate();
+      });
+    });
+  })();
+</script>

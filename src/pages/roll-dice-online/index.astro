@@ -1,0 +1,250 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'roll-dice-online');
+if (!entry) throw new Error('roll-dice-online entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    {/*
+      외부 리소스 안내:
+      기존 WP 이미지 경로 https://goolapp.com/wp-content/app-image/dice/dice01.png ~ dice06.png 를
+      로컬 폴더 public/images/dice/ 에 dice01.png ~ dice06.png 로 복사해두어야 합니다.
+      (메타: resource_wp → same_resourse_copied_to_our_project_folder: images/dice)
+    */}
+    <section class="dice-app">
+      <div class="dice-stage">
+        <div class="cube" id="cube">
+          <div class="face face-front"><img src="/images/dice/dice01.png" alt="주사위 1" /></div>
+          <div class="face face-back"><img src="/images/dice/dice06.png" alt="주사위 6" /></div>
+          <div class="face face-right"><img src="/images/dice/dice03.png" alt="주사위 3" /></div>
+          <div class="face face-left"><img src="/images/dice/dice04.png" alt="주사위 4" /></div>
+          <div class="face face-top"><img src="/images/dice/dice02.png" alt="주사위 2" /></div>
+          <div class="face face-bottom"><img src="/images/dice/dice05.png" alt="주사위 5" /></div>
+        </div>
+      </div>
+
+      <div class="result-area" id="resultArea" hidden>
+        <span class="result-label">결과</span>
+        <span class="result-value" id="resultValue">-</span>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-primary" id="rollBtn">굴리세요!</button>
+      </div>
+    </section>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .dice-app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem 1rem;
+  }
+
+  .dice-stage {
+    width: 200px;
+    height: 200px;
+    perspective: 1000px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cube {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    transform-style: preserve-3d;
+    transform: rotateX(0deg) rotateY(0deg);
+    transition: transform 3s ease;
+  }
+
+  .face {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    border-radius: 16px;
+    background: var(--color-surface, #fff);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .face img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .face-front  { transform: translateZ(70px); }
+  .face-back   { transform: rotateY(180deg) translateZ(70px); }
+  .face-right  { transform: rotateY(90deg) translateZ(70px); }
+  .face-left   { transform: rotateY(-90deg) translateZ(70px); }
+  .face-top    { transform: rotateX(90deg) translateZ(70px); }
+  .face-bottom { transform: rotateX(-90deg) translateZ(70px); }
+
+  .result-area {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-surface-alt, #f3f4f6);
+    border-radius: 999px;
+    font-size: 1.05rem;
+  }
+  .result-area[hidden] {
+    display: none;
+  }
+
+  .result-label {
+    color: var(--color-text-muted, #6b7280);
+    font-weight: 500;
+  }
+
+  .result-value {
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 1.5rem;
+    min-width: 1.5rem;
+    text-align: center;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 0.95rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  }
+
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 480px) {
+    .dice-stage { width: 180px; height: 180px; }
+    .cube { width: 120px; height: 120px; }
+    .face { width: 120px; height: 120px; border-radius: 14px; }
+    .face-front  { transform: translateZ(60px); }
+    .face-back   { transform: rotateY(180deg) translateZ(60px); }
+    .face-right  { transform: rotateY(90deg) translateZ(60px); }
+    .face-left   { transform: rotateY(-90deg) translateZ(60px); }
+    .face-top    { transform: rotateX(90deg) translateZ(60px); }
+    .face-bottom { transform: rotateX(-90deg) translateZ(60px); }
+  }
+</style>
+
+<script>
+  (function () {
+    const cube = document.getElementById('cube') as HTMLElement | null;
+    const rollBtn = document.getElementById('rollBtn') as HTMLButtonElement | null;
+    const resultArea = document.getElementById('resultArea') as HTMLElement | null;
+    const resultValue = document.getElementById('resultValue') as HTMLElement | null;
+
+    if (!cube || !rollBtn || !resultArea || !resultValue) return;
+
+    // 각 숫자(1~6)가 정면으로 오기 위한 rotateX / rotateY 각도
+    const rotations: Record<number, { x: number; y: number }> = {
+      1: { x: 0,    y: 0    },   // front
+      2: { x: -90,  y: 0    },   // top
+      3: { x: 0,    y: -90  },   // right
+      4: { x: 0,    y: 90   },   // left
+      5: { x: 90,   y: 0    },   // bottom
+      6: { x: 0,    y: 180  },   // back
+    };
+
+    let isRolling = false;
+
+    function rollDice() {
+      if (isRolling || !cube || !rollBtn || !resultArea || !resultValue) return;
+      isRolling = true;
+      rollBtn.disabled = true;
+
+      const result = Math.floor(Math.random() * 6) + 1;
+      const { x, y } = rotations[result];
+      const spins = 4 + Math.floor(Math.random() * 2); // 4 ~ 5
+      const targetX = x + 360 * spins;
+      const targetY = y + 360 * spins;
+
+      cube.style.transition = 'transform 3s ease';
+      cube.style.transform = `rotateX(${targetX}deg) rotateY(${targetY}deg)`;
+
+      window.setTimeout(() => {
+        // 누적 회전 방지: transition 끄고 실제 목표 각도로 스냅
+        cube.style.transition = 'none';
+        cube.style.transform = `rotateX(${x}deg) rotateY(${y}deg)`;
+
+        window.setTimeout(() => {
+          cube.style.transition = 'transform 3s ease';
+          resultValue.textContent = String(result);
+          resultArea.hidden = false;
+          isRolling = false;
+          rollBtn.disabled = false;
+        }, 50);
+      }, 3000);
+    }
+
+    rollBtn.addEventListener('click', rollDice);
+  })();
+</script>

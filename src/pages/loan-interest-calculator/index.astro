@@ -1,0 +1,491 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'loan-interest-calculator');
+if (!entry) throw new Error('loan-interest-calculator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="loan-calc">
+      <section class="input-screen" id="inputScreen">
+        <div class="form-group">
+          <label for="principal">대출 원금 (원)</label>
+          <input type="number" id="principal" min="0" placeholder="예: 100000000" />
+        </div>
+
+        <div class="form-group">
+          <label for="years">대출 기간 (년)</label>
+          <input type="number" id="years" min="0" step="0.1" placeholder="예: 10" />
+        </div>
+
+        <div class="form-group">
+          <label for="rate">대출 금리 (%)</label>
+          <input type="number" id="rate" min="0" step="0.01" placeholder="예: 4.5" />
+        </div>
+
+        <div class="form-group">
+          <label class="group-label">상환 방식</label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="repayMethod" value="annuity" checked />
+              <div class="radio-content">
+                <strong>원리금 균등분할상환</strong>
+                <span>매월 같은 금액으로 원금과 이자를 함께 상환 (일반적)</span>
+              </div>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="repayMethod" value="principal" />
+              <div class="radio-content">
+                <strong>원금 균등분할상환</strong>
+                <span>매월 같은 원금 상환, 이자는 남은 원금에 따라 감소</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="calculateBtn">이자 계산하기</button>
+      </section>
+
+      <section class="result-screen" id="resultScreen" hidden>
+        <div class="result-summary" id="resultText"></div>
+
+        <div class="schedule-wrapper">
+          <button class="btn btn-outline" id="toggleScheduleBtn">상환 스케줄 보기</button>
+          <div class="schedule-table-wrapper" id="scheduleTableWrapper" hidden></div>
+        </div>
+
+        <button class="btn btn-secondary" id="resetBtn">처음으로</button>
+      </section>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .loan-calc {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 1rem 0;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 0.95rem;
+  }
+
+  .group-label {
+    margin-bottom: 0.75rem !important;
+  }
+
+  .form-group input[type="number"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+  }
+
+  .form-group input[type="number"]:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .radio-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .radio-item:hover {
+    border-color: var(--color-primary);
+  }
+
+  .radio-item input[type="radio"] {
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+    accent-color: var(--color-primary);
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .radio-item:has(input[type="radio"]:checked) {
+    border-color: var(--color-primary);
+    background: var(--color-surface-alt, rgba(0, 0, 0, 0.02));
+  }
+
+  .radio-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .radio-content strong {
+    font-size: 1rem;
+    color: var(--color-text);
+  }
+
+  .radio-content span {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary, #6b7280);
+  }
+
+  .btn {
+    display: inline-block;
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-sizing: border-box;
+  }
+
+  .btn:active {
+    transform: translateY(1px);
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+    margin-top: 1rem;
+  }
+
+  .btn-primary:hover {
+    background: var(--color-primary-dark, var(--color-primary));
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+  }
+
+  .btn-outline:hover {
+    background: var(--color-surface-alt, rgba(0, 0, 0, 0.04));
+  }
+
+  .btn-secondary {
+    background: var(--color-surface-alt, #f3f4f6);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    margin-top: 0.75rem;
+  }
+
+  .btn-secondary:hover {
+    background: var(--color-border);
+  }
+
+  .input-screen[hidden],
+  .result-screen[hidden],
+  .schedule-table-wrapper[hidden] {
+    display: none !important;
+  }
+
+  .result-summary {
+    background: var(--color-surface-alt, #f9fafb);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .result-summary :global(.summary-row) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .result-summary :global(.summary-row:last-child) {
+    border-bottom: none;
+  }
+
+  .result-summary :global(.summary-label) {
+    color: var(--color-text-secondary, #6b7280);
+    font-size: 0.95rem;
+  }
+
+  .result-summary :global(.summary-value) {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--color-text);
+  }
+
+  .result-summary :global(.summary-value.highlight) {
+    color: var(--color-primary);
+    font-size: 1.25rem;
+  }
+
+  .schedule-wrapper {
+    margin-bottom: 1rem;
+  }
+
+  .schedule-table-wrapper {
+    margin-top: 1rem;
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+  }
+
+  .schedule-table-wrapper :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    min-width: 560px;
+  }
+
+  .schedule-table-wrapper :global(th),
+  .schedule-table-wrapper :global(td) {
+    padding: 0.625rem 0.75rem;
+    text-align: right;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .schedule-table-wrapper :global(th:first-child),
+  .schedule-table-wrapper :global(td:first-child) {
+    text-align: center;
+  }
+
+  .schedule-table-wrapper :global(thead th) {
+    background: var(--color-surface-alt, #f3f4f6);
+    color: var(--color-text);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+  }
+
+  .schedule-table-wrapper :global(tbody tr:last-child td) {
+    border-bottom: none;
+  }
+
+  .schedule-table-wrapper :global(tbody tr:nth-child(even)) {
+    background: var(--color-surface-alt, rgba(0, 0, 0, 0.02));
+  }
+
+  .notice {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface-alt, #f9fafb);
+    border-left: 3px solid var(--color-primary);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary, #6b7280);
+  }
+</style>
+
+<script>
+  function formatNumber(num: number): string {
+    return Math.round(num).toLocaleString('ko-KR');
+  }
+
+  let currentSchedule: Array<{ month: number; principalPay: number; interest: number; remaining: number }> = [];
+
+  function calculate() {
+    const principal = parseFloat((document.getElementById('principal') as HTMLInputElement).value);
+    const years = parseFloat((document.getElementById('years') as HTMLInputElement).value);
+    const rate = parseFloat((document.getElementById('rate') as HTMLInputElement).value);
+    const repayMethodEl = document.querySelector('input[name="repayMethod"]:checked') as HTMLInputElement | null;
+    const repayMethod = repayMethodEl ? repayMethodEl.value : 'annuity';
+
+    if (!principal || principal <= 0 || isNaN(principal)) {
+      alert('대출 원금을 올바르게 입력해주세요.');
+      return;
+    }
+    if (!years || years <= 0 || isNaN(years)) {
+      alert('대출 기간을 올바르게 입력해주세요.');
+      return;
+    }
+    if (rate === null || isNaN(rate) || rate < 0) {
+      alert('대출 금리를 올바르게 입력해주세요.');
+      return;
+    }
+
+    const months = Math.round(years * 12);
+    const monthlyRate = rate / 100 / 12;
+    let remaining = principal;
+    let totalInterest = 0;
+    let monthlyPayment = 0;
+    const schedule: typeof currentSchedule = [];
+
+    if (repayMethod === 'annuity') {
+      if (monthlyRate === 0) {
+        monthlyPayment = principal / months;
+      } else {
+        monthlyPayment = (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
+      }
+      for (let m = 1; m <= months; m++) {
+        const interest = remaining * monthlyRate;
+        let principalPay = monthlyPayment - interest;
+        remaining -= principalPay;
+        if (remaining < 0) {
+          principalPay += remaining;
+          remaining = 0;
+        }
+        totalInterest += interest;
+        schedule.push({
+          month: m,
+          principalPay,
+          interest,
+          remaining,
+        });
+      }
+    } else {
+      const principalPay = principal / months;
+      for (let m = 1; m <= months; m++) {
+        const interest = remaining * monthlyRate;
+        remaining -= principalPay;
+        if (remaining < 0) remaining = 0;
+        totalInterest += interest;
+        schedule.push({
+          month: m,
+          principalPay,
+          interest,
+          remaining,
+        });
+      }
+      monthlyPayment = principalPay + principal * monthlyRate; // 첫 달 기준
+    }
+
+    const totalPayment = principal + totalInterest;
+    currentSchedule = schedule;
+
+    const methodLabel = repayMethod === 'annuity' ? '원리금 균등분할상환' : '원금 균등분할상환';
+    const firstMonthLabel = repayMethod === 'annuity' ? '월 상환 금액' : '첫 달 상환 금액';
+
+    const resultText = document.getElementById('resultText') as HTMLElement;
+    resultText.innerHTML = `
+      <div class="summary-row">
+        <span class="summary-label">상환 방식</span>
+        <span class="summary-value">${methodLabel}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">${firstMonthLabel}</span>
+        <span class="summary-value highlight">${formatNumber(monthlyPayment)}원</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">총 대출 이자</span>
+        <span class="summary-value">${formatNumber(totalInterest)}원</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">총 상환 금액</span>
+        <span class="summary-value">${formatNumber(totalPayment)}원</span>
+      </div>
+      <div class="notice">실제 금융기관의 특약·우대금리 등으로 인해 결과와 차이가 발생할 수 있습니다. 참고용으로 활용해주세요.</div>
+    `;
+
+    (document.getElementById('inputScreen') as HTMLElement).hidden = true;
+    (document.getElementById('resultScreen') as HTMLElement).hidden = false;
+
+    // 스케줄 테이블은 일단 숨김 상태로 초기화
+    const tableWrapper = document.getElementById('scheduleTableWrapper') as HTMLElement;
+    tableWrapper.hidden = true;
+    tableWrapper.innerHTML = '';
+    (document.getElementById('toggleScheduleBtn') as HTMLElement).textContent = '상환 스케줄 보기';
+  }
+
+  function toggleSchedule() {
+    const tableWrapper = document.getElementById('scheduleTableWrapper') as HTMLElement;
+    const toggleBtn = document.getElementById('toggleScheduleBtn') as HTMLElement;
+
+    if (tableWrapper.hidden) {
+      let html = '<table><thead><tr>';
+      html += '<th>회차</th><th>원금</th><th>이자</th><th>월 상환액</th><th>남은 원금</th>';
+      html += '</tr></thead><tbody>';
+      currentSchedule.forEach(row => {
+        const total = row.principalPay + row.interest;
+        html += `<tr>
+          <td>${row.month}</td>
+          <td>${formatNumber(row.principalPay)}</td>
+          <td>${formatNumber(row.interest)}</td>
+          <td>${formatNumber(total)}</td>
+          <td>${formatNumber(row.remaining)}</td>
+        </tr>`;
+      });
+      html += '</tbody></table>';
+      tableWrapper.innerHTML = html;
+      tableWrapper.hidden = false;
+      toggleBtn.textContent = '상환 스케줄 숨기기';
+    } else {
+      tableWrapper.hidden = true;
+      toggleBtn.textContent = '상환 스케줄 보기';
+    }
+  }
+
+  function resetForm() {
+    (document.getElementById('inputScreen') as HTMLElement).hidden = false;
+    (document.getElementById('resultScreen') as HTMLElement).hidden = true;
+    const tableWrapper = document.getElementById('scheduleTableWrapper') as HTMLElement;
+    tableWrapper.hidden = true;
+    tableWrapper.innerHTML = '';
+  }
+
+  document.getElementById('calculateBtn')?.addEventListener('click', calculate);
+  document.getElementById('toggleScheduleBtn')?.addEventListener('click', toggleSchedule);
+  document.getElementById('resetBtn')?.addEventListener('click', resetForm);
+
+  // 포커스 시 기본값 클리어 UX (placeholder가 보이도록)
+  ['principal', 'years', 'rate'].forEach(id => {
+    const el = document.getElementById(id) as HTMLInputElement | null;
+    if (!el) return;
+    el.addEventListener('focus', () => {
+      if (el.value === '0') el.value = '';
+    });
+  });
+</script>

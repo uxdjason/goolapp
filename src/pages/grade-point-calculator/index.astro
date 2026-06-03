@@ -1,0 +1,516 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'grade-point-calculator');
+if (!entry) throw new Error('grade-point-calculator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="gpa-app">
+      <div class="scale-selector">
+        <p class="scale-label">만점 기준 선택</p>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="maxScore" value="4.5" checked />
+            <span>4.5 만점</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="maxScore" value="4.3" />
+            <span>4.3 만점</span>
+          </label>
+        </div>
+      </div>
+
+      <div id="subjectList" class="subject-list"></div>
+
+      <button id="addSubjectBtn" class="btn-add" type="button">+ 과목 추가</button>
+
+      <div id="resultsBox" class="results-box" hidden>
+        <h3 class="results-title">계산 결과</h3>
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="result-label">총 이수 과목</span>
+            <span class="result-value"><span id="totalSubjects">0</span>과목</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">총 이수 학점</span>
+            <span class="result-value"><span id="totalCredits">0</span>학점</span>
+          </div>
+          <div class="result-item highlight">
+            <span class="result-label">GPA 평점</span>
+            <span class="result-value">
+              <span id="gpaValue">0.00</span>
+              <span class="result-unit"> / <span id="maxScaleLabel">4.5</span></span>
+            </span>
+          </div>
+        </div>
+        <button id="copyBtn" class="btn-copy" type="button">📋 클립보드로 복사</button>
+      </div>
+
+      <div id="emptyState" class="empty-state">
+        <p>과목별 학점과 성적을 입력하면<br />GPA가 자동으로 계산됩니다.</p>
+      </div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .gpa-app {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .scale-selector {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 16px 20px;
+  }
+
+  .scale-label {
+    margin: 0 0 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 12px;
+  }
+
+  .radio-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: 2px solid var(--color-border);
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--color-text);
+    transition: all 0.15s ease;
+    background: var(--color-background);
+  }
+
+  .radio-option:hover {
+    border-color: var(--color-primary);
+  }
+
+  .radio-option:has(input:checked) {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: #fff;
+  }
+
+  .radio-option input {
+    accent-color: var(--color-primary);
+  }
+
+  .subject-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-add {
+    width: 100%;
+    padding: 14px;
+    border: 2px dashed var(--color-border);
+    background: transparent;
+    color: var(--color-primary);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-add:hover {
+    border-color: var(--color-primary);
+    background: var(--color-surface);
+  }
+
+  .results-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 20px;
+    display: block;
+  }
+
+  .results-box[hidden] {
+    display: none;
+  }
+
+  .results-title {
+    margin: 0 0 16px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .result-grid {
+    display: grid;
+    gap: 10px;
+  }
+
+  .result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+  }
+
+  .result-item.highlight {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+  }
+
+  .result-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .result-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .result-item.highlight .result-value {
+    font-size: 1.4rem;
+  }
+
+  .result-unit {
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.85;
+  }
+
+  .btn-copy {
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px;
+    background: var(--color-text);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-copy:hover {
+    opacity: 0.85;
+  }
+
+  .empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 20px;
+    background: var(--color-surface);
+    border: 1px dashed var(--color-border);
+    border-radius: 12px;
+    color: var(--color-text-secondary, #6b7280);
+    text-align: center;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .empty-state[hidden] {
+    display: none;
+  }
+
+  /* 동적으로 생성되는 과목 카드 (전역 스코프 필요) */
+  :global(.subject-group) {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    padding: 14px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+  }
+
+  :global(.subject-group .row-1) {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  :global(.subject-group .row-2) {
+    display: flex;
+    gap: 8px;
+    grid-column: 1 / -1;
+  }
+
+  :global(.subject-name) {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: var(--color-background);
+    color: var(--color-text);
+  }
+
+  :global(.subject-credit) {
+    width: 90px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: var(--color-background);
+    color: var(--color-text);
+  }
+
+  :global(.subject-grade) {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: var(--color-background);
+    color: var(--color-text);
+  }
+
+  :global(.subject-name:focus),
+  :global(.subject-credit:focus),
+  :global(.subject-grade:focus) {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  :global(.btn-remove) {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--color-border);
+    background: var(--color-background);
+    color: #dc2626;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+
+  :global(.btn-remove:hover) {
+    background: #fee2e2;
+    border-color: #dc2626;
+  }
+
+  @media (max-width: 480px) {
+    .radio-group {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script>
+  const gradeMap45: Record<string, number> = {
+    'A+': 4.5, 'A0': 4.0, 'A-': 3.7,
+    'B+': 3.5, 'B0': 3.0, 'B-': 2.7,
+    'C+': 2.5, 'C0': 2.0, 'C-': 1.7,
+    'D+': 1.5, 'D0': 1.0, 'D-': 0.7,
+    'F': 0
+  };
+  const gradeMap43: Record<string, number> = {
+    'A+': 4.3, 'A0': 4.0, 'A-': 3.7,
+    'B+': 3.3, 'B0': 3.0, 'B-': 2.7,
+    'C+': 2.3, 'C0': 2.0, 'C-': 1.7,
+    'D+': 1.3, 'D0': 1.0, 'D-': 0.7,
+    'F': 0
+  };
+  const passGrades = ['S', 'U', 'P'];
+  const gradeOptions = ['A+','A0','A-','B+','B0','B-','C+','C0','C-','D+','D0','D-','F','S','U','P'];
+
+  const subjectList = document.getElementById('subjectList') as HTMLDivElement;
+  const addBtn = document.getElementById('addSubjectBtn') as HTMLButtonElement;
+  const resultsBox = document.getElementById('resultsBox') as HTMLDivElement;
+  const emptyState = document.getElementById('emptyState') as HTMLDivElement;
+  const totalSubjectsEl = document.getElementById('totalSubjects') as HTMLSpanElement;
+  const totalCreditsEl = document.getElementById('totalCredits') as HTMLSpanElement;
+  const gpaValueEl = document.getElementById('gpaValue') as HTMLSpanElement;
+  const maxScaleLabelEl = document.getElementById('maxScaleLabel') as HTMLSpanElement;
+  const copyBtn = document.getElementById('copyBtn') as HTMLButtonElement;
+
+  let subjectCounter = 0;
+
+  function addSubject() {
+    subjectCounter++;
+    const card = document.createElement('div');
+    card.className = 'subject-group';
+
+    const row1 = document.createElement('div');
+    row1.className = 'row-1';
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.className = 'subject-name';
+    nameInput.placeholder = `과목명 ${subjectCounter} (선택)`;
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'btn-remove';
+    removeBtn.textContent = '×';
+    removeBtn.setAttribute('aria-label', '과목 삭제');
+    removeBtn.addEventListener('click', () => {
+      card.remove();
+      calculate();
+    });
+
+    row1.appendChild(nameInput);
+    row1.appendChild(removeBtn);
+
+    const row2 = document.createElement('div');
+    row2.className = 'row-2';
+
+    const creditInput = document.createElement('input');
+    creditInput.type = 'number';
+    creditInput.className = 'subject-credit';
+    creditInput.min = '0';
+    creditInput.step = '1';
+    creditInput.placeholder = '학점';
+
+    const gradeSelect = document.createElement('select');
+    gradeSelect.className = 'subject-grade';
+    const placeholderOpt = document.createElement('option');
+    placeholderOpt.value = '';
+    placeholderOpt.textContent = '성적 선택';
+    gradeSelect.appendChild(placeholderOpt);
+    gradeOptions.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g;
+      opt.textContent = g;
+      gradeSelect.appendChild(opt);
+    });
+
+    row2.appendChild(creditInput);
+    row2.appendChild(gradeSelect);
+
+    card.appendChild(row1);
+    card.appendChild(row2);
+
+    [nameInput, creditInput, gradeSelect].forEach(el => {
+      el.addEventListener('input', calculate);
+      el.addEventListener('change', calculate);
+    });
+
+    subjectList.appendChild(card);
+    calculate();
+  }
+
+  function getSelectedScale(): '4.5' | '4.3' {
+    const checked = document.querySelector('input[name="maxScore"]:checked') as HTMLInputElement;
+    return (checked?.value as '4.5' | '4.3') || '4.5';
+  }
+
+  function calculate() {
+    const scale = getSelectedScale();
+    const map = scale === '4.5' ? gradeMap45 : gradeMap43;
+
+    let totalCount = 0;
+    let totalCreditsForGpa = 0;
+    let weighted = 0;
+    let earnedCredits = 0;
+
+    const groups = document.querySelectorAll('.subject-group');
+    groups.forEach(group => {
+      const creditInput = group.querySelector('.subject-credit') as HTMLInputElement;
+      const gradeSelect = group.querySelector('.subject-grade') as HTMLSelectElement;
+      const credit = parseFloat(creditInput.value);
+      const grade = gradeSelect.value;
+
+      if (credit > 0 && grade) {
+        totalCount++;
+        if (grade in map) {
+          totalCreditsForGpa += credit;
+          weighted += credit * map[grade];
+          if (grade !== 'F') {
+            earnedCredits += credit;
+          }
+        } else if (passGrades.includes(grade)) {
+          earnedCredits += credit;
+        }
+      }
+    });
+
+    const gpa = totalCreditsForGpa > 0 ? (weighted / totalCreditsForGpa).toFixed(2) : '0.00';
+
+    totalSubjectsEl.textContent = String(totalCount);
+    totalCreditsEl.textContent = String(earnedCredits);
+    gpaValueEl.textContent = gpa;
+    maxScaleLabelEl.textContent = scale;
+
+    if (totalCount > 0) {
+      resultsBox.hidden = false;
+      emptyState.hidden = true;
+    } else {
+      resultsBox.hidden = true;
+      emptyState.hidden = false;
+    }
+  }
+
+  addBtn.addEventListener('click', addSubject);
+
+  document.querySelectorAll('input[name="maxScore"]').forEach(radio => {
+    radio.addEventListener('change', calculate);
+  });
+
+  copyBtn.addEventListener('click', async () => {
+    const scale = getSelectedScale();
+    const text = `[GPA 계산 결과]\n총 이수 과목: ${totalSubjectsEl.textContent}과목\n총 이수 학점: ${totalCreditsEl.textContent}학점\nGPA 평점: ${gpaValueEl.textContent} / ${scale}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      alert('결과가 클립보드에 복사되었습니다.');
+    } catch {
+      alert('복사에 실패했습니다. 브라우저 환경을 확인해 주세요.');
+    }
+  });
+
+  // 초기 1개 행 추가
+  addSubject();
+</script>

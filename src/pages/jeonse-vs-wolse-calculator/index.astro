@@ -1,0 +1,342 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'jeonse-vs-wolse-calculator');
+if (!entry) throw new Error('jeonse-vs-wolse-calculator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="calc-container">
+      <div class="input-section">
+        <div class="card jeonse-card">
+          <h2 class="card-title">🏠 전세</h2>
+          <div class="field">
+            <label for="jeonse-deposit">전세 보증금 (만원)</label>
+            <input id="jeonse-deposit" type="number" placeholder="예: 30000" value="30000" />
+          </div>
+          <div class="result-box" id="jeonse-result-box">
+            <div class="result-label">전세 월 환산 부담액</div>
+            <div class="result-value" id="jeonse-monthly">0원</div>
+            <div class="result-sub">(보증금 × 이자율 ÷ 12)</div>
+          </div>
+        </div>
+
+        <div class="card wolse-card">
+          <h2 class="card-title">🏡 월세</h2>
+          <div class="field">
+            <label for="wolse-deposit">월세 보증금 (만원)</label>
+            <input id="wolse-deposit" type="number" placeholder="예: 5000" value="5000" />
+          </div>
+          <div class="field">
+            <label for="wolse-rent">월 임대료 (만원)</label>
+            <input id="wolse-rent" type="number" placeholder="예: 100" value="100" />
+          </div>
+          <div class="result-box" id="wolse-result-box">
+            <div class="result-row">
+              <span>보증금 이자</span>
+              <span id="wolse-interest">0원</span>
+            </div>
+            <div class="result-row">
+              <span>월 임대료</span>
+              <span id="wolse-rent-display">0원</span>
+            </div>
+            <div class="result-divider"></div>
+            <div class="result-label">월세 총 월 부담액</div>
+            <div class="result-value" id="wolse-monthly">0원</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rate-section">
+        <div class="field">
+          <label for="interest-rate">보증금 대출 이자율 / 기회비용 (%)</label>
+          <input id="interest-rate" type="number" step="0.1" value="3.5" />
+          <p class="hint">전세는 보증금에 대한 이자(또는 그 돈을 다른 곳에 투자했을 때 기대 수익률)를 월 부담으로 환산해 비교합니다.</p>
+        </div>
+      </div>
+
+      <div class="summary" id="summary">
+        <div class="summary-icon">💡</div>
+        <div class="summary-text" id="summary-text">값을 입력하면 자동으로 비교됩니다.</div>
+        <div class="summary-detail" id="summary-detail"></div>
+      </div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .calc-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .input-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 640px) {
+    .input-section {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .card {
+    background: var(--color-surface, #fff);
+    border: 2px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .card.highlight-cheaper {
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .card-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text, #111827);
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .field label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-secondary, #4b5563);
+  }
+
+  .field input {
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+    font-size: 1rem;
+    border: 2px solid var(--color-border, #d1d5db);
+    border-radius: 8px;
+    background: var(--color-bg, #fff);
+    color: var(--color-text, #111827);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-sizing: border-box;
+  }
+
+  .field input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  .hint {
+    margin: 0.35rem 0 0;
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary, #6b7280);
+    line-height: 1.5;
+  }
+
+  .result-box {
+    background: var(--color-bg-soft, #f9fafb);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .result-label {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary, #4b5563);
+    font-weight: 600;
+  }
+
+  .result-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .result-sub {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary, #6b7280);
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--color-text-secondary, #4b5563);
+  }
+
+  .result-row span:last-child {
+    font-weight: 600;
+    color: var(--color-text, #111827);
+  }
+
+  .result-divider {
+    height: 1px;
+    background: var(--color-border, #e5e7eb);
+    margin: 0.3rem 0;
+  }
+
+  .rate-section {
+    background: var(--color-surface, #fff);
+    border: 2px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .summary {
+    background: linear-gradient(135deg, var(--color-primary-soft, #eff6ff), var(--color-bg-soft, #f9fafb));
+    border: 2px solid var(--color-primary);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .summary-icon {
+    font-size: 2rem;
+  }
+
+  .summary-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text, #111827);
+    line-height: 1.5;
+  }
+
+  .summary-detail {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary, #4b5563);
+    line-height: 1.6;
+  }
+
+  .summary-detail:empty {
+    display: none;
+  }
+</style>
+
+<script>
+  (function () {
+    const $ = (id: string) => document.getElementById(id) as HTMLInputElement | HTMLElement | null;
+
+    const jeonseDepositEl = $('jeonse-deposit') as HTMLInputElement | null;
+    const wolseDepositEl = $('wolse-deposit') as HTMLInputElement | null;
+    const wolseRentEl = $('wolse-rent') as HTMLInputElement | null;
+    const interestRateEl = $('interest-rate') as HTMLInputElement | null;
+
+    const jeonseMonthlyEl = $('jeonse-monthly');
+    const wolseInterestEl = $('wolse-interest');
+    const wolseRentDisplayEl = $('wolse-rent-display');
+    const wolseMonthlyEl = $('wolse-monthly');
+
+    const jeonseBox = $('jeonse-result-box');
+    const wolseBox = $('wolse-result-box');
+    const jeonseCard = document.querySelector('.jeonse-card');
+    const wolseCard = document.querySelector('.wolse-card');
+
+    const summaryText = $('summary-text');
+    const summaryDetail = $('summary-detail');
+
+    if (!jeonseDepositEl || !wolseDepositEl || !wolseRentEl || !interestRateEl) return;
+
+    const fmt = new Intl.NumberFormat('ko-KR');
+    const won = (n: number) => fmt.format(Math.round(n)) + '원';
+
+    function calculate() {
+      const jeonseDeposit = (parseFloat(jeonseDepositEl!.value) || 0) * 10000;
+      const wolseDeposit = (parseFloat(wolseDepositEl!.value) || 0) * 10000;
+      const wolseRent = (parseFloat(wolseRentEl!.value) || 0) * 10000;
+      const rate = (parseFloat(interestRateEl!.value) || 0) / 100;
+
+      const jeonseMonthly = (jeonseDeposit * rate) / 12;
+      const wolseInterest = (wolseDeposit * rate) / 12;
+      const wolseMonthly = wolseInterest + wolseRent;
+
+      if (jeonseMonthlyEl) jeonseMonthlyEl.textContent = won(jeonseMonthly);
+      if (wolseInterestEl) wolseInterestEl.textContent = won(wolseInterest);
+      if (wolseRentDisplayEl) wolseRentDisplayEl.textContent = won(wolseRent);
+      if (wolseMonthlyEl) wolseMonthlyEl.textContent = won(wolseMonthly);
+
+      jeonseCard?.classList.remove('highlight-cheaper');
+      wolseCard?.classList.remove('highlight-cheaper');
+
+      const hasInput =
+        jeonseDeposit > 0 || wolseDeposit > 0 || wolseRent > 0;
+
+      if (!hasInput) {
+        if (summaryText) summaryText.textContent = '값을 입력하면 자동으로 비교됩니다.';
+        if (summaryDetail) summaryDetail.textContent = '';
+        return;
+      }
+
+      const diff = Math.abs(jeonseMonthly - wolseMonthly);
+      const twoYear = diff * 24;
+
+      if (jeonseMonthly < wolseMonthly) {
+        jeonseCard?.classList.add('highlight-cheaper');
+        if (summaryText) summaryText.textContent = `전세가 월 ${won(diff)} 더 저렴합니다`;
+        if (summaryDetail)
+          summaryDetail.textContent = `2년(24개월) 기준 약 ${won(twoYear)} 절약할 수 있어요.`;
+      } else if (wolseMonthly < jeonseMonthly) {
+        wolseCard?.classList.add('highlight-cheaper');
+        if (summaryText) summaryText.textContent = `월세가 월 ${won(diff)} 더 저렴합니다`;
+        if (summaryDetail)
+          summaryDetail.textContent = `2년(24개월) 기준 약 ${won(twoYear)} 절약할 수 있어요.`;
+      } else {
+        if (summaryText) summaryText.textContent = '전세와 월세의 월 부담액이 동일합니다';
+        if (summaryDetail) summaryDetail.textContent = '';
+      }
+    }
+
+    [jeonseDepositEl, wolseDepositEl, wolseRentEl, interestRateEl].forEach((el) => {
+      el.addEventListener('input', calculate);
+    });
+
+    calculate();
+  })();
+</script>

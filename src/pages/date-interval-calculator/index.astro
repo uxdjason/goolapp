@@ -1,0 +1,542 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'date-interval-calculator');
+if (!entry) throw new Error('date-interval-calculator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+
+const currentYear = new Date().getFullYear();
+const currentMonth = new Date().getMonth() + 1;
+const currentDay = new Date().getDate();
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="calculator-wrapper">
+      <div class="date-card">
+        <div class="date-card-header">
+          <span class="date-badge start-badge">시작</span>
+          <h2 class="date-card-title">시작 날짜</h2>
+        </div>
+        <div class="date-inputs">
+          <div class="input-group">
+            <label for="startYear">년</label>
+            <input id="startYear" type="number" min="1" max="9999" value={currentYear} />
+          </div>
+          <div class="input-group">
+            <label for="startMonth">월</label>
+            <input id="startMonth" type="number" min="1" max="12" value="1" />
+          </div>
+          <div class="input-group">
+            <label for="startDay">일</label>
+            <input id="startDay" type="number" min="1" max="31" value="1" />
+          </div>
+        </div>
+      </div>
+
+      <div class="date-card">
+        <div class="date-card-header">
+          <span class="date-badge end-badge">종료</span>
+          <h2 class="date-card-title">종료 날짜</h2>
+        </div>
+        <div class="date-inputs">
+          <div class="input-group">
+            <label for="endYear">년</label>
+            <input id="endYear" type="number" min="1" max="9999" value={currentYear} />
+          </div>
+          <div class="input-group">
+            <label for="endMonth">월</label>
+            <input id="endMonth" type="number" min="1" max="12" value={currentMonth} />
+          </div>
+          <div class="input-group">
+            <label for="endDay">일</label>
+            <input id="endDay" type="number" min="1" max="31" value={currentDay} />
+          </div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button id="calcBtn" class="btn-primary" type="button">날짜 차이 계산</button>
+        <button id="resetBtn" class="btn-text" type="button">초기화</button>
+      </div>
+
+      <div id="errorMsg" class="error-msg" hidden></div>
+
+      <div id="resultSection" class="result-section" hidden>
+        <h3 class="result-title">계산 결과</h3>
+
+        <div class="result-card primary-result">
+          <div class="result-label">년 · 개월 · 일</div>
+          <div class="result-value" id="resultYMD">-</div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-card">
+            <div class="result-label">총 개월 + 일</div>
+            <div class="result-value-sm" id="resultMD">-</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">총 일수</div>
+            <div class="result-value-sm" id="resultDays">-</div>
+          </div>
+        </div>
+
+        <div class="period-info" id="periodInfo"></div>
+
+        <button id="copyBtn" class="btn-secondary" type="button">결과 복사</button>
+      </div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .calculator-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .date-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 12px);
+    padding: 1.25rem;
+  }
+
+  .date-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 1rem;
+  }
+
+  .date-badge {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .start-badge {
+    background: var(--color-primary);
+  }
+
+  .end-badge {
+    background: var(--color-secondary, var(--color-primary));
+  }
+
+  .date-card-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .date-inputs {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .input-group label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-text-muted, #6b7280);
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    font-size: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 8px);
+    background: var(--color-bg, #fff);
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -moz-appearance: textfield;
+  }
+
+  .input-group input::-webkit-outer-spin-button,
+  .input-group input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 59 130 246), 0.15);
+  }
+
+  .action-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--color-primary);
+    border: none;
+    border-radius: var(--radius-md, 8px);
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.15s;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.92;
+  }
+
+  .btn-primary:active {
+    transform: translateY(1px);
+  }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: transparent;
+    border: 1.5px solid var(--color-primary);
+    border-radius: var(--radius-md, 8px);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(var(--color-primary-rgb, 59 130 246), 0.08);
+  }
+
+  .btn-text {
+    width: 100%;
+    padding: 0.625rem;
+    font-size: 0.9375rem;
+    color: var(--color-text-muted, #6b7280);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-text:hover {
+    color: var(--color-text);
+    text-decoration: underline;
+  }
+
+  .error-msg {
+    padding: 0.875rem 1rem;
+    background: rgba(239, 68, 68, 0.08);
+    color: #b91c1c;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: var(--radius-md, 8px);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+  .error-msg[hidden] { display: none; }
+
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    padding: 1.25rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 12px);
+    margin-top: 0.5rem;
+  }
+  .result-section[hidden] { display: none; }
+
+  .result-title {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .result-card {
+    padding: 1rem;
+    background: var(--color-bg, #fff);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 8px);
+    text-align: center;
+  }
+
+  .primary-result {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary, var(--color-primary)));
+    border: none;
+    color: #fff;
+  }
+
+  .primary-result .result-label {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .primary-result .result-value {
+    color: #fff;
+  }
+
+  .result-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-text-muted, #6b7280);
+    margin-bottom: 0.5rem;
+  }
+
+  .result-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    word-break: keep-all;
+  }
+
+  .result-value-sm {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--color-text);
+    word-break: keep-all;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.625rem;
+  }
+
+  .period-info {
+    padding: 0.75rem 1rem;
+    background: var(--color-bg, #fff);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md, 8px);
+    font-size: 0.875rem;
+    color: var(--color-text-muted, #6b7280);
+    text-align: center;
+  }
+
+  @media (max-width: 380px) {
+    .date-inputs {
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .input-group input {
+      padding: 0.5rem 0.5rem;
+      font-size: 0.9375rem;
+    }
+  }
+</style>
+
+<script>
+  function $(id: string) {
+    return document.getElementById(id) as HTMLInputElement;
+  }
+
+  function getDailyEndOfMonth(year: number, month: number): number {
+    // month: 1-12. Returns last day of that month.
+    return new Date(year, month, 0).getDate();
+  }
+
+  function formatDate(y: number, m: number, d: number): string {
+    return `${y}년 ${m}월 ${d}일`;
+  }
+
+  function calculate() {
+    const errEl = document.getElementById('errorMsg')!;
+    const resultSec = document.getElementById('resultSection')!;
+
+    const sy = parseInt($('startYear').value, 10);
+    const sm = parseInt($('startMonth').value, 10);
+    const sd = parseInt($('startDay').value, 10);
+    const ey = parseInt($('endYear').value, 10);
+    const em = parseInt($('endMonth').value, 10);
+    const ed = parseInt($('endDay').value, 10);
+
+    const showError = (msg: string) => {
+      errEl.textContent = msg;
+      errEl.hidden = false;
+      resultSec.hidden = true;
+    };
+
+    if ([sy, sm, sd, ey, em, ed].some(v => isNaN(v))) {
+      showError('모든 날짜 필드를 입력해 주세요.');
+      return;
+    }
+
+    if (sm < 1 || sm > 12 || em < 1 || em > 12) {
+      showError('월은 1부터 12 사이의 값이어야 합니다.');
+      return;
+    }
+
+    if (sd < 1 || sd > 31 || ed < 1 || ed > 31) {
+      showError('일은 1부터 31 사이의 값이어야 합니다.');
+      return;
+    }
+
+    // 실제 유효한 날짜인지 확인 (예: 2월 30일 방지)
+    const startMaxDay = getDailyEndOfMonth(sy, sm);
+    const endMaxDay = getDailyEndOfMonth(ey, em);
+    if (sd > startMaxDay) {
+      showError(`시작 날짜의 ${sy}년 ${sm}월은 ${startMaxDay}일까지 있습니다.`);
+      return;
+    }
+    if (ed > endMaxDay) {
+      showError(`종료 날짜의 ${ey}년 ${em}월은 ${endMaxDay}일까지 있습니다.`);
+      return;
+    }
+
+    const start = new Date(sy, sm - 1, sd);
+    const end = new Date(ey, em - 1, ed);
+
+    if (end <= start) {
+      showError('종료 날짜는 시작 날짜보다 이후여야 합니다.');
+      return;
+    }
+
+    // 년/월/일 차이 계산
+    let years = end.getFullYear() - start.getFullYear();
+    let months = end.getMonth() - start.getMonth();
+    let days = end.getDate() - start.getDate();
+
+    if (days < 0) {
+      months -= 1;
+      // 전월의 말일 추가
+      const prevMonthDate = new Date(end.getFullYear(), end.getMonth(), 0);
+      days += prevMonthDate.getDate();
+    }
+    if (months < 0) {
+      years -= 1;
+      months += 12;
+    }
+
+    const totalMonths = years * 12 + months;
+    const diffInDays = Math.ceil((end.getTime() - start.getTime()) / 86400000);
+
+    // 결과 출력
+    const ymdParts: string[] = [];
+    if (years > 0) ymdParts.push(`${years}년`);
+    if (months > 0) ymdParts.push(`${months}개월`);
+    if (days > 0 || ymdParts.length === 0) ymdParts.push(`${days}일`);
+    document.getElementById('resultYMD')!.textContent = ymdParts.join(' ');
+
+    document.getElementById('resultMD')!.textContent = `${totalMonths.toLocaleString()}개월 ${days}일`;
+    document.getElementById('resultDays')!.textContent = `${diffInDays.toLocaleString()}일`;
+
+    document.getElementById('periodInfo')!.textContent =
+      `${formatDate(sy, sm, sd)} → ${formatDate(ey, em, ed)}`;
+
+    errEl.hidden = true;
+    resultSec.hidden = false;
+
+    resultSec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function resetApp() {
+    const now = new Date();
+    $('startYear').value = String(now.getFullYear());
+    $('startMonth').value = '1';
+    $('startDay').value = '1';
+    $('endYear').value = String(now.getFullYear());
+    $('endMonth').value = String(now.getMonth() + 1);
+    $('endDay').value = String(now.getDate());
+
+    document.getElementById('errorMsg')!.hidden = true;
+    document.getElementById('resultSection')!.hidden = true;
+  }
+
+  async function copyResult() {
+    const ymd = document.getElementById('resultYMD')!.textContent || '';
+    const md = document.getElementById('resultMD')!.textContent || '';
+    const days = document.getElementById('resultDays')!.textContent || '';
+    const period = document.getElementById('periodInfo')!.textContent || '';
+
+    const text = `[날짜 차이 계산 결과]\n${period}\n\n· ${ymd}\n· 총 ${md}\n· 총 ${days}`;
+
+    const btn = document.getElementById('copyBtn')!;
+    const originalText = btn.textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = '복사 완료 ✓';
+    } catch (e) {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        btn.textContent = '복사 완료 ✓';
+      } catch {
+        btn.textContent = '복사 실패';
+      }
+      document.body.removeChild(ta);
+    }
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 1600);
+  }
+
+  // 포커스 시 전체 선택 (UX 개선)
+  function attachFocusSelect() {
+    document.querySelectorAll<HTMLInputElement>('.input-group input').forEach(inp => {
+      inp.addEventListener('focus', () => {
+        inp.select();
+      });
+    });
+  }
+
+  document.getElementById('calcBtn')?.addEventListener('click', calculate);
+  document.getElementById('resetBtn')?.addEventListener('click', resetApp);
+  document.getElementById('copyBtn')?.addEventListener('click', copyResult);
+
+  // 엔터키로도 계산 가능
+  document.querySelectorAll<HTMLInputElement>('.input-group input').forEach(inp => {
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        calculate();
+      }
+    });
+  });
+
+  attachFocusSelect();
+</script>

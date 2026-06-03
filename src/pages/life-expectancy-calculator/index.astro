@@ -1,0 +1,557 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'life-expectancy-calculator');
+if (!entry) throw new Error('life-expectancy-calculator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div id="calculator-app">
+      <div class="progress-container">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+
+      <!-- Screen 1: Intro -->
+      <div id="screen1" class="screen">
+        <h2>당신의 예상 수명은?</h2>
+        <p>몇 가지 간단한 질문에 답하고 당신의 예상 수명을 알아보세요. 결과는 재미로만 참고해주세요!</p>
+        <div class="button-group">
+          <button id="start-btn" class="btn btn-primary">시작하기</button>
+        </div>
+      </div>
+
+      <!-- Screen 2: Basic Info -->
+      <div id="screen2" class="screen" hidden>
+        <h3>기본 정보 (1/6)</h3>
+        <div class="question-group">
+          <label for="MyAge" class="form-label">현재 만 나이를 입력하세요.</label>
+          <input type="number" id="MyAge" class="form-input" placeholder="예: 35">
+        </div>
+        <div class="question-group">
+          <p class="form-label">원하는 삶의 방식을 선택하세요.</p>
+          <div class="options-group">
+            <label class="radio-label"><input type="radio" name="MyLife" value="60"> 짧고 굵게</label>
+            <label class="radio-label"><input type="radio" name="MyLife" value="76"> 평균적으로</label>
+            <label class="radio-label"><input type="radio" name="MyLife" value="99"> 얇고 길게</label>
+          </div>
+        </div>
+        <div class="button-group">
+          <button class="btn btn-secondary" data-goto="1">이전</button>
+          <button class="btn btn-primary" data-validate="2">다음</button>
+        </div>
+      </div>
+
+      <!-- Screen 3: Family/Environment -->
+      <div id="screen3" class="screen" hidden>
+        <h3>환경 및 가족력 (2/6)</h3>
+        <div class="question-group">
+            <p class="form-label">성별</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a1" value="-3"> 남</label><label class="radio-label"><input type="radio" name="a1" value="4"> 여</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">인구 200만 이상의 도시에 거주</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a2" value="-2"> 예</label><label class="radio-label"><input type="radio" name="a2" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">인구 1만 이하의 농어촌/산촌 거주</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a3" value="2"> 예</label><label class="radio-label"><input type="radio" name="a3" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">조부모 중 한 분 이상 85세까지 생존</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a4" value="2"> 예</label><label class="radio-label"><input type="radio" name="a4" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">조부모 네 분 모두 80세까지 생존</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a5" value="6"> 예</label><label class="radio-label"><input type="radio" name="a5" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">부모님 중 한 분이 50세 전 뇌졸중/심장마비로 사망</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a6" value="-4"> 예</label><label class="radio-label"><input type="radio" name="a6" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">부모형제 중 50세 이하 암, 심장질환, 당뇨병 환자 유무</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a7" value="-3"> 예</label><label class="radio-label"><input type="radio" name="a7" value="0"> 아니오</label></div>
+        </div>
+        <div class="button-group">
+          <button class="btn btn-secondary" data-goto="2">이전</button>
+          <button class="btn btn-primary" data-validate="3">다음</button>
+        </div>
+      </div>
+      
+      <!-- Screen 4: Socioeconomic -->
+      <div id="screen4" class="screen" hidden>
+        <h3>사회경제적 요인 (3/6)</h3>
+        <div class="question-group">
+            <p class="form-label">연소득 6천만원 이상</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a8" value="-2"> 예</label><label class="radio-label"><input type="radio" name="a8" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">4년제 대학 졸업 이상</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a9" value="1"> 예</label><label class="radio-label"><input type="radio" name="a9" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">석/박사 또는 전문직 자격증 보유</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a10" value="2"> 예</label><label class="radio-label"><input type="radio" name="a10" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">65세 이상이고 현재 일을 하고 있음</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a11" value="3"> 예</label><label class="radio-label"><input type="radio" name="a11" value="0"> 아니오</label></div>
+        </div>
+        <div class="button-group">
+          <button class="btn btn-secondary" data-goto="3">이전</button>
+          <button class="btn btn-primary" data-validate="4">다음</button>
+        </div>
+      </div>
+
+      <!-- Screen 5: Lifestyle/Personality -->
+      <div id="screen5" class="screen" hidden>
+        <h3>생활 습관 (4/6)</h3>
+        <div class="question-group">
+            <p class="form-label">배우자/가족/친구와 함께 살고 있음</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a12" value="5"> 예</label><label class="radio-label"><input type="radio" name="a12" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">주로 앉아서 일하는 사무직</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a13" value="-3"> 예</label><label class="radio-label"><input type="radio" name="a13" value="3"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">몸을 많이 쓰는 육체노동직</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a14" value="3"> 예</label><label class="radio-label"><input type="radio" name="a14" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">주 5회 이상, 30분 이상 운동</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a15" value="4"> 예</label><label class="radio-label"><input type="radio" name="a15" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">주 2~3회, 30분 이상 운동</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a16" value="2"> 예</label><label class="radio-label"><input type="radio" name="a16" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">하루 10시간 이상 잠을 잠</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a17" value="-4"> 예</label><label class="radio-label"><input type="radio" name="a17" value="0"> 아니오</label></div>
+        </div>
+        <div class="button-group">
+          <button class="btn btn-secondary" data-goto="4">이전</button>
+          <button class="btn btn-primary" data-validate="5">다음</button>
+        </div>
+      </div>
+
+      <!-- Screen 6: Habits/Health -->
+      <div id="screen6" class="screen" hidden>
+        <h3>성격 및 건강 습관 (5/6)</h3>
+        <div class="question-group">
+            <p class="form-label">감정적이고 공격적이며 급한 성격</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a18" value="-3"> 예</label><label class="radio-label"><input type="radio" name="a18" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">평소 마음이 편하고 일을 쉽게 생각하는 편</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a19" value="3"> 예</label><label class="radio-label"><input type="radio" name="a19" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">스스로 행복하다고 생각함</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a20" value="1"> 예</label><label class="radio-label"><input type="radio" name="a20" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">최근 1~2년 사이 과속으로 단속된 적이 있음</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a21" value="-2"> 예</label><label class="radio-label"><input type="radio" name="a21" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">(여성만 해당) 1년에 한 번 이상 산부인과 검진</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a22" value="2"> 예</label><label class="radio-label"><input type="radio" name="a22" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">(40세 이상) 매년 건강검진을 받음</p>
+            <div class="options-group"><label class="radio-label"><input type="radio" name="a24" value="2"> 예</label><label class="radio-label"><input type="radio" name="a24" value="0"> 아니오</label></div>
+        </div>
+        <div class="question-group">
+            <p class="form-label">흡연량</p>
+            <div class="options-group">
+                <label class="radio-label"><input type="radio" name="a23" value="0"> 비흡연</label>
+                <label class="radio-label"><input type="radio" name="a23" value="-3"> 하루 반갑~한갑</label>
+                <label class="radio-label"><input type="radio" name="a23" value="-6"> 하루 한갑~두갑</label>
+                <label class="radio-label"><input type="radio" name="a23" value="-8"> 하루 두갑 이상</label>
+            </div>
+        </div>
+        <div class="button-group">
+          <button class="btn btn-secondary" data-goto="5">이전</button>
+          <button class="btn btn-primary" data-validate="6">다음</button>
+        </div>
+      </div>
+
+      <!-- Screen 7: Physical -->
+      <div id="screen7" class="screen" hidden>
+        <h3>신체 정보 (6/6)</h3>
+        <div class="question-group">
+            <label for="Tall" class="form-label">키(cm)</label>
+            <input type="number" id="Tall" class="form-input" placeholder="예: 175">
+        </div>
+        <div class="question-group">
+            <label for="Weight" class="form-label">몸무게(kg)</label>
+            <input type="number" id="Weight" class="form-input" placeholder="예: 70">
+        </div>
+        <div id="Biman" class="bmi-feedback"></div>
+        <div class="button-group">
+          <button class="btn btn-secondary" data-goto="6">이전</button>
+          <button id="calculate-btn" class="btn btn-primary" data-validate="7">결과 보기</button>
+        </div>
+      </div>
+
+      <!-- Screen 8: Result -->
+      <div id="screen8" class="screen result-screen" hidden>
+        <h3>계산 결과</h3>
+        <p>당신의 예상 수명은...</p>
+        <div id="lifeResult" class="result-value"></div>
+        <div id="lifeDetail" class="result-detail"></div>
+        <div class="button-group">
+          <button id="restart-btn" class="btn btn-primary">처음부터 다시하기</button>
+        </div>
+      </div>
+      
+      <div id="error-message" class="error-message" hidden></div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+
+<style>
+  #calculator-app {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-background-secondary);
+  }
+  .progress-container {
+    width: 100%;
+    background-color: var(--color-gray-200);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 8px;
+    width: 0%;
+    background-color: var(--color-primary);
+    transition: width 0.3s ease-in-out;
+  }
+  .screen {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .screen[hidden] {
+    display: none;
+  }
+  .result-screen {
+    align-items: center;
+    text-align: center;
+  }
+  .question-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .form-label {
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    font-size: 1rem;
+    background-color: var(--color-background-primary);
+  }
+  .form-input:focus {
+    outline: 2px solid var(--color-primary);
+    border-color: transparent;
+  }
+  .options-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  .radio-label {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .radio-label:has(input:checked) {
+    background-color: var(--color-primary-light);
+    border-color: var(--color-primary);
+    font-weight: 600;
+  }
+  .radio-label:hover {
+    border-color: var(--color-primary);
+  }
+  .radio-label input[type="radio"] {
+    margin-right: 0.5rem;
+  }
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .button-group > .btn {
+      flex: 1;
+  }
+  .bmi-feedback {
+    text-align: center;
+    font-weight: 600;
+    padding: 0.5rem;
+    border-radius: var(--border-radius-md);
+  }
+  .bmi-feedback.low { background-color: #e0f2fe; color: #075985; }
+  .bmi-feedback.normal { background-color: #dcfce7; color: #166534; }
+  .bmi-feedback.high { background-color: #fee2e2; color: #991b1b; }
+  .result-value {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 1rem 0;
+  }
+  .result-detail {
+    font-size: 1.125rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 1.5rem;
+  }
+  .error-message {
+    padding: 0.75rem;
+    background-color: var(--color-error-light);
+    color: var(--color-error-dark);
+    border-radius: var(--border-radius-md);
+    text-align: center;
+  }
+  .error-message[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const app = document.getElementById('calculator-app');
+    const screens = app.querySelectorAll('.screen');
+    const progressBar = app.querySelector('#progressBar');
+    const errorMessage = app.querySelector('#error-message');
+    const totalSteps = 6;
+
+    const navigate = (e) => {
+      const target = e.target;
+      const gotoScreen = target.dataset.goto;
+      const validateScreenNum = target.dataset.validate;
+
+      if (gotoScreen) {
+        showScreen(parseInt(gotoScreen, 10));
+      } else if (validateScreenNum) {
+        const currentScreenNum = parseInt(validateScreenNum, 10);
+        if (validateAndProceed(currentScreenNum)) {
+          if (currentScreenNum === 7) { // Final screen before result
+            calculateAndShowResult();
+            showScreen(8);
+          } else {
+            showScreen(currentScreenNum + 1);
+          }
+        }
+      }
+    };
+
+    app.addEventListener('click', (e) => {
+      if (e.target.matches('button')) {
+        navigate(e);
+      }
+    });
+
+    document.getElementById('start-btn').addEventListener('click', () => showScreen(2));
+    document.getElementById('restart-btn').addEventListener('click', () => {
+        app.querySelector('form, #calculator-app').reset();
+        showScreen(1);
+    });
+
+    const tallInput = document.getElementById('Tall');
+    const weightInput = document.getElementById('Weight');
+    [tallInput, weightInput].forEach(input => {
+      input.addEventListener('input', updateBmiStatus);
+      input.addEventListener('focus', (e) => e.target.value = '');
+    });
+     
+    function showScreen(screenNumber) {
+      screens.forEach(s => s.hidden = true);
+      const screenToShow = document.getElementById(`screen${screenNumber}`);
+      if (screenToShow) {
+        screenToShow.hidden = false;
+      }
+      errorMessage.hidden = true;
+      updateProgressBar(screenNumber);
+    }
+    
+    function updateProgressBar(screenNumber) {
+        if (screenNumber > 1 && screenNumber <= totalSteps + 1) {
+            const progress = ((screenNumber - 2) / totalSteps) * 100;
+            progressBar.style.width = `${progress}%`;
+        } else if (screenNumber === 1) {
+             progressBar.style.width = '0%';
+        } else if (screenNumber > totalSteps + 1) {
+             progressBar.style.width = '100%';
+        }
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.hidden = false;
+    }
+
+    function validateAndProceed(screenNum) {
+      const screen = document.getElementById(`screen${screenNum}`);
+      const questions = new Set();
+      screen.querySelectorAll('input[type="radio"]').forEach(radio => questions.add(radio.name));
+      
+      for (const name of questions) {
+        if (!screen.querySelector(`input[name="${name}"]:checked`)) {
+          const label = screen.querySelector(`input[name="${name}"]`).closest('.question-group').querySelector('.form-label');
+          showError(`'${label.textContent}' 질문에 답해주세요.`);
+          return false;
+        }
+      }
+
+      if (screenNum === 2) {
+        const ageInput = document.getElementById('MyAge');
+        if (!ageInput.value || parseInt(ageInput.value) <= 0) {
+          showError('올바른 만 나이를 입력해주세요.');
+          return false;
+        }
+      }
+
+      if (screenNum === 7) {
+        if (!tallInput.value || parseInt(tallInput.value) <= 0) {
+          showError('올바른 키를 입력해주세요.');
+          return false;
+        }
+        if (!weightInput.value || parseInt(weightInput.value) <= 0) {
+          showError('올바른 몸무게를 입력해주세요.');
+          return false;
+        }
+      }
+      
+      errorMessage.hidden = true;
+      return true;
+    }
+
+    function updateBmiStatus() {
+        const tall = parseFloat(tallInput.value);
+        const weight = parseFloat(weightInput.value);
+        const feedbackEl = document.getElementById('Biman');
+
+        if (!tall || !weight || tall <= 0 || weight <= 0) {
+            feedbackEl.textContent = '';
+            feedbackEl.className = 'bmi-feedback';
+            return;
+        }
+
+        const stdWeight = (tall - 100) * 0.9;
+        const lowerBound = stdWeight - 10;
+        const upperBound = stdWeight + 10;
+        
+        feedbackEl.className = 'bmi-feedback';
+        if (weight <= lowerBound) {
+            feedbackEl.textContent = '저체중';
+            feedbackEl.classList.add('low');
+        } else if (weight > upperBound) {
+            feedbackEl.textContent = '비만';
+            feedbackEl.classList.add('high');
+        } else {
+            feedbackEl.textContent = '정상체중';
+            feedbackEl.classList.add('normal');
+        }
+    }
+
+    function calculateAndShowResult() {
+      let totalScore = 0;
+      
+      const form = app.querySelector('#calculator-app');
+      const formData = new FormData(form);
+      const radioValues = {};
+      form.querySelectorAll('input[type=radio]:checked').forEach(radio => {
+        radioValues[radio.name] = radio.value;
+      });
+
+      // 1. 삶의 방식
+      totalScore += parseInt(radioValues['MyLife'] || 0);
+
+      // 2. a1 ~ a24 합산
+      for (let i = 1; i <= 24; i++) {
+        totalScore += parseInt(radioValues[`a${i}`] || 0);
+      }
+      
+      // 3. 나이 보정
+      const age = parseInt(document.getElementById('MyAge').value);
+      if (age >= 70) totalScore += 5;
+      else if (age >= 50) totalScore += 4;
+      else if (age >= 40) totalScore += 3;
+      else if (age >= 30) totalScore += 2;
+
+      // 4. 비만 보정
+      const tall = parseFloat(tallInput.value);
+      const weight = parseFloat(weightInput.value);
+      const stdWeight = (tall - 100) * 0.9;
+      const over = weight - (stdWeight + 10);
+      if (over >= 23) totalScore -= 8;
+      else if (over >= 13) totalScore -= 4;
+      else if (over >= 5) totalScore -= 2;
+      
+      const expectedLife = totalScore;
+      const remainYears = expectedLife - age;
+
+      document.getElementById('lifeResult').textContent = `${expectedLife}살`;
+      if (remainYears > 0) {
+          const remainMonths = Math.round(remainYears * 12);
+          const remainDays = Math.round(remainYears * 365);
+          document.getElementById('lifeDetail').innerHTML = `
+              앞으로 약 <strong>${remainYears.toFixed(1)}년</strong><br>
+              (${remainMonths.toLocaleString()}개월, ${remainDays.toLocaleString()}일)
+          `;
+      } else {
+          document.getElementById('lifeDetail').textContent = '이미 예상 수명을 넘으셨습니다. 대단하십니다!';
+      }
+    }
+    
+    // Initialize
+    showScreen(1);
+  });
+</script>

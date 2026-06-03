@@ -1,0 +1,382 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'lotto-number-generator');
+if (!entry) throw new Error('lotto-number-generator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="lotto-app">
+      <div class="action-buttons">
+        <button class="action-btn primary" id="generate-one" type="button">1 세트 받기</button>
+        <button class="action-btn primary" id="generate-five" type="button">5 세트 받기</button>
+        <button class="action-btn secondary" id="clear-all" type="button">모두 지우기</button>
+      </div>
+
+      <div id="results-container" class="results-container" aria-live="polite"></div>
+
+      <div id="empty-state" class="empty-state" hidden>
+        <p>아직 생성된 번호가 없어요. 위 버튼을 눌러 번호를 받아보세요!</p>
+      </div>
+
+      <div id="toast" class="toast" role="status" aria-live="polite" hidden>번호가 복사되었습니다.</div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .lotto-app {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  .action-btn {
+    flex: 1 1 auto;
+    min-width: 120px;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    border: 2px solid transparent;
+  }
+
+  .action-btn.primary {
+    background-color: var(--color-primary);
+    color: #fff;
+  }
+
+  .action-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    filter: brightness(1.05);
+  }
+
+  .action-btn.secondary {
+    background-color: transparent;
+    color: var(--color-text, #333);
+    border: 2px solid var(--color-border, #d1d5db);
+  }
+
+  .action-btn.secondary:hover {
+    transform: translateY(-2px);
+    background-color: var(--color-bg-muted, #f3f4f6);
+  }
+
+  .results-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    border: 2px dashed var(--color-border, #d1d5db);
+    border-radius: 12px;
+    color: var(--color-text-muted, #6b7280);
+    text-align: center;
+  }
+
+  .empty-state[hidden] {
+    display: none;
+  }
+
+  /* 동적으로 생성되는 요소는 :global() 사용 */
+  .results-container :global(.lotto-set) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
+  .results-container :global(.lotto-balls) {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    flex: 1 1 auto;
+  }
+
+  .results-container :global(.lotto-ball) {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  }
+
+  .results-container :global(.copy-btn) {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .results-container :global(.copy-btn:hover) {
+    background-color: var(--color-primary);
+    color: #fff;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(17, 24, 39, 0.92);
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    z-index: 9999;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  .toast[hidden] {
+    display: none;
+  }
+
+  .toast.fade-out {
+    opacity: 0;
+  }
+
+  @media (max-width: 480px) {
+    .action-btn {
+      flex: 1 1 100%;
+    }
+    .results-container :global(.lotto-ball) {
+      width: 36px;
+      height: 36px;
+      font-size: 0.95rem;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    const STORAGE_KEY = 'lottoSetsHTML';
+    const LEGACY_KEY = 'lottoSetsHTML_wp';
+
+    const genOneBtn = document.getElementById('generate-one');
+    const genFiveBtn = document.getElementById('generate-five');
+    const clearBtn = document.getElementById('clear-all');
+    const resultsContainer = document.getElementById('results-container');
+    const emptyState = document.getElementById('empty-state');
+    const toast = document.getElementById('toast');
+
+    if (!genOneBtn || !genFiveBtn || !clearBtn || !resultsContainer || !emptyState || !toast) return;
+
+    function generateLottoNumbers() {
+      const numbers = new Set();
+      while (numbers.size < 6) {
+        numbers.add(Math.floor(Math.random() * 45) + 1);
+      }
+      return Array.from(numbers).sort((a, b) => a - b);
+    }
+
+    function getBallColor(n) {
+      if (n <= 10) return '#fbc400';
+      if (n <= 20) return '#69c8f2';
+      if (n <= 30) return '#ff7272';
+      if (n <= 40) return '#aaaaaa';
+      return '#b0d840';
+    }
+
+    function createLottoSetElement(numbers) {
+      const setDiv = document.createElement('div');
+      setDiv.className = 'lotto-set';
+
+      const ballsWrap = document.createElement('div');
+      ballsWrap.className = 'lotto-balls';
+
+      numbers.forEach((num) => {
+        const ball = document.createElement('span');
+        ball.className = 'lotto-ball';
+        ball.style.backgroundColor = getBallColor(num);
+        ball.textContent = String(num);
+        ballsWrap.appendChild(ball);
+      });
+
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'copy-btn';
+      copyBtn.type = 'button';
+      copyBtn.textContent = '복사';
+      copyBtn.setAttribute('data-numbers', numbers.join(', '));
+
+      setDiv.appendChild(ballsWrap);
+      setDiv.appendChild(copyBtn);
+      return setDiv;
+    }
+
+    function updateEmptyState() {
+      const hasResults = resultsContainer.children.length > 0;
+      if (hasResults) {
+        emptyState.setAttribute('hidden', '');
+      } else {
+        emptyState.removeAttribute('hidden');
+      }
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, resultsContainer.innerHTML);
+      } catch (e) {
+        /* ignore */
+      }
+    }
+
+    function loadFromStorage() {
+      try {
+        let saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) {
+          const legacy = localStorage.getItem(LEGACY_KEY);
+          if (legacy) {
+            saved = legacy;
+            localStorage.setItem(STORAGE_KEY, legacy);
+          }
+        }
+        if (saved && saved.trim()) {
+          resultsContainer.innerHTML = saved;
+          return true;
+        }
+      } catch (e) {
+        /* ignore */
+      }
+      return false;
+    }
+
+    function generateSets(count) {
+      resultsContainer.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const nums = generateLottoNumbers();
+        resultsContainer.appendChild(createLottoSetElement(nums));
+      }
+      saveToStorage();
+      updateEmptyState();
+    }
+
+    let toastTimer = null;
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.remove('fade-out');
+      toast.removeAttribute('hidden');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => {
+          toast.setAttribute('hidden', '');
+          toast.classList.remove('fade-out');
+        }, 300);
+      }, 1500);
+    }
+
+    async function copyText(text) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+      } catch (e) {
+        /* fall through */
+      }
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    genOneBtn.addEventListener('click', () => generateSets(1));
+    genFiveBtn.addEventListener('click', () => generateSets(5));
+    clearBtn.addEventListener('click', () => {
+      resultsContainer.innerHTML = '';
+      saveToStorage();
+      updateEmptyState();
+    });
+
+    resultsContainer.addEventListener('click', async (e) => {
+      const target = e.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.classList.contains('copy-btn')) {
+        const nums = target.getAttribute('data-numbers') || '';
+        const ok = await copyText(nums);
+        showToast(ok ? '번호가 복사되었습니다.' : '복사에 실패했습니다.');
+      }
+    });
+
+    // 초기화
+    const restored = loadFromStorage();
+    if (!restored) {
+      generateSets(1);
+    } else {
+      updateEmptyState();
+    }
+  })();
+</script>

@@ -1,0 +1,546 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'date-time-interval-calculator');
+if (!entry) throw new Error('date-time-interval-calculator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="calc-wrapper">
+
+      <!-- Screen 1: 시작 날짜·시간 입력 -->
+      <div id="screen1" class="screen">
+        <h2 class="screen-title">시작 날짜 · 시간</h2>
+        <div class="field-group">
+          <div class="field-row">
+            <div class="field">
+              <label for="startYear">년</label>
+              <input type="number" id="startYear" min="1" placeholder="예) 2020" />
+            </div>
+            <div class="field">
+              <label for="startMonth">월</label>
+              <input type="number" id="startMonth" min="1" max="12" placeholder="1~12" />
+            </div>
+            <div class="field">
+              <label for="startDay">일</label>
+              <input type="number" id="startDay" min="1" max="31" placeholder="1~31" />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="startHour">시</label>
+              <input type="number" id="startHour" min="0" max="23" placeholder="0~23" />
+            </div>
+            <div class="field">
+              <label for="startMin">분</label>
+              <input type="number" id="startMin" min="0" max="59" placeholder="0~59" />
+            </div>
+            <div class="field">
+              <label for="startSec">초</label>
+              <input type="number" id="startSec" min="0" max="59" placeholder="0~59" />
+            </div>
+          </div>
+        </div>
+        <p id="error1" class="error-msg" hidden></p>
+        <div class="btn-row">
+          <button id="btnNext" class="btn btn-primary btn-full">다음 →</button>
+        </div>
+      </div>
+
+      <!-- Screen 2: 종료 날짜·시간 입력 -->
+      <div id="screen2" class="screen" hidden>
+        <h2 class="screen-title">종료 날짜 · 시간</h2>
+        <div class="field-group">
+          <div class="field-row">
+            <div class="field">
+              <label for="endYear">년</label>
+              <input type="number" id="endYear" min="1" placeholder="예) 2024" />
+            </div>
+            <div class="field">
+              <label for="endMonth">월</label>
+              <input type="number" id="endMonth" min="1" max="12" placeholder="1~12" />
+            </div>
+            <div class="field">
+              <label for="endDay">일</label>
+              <input type="number" id="endDay" min="1" max="31" placeholder="1~31" />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="endHour">시</label>
+              <input type="number" id="endHour" min="0" max="23" placeholder="0~23" />
+            </div>
+            <div class="field">
+              <label for="endMin">분</label>
+              <input type="number" id="endMin" min="0" max="59" placeholder="0~59" />
+            </div>
+            <div class="field">
+              <label for="endSec">초</label>
+              <input type="number" id="endSec" min="0" max="59" placeholder="0~59" />
+            </div>
+          </div>
+        </div>
+        <p id="error2" class="error-msg" hidden></p>
+        <div class="btn-col">
+          <button id="btnCalc" class="btn btn-primary btn-full">계산하기</button>
+          <button id="btnBack" class="btn btn-text">← 이전으로</button>
+        </div>
+      </div>
+
+      <!-- Screen 3: 결과 -->
+      <div id="screen3" class="screen" hidden>
+        <h2 class="screen-title">계산 결과</h2>
+        <div id="result" class="result-box"></div>
+        <div class="btn-col">
+          <button id="btnCopy" class="btn btn-secondary btn-full">📋 클립보드 복사</button>
+          <button id="btnReset" class="btn btn-text">처음으로</button>
+        </div>
+        <p id="copyMsg" class="copy-msg" hidden>복사되었습니다!</p>
+      </div>
+
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .calc-wrapper {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+
+  .screen {
+    display: block;
+  }
+  .screen[hidden] {
+    display: none;
+  }
+
+  .screen-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 1.25rem;
+    text-align: center;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .field label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-muted, #6b7280);
+    text-align: center;
+  }
+
+  .field input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.55rem 0.4rem;
+    border: 1.5px solid var(--color-border, #d1d5db);
+    border-radius: 8px;
+    font-size: 1rem;
+    text-align: center;
+    background: var(--color-surface, #fff);
+    color: var(--color-text, #111827);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -moz-appearance: textfield;
+  }
+  .field input::-webkit-outer-spin-button,
+  .field input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+  }
+
+  /* 버튼 공통 */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.18s, transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+  .btn-primary:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    background: var(--color-surface, #f3f4f6);
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+  }
+  .btn-secondary:hover {
+    background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+    transform: translateY(-1px);
+  }
+  .btn-text {
+    background: none;
+    border: none;
+    color: var(--color-text-muted, #6b7280);
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .btn-text:hover {
+    color: var(--color-primary);
+  }
+  .btn-full {
+    width: 100%;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .btn-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  /* 에러 메시지 */
+  .error-msg {
+    color: #dc2626;
+    font-size: 0.88rem;
+    margin: 0 0 0.75rem;
+    text-align: center;
+  }
+  .error-msg[hidden] {
+    display: none;
+  }
+
+  /* 결과 박스 */
+  .result-box {
+    background: var(--color-surface, #f9fafb);
+    border: 1.5px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    padding: 1.25rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--color-text, #111827);
+  }
+
+  /* result-box 내부 동적 요소 (innerHTML) */
+  :global(.result-headline) {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  :global(.result-table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+  }
+  :global(.result-table tr) {
+    border-bottom: 1px solid var(--color-border, #e5e7eb);
+  }
+  :global(.result-table tr:last-child) {
+    border-bottom: none;
+  }
+  :global(.result-table td) {
+    padding: 0.45rem 0.5rem;
+    font-size: 0.9rem;
+  }
+  :global(.result-table td:first-child) {
+    color: var(--color-text-muted, #6b7280);
+    font-weight: 600;
+    white-space: nowrap;
+    width: 30%;
+  }
+  :global(.result-table td:last-child) {
+    font-weight: 500;
+    color: var(--color-text, #111827);
+  }
+  :global(.result-highlight) {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  /* 복사 메시지 */
+  .copy-msg {
+    font-size: 0.85rem;
+    color: #16a34a;
+    margin-top: 0.25rem;
+    text-align: center;
+  }
+  .copy-msg[hidden] {
+    display: none;
+  }
+
+  @media (max-width: 400px) {
+    .field-row {
+      gap: 0.5rem;
+    }
+    .field input {
+      font-size: 0.9rem;
+      padding: 0.5rem 0.25rem;
+    }
+  }
+</style>
+
+<script>
+  /* ── 유틸 ── */
+  function getInt(id: string): number {
+    return parseInt((document.getElementById(id) as HTMLInputElement).value, 10);
+  }
+  function showError(id: string, msg: string) {
+    const el = document.getElementById(id) as HTMLParagraphElement;
+    el.textContent = msg;
+    el.hidden = false;
+  }
+  function clearError(id: string) {
+    const el = document.getElementById(id) as HTMLParagraphElement;
+    el.textContent = '';
+    el.hidden = true;
+  }
+
+  function validateDateFields(
+    year: number, month: number, day: number,
+    hour: number, min: number, sec: number
+  ): string | null {
+    if (isNaN(year) || year < 1) return '년도를 올바르게 입력해 주세요.';
+    if (isNaN(month) || month < 1 || month > 12) return '월은 1~12 사이로 입력해 주세요.';
+    if (isNaN(day) || day < 1 || day > 31) return '일은 1~31 사이로 입력해 주세요.';
+    if (isNaN(hour) || hour < 0 || hour > 23) return '시는 0~23 사이로 입력해 주세요.';
+    if (isNaN(min) || min < 0 || min > 59) return '분은 0~59 사이로 입력해 주세요.';
+    if (isNaN(sec) || sec < 0 || sec > 59) return '초는 0~59 사이로 입력해 주세요.';
+    return null;
+  }
+
+  /* ── 화면 전환 ── */
+  function showScreen(id: string) {
+    ['screen1', 'screen2', 'screen3'].forEach(s => {
+      const el = document.getElementById(s)!;
+      el.hidden = (s !== id);
+    });
+  }
+
+  /* ── 계산 ── */
+  function getDaysInMonth(year: number, month: number): number {
+    return new Date(year, month, 0).getDate();
+  }
+
+  function calculate() {
+    const sy = getInt('startYear'), sm = getInt('startMonth'), sd = getInt('startDay');
+    const sh = getInt('startHour'), smin = getInt('startMin'), ss = getInt('startSec');
+    const ey = getInt('endYear'), em = getInt('endMonth'), ed = getInt('endDay');
+    const eh = getInt('endHour'), emin = getInt('endMin'), es = getInt('endSec');
+
+    const startDate = new Date(sy, sm - 1, sd, sh, smin, ss);
+    const endDate   = new Date(ey, em - 1, ed, eh, emin, es);
+    const diffMs    = endDate.getTime() - startDate.getTime();
+
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const totalHours   = Math.floor(totalMinutes / 60);
+    const totalDays    = Math.floor(totalHours / 24);
+    const totalMonths_raw = (ey - sy) * 12 + (em - sm);
+
+    // 분해 계산
+    let years   = ey - sy;
+    let months  = em - sm;
+    let days    = ed - sd;
+    let hours   = eh - sh;
+    let minutes = emin - smin;
+    let seconds = es - ss;
+
+    if (seconds < 0) { seconds += 60; minutes--; }
+    if (minutes < 0) { minutes += 60; hours--; }
+    if (hours < 0)   { hours += 24; days--; }
+    if (days < 0) {
+      const prevMonth = (em - 2 + 12) % 12 + 1;
+      const prevMonthYear = em === 1 ? ey - 1 : ey;
+      days += getDaysInMonth(prevMonthYear, prevMonth);
+      months--;
+    }
+    if (months < 0) { months += 12; years--; }
+
+    const totalMonths = years * 12 + months;
+
+    /* 분해 헤드라인 */
+    const parts: string[] = [];
+    if (years > 0)   parts.push(`${years}년`);
+    if (months > 0)  parts.push(`${months}개월`);
+    if (days > 0)    parts.push(`${days}일`);
+    if (hours > 0)   parts.push(`${hours}시간`);
+    if (minutes > 0) parts.push(`${minutes}분`);
+    if (seconds > 0) parts.push(`${seconds}초`);
+    const headline = parts.length > 0 ? parts.join(' ') : '0초';
+
+    /* 총합 단위 포맷 */
+    function fmtTotal(label: string, total: number, unit: string, rem: string): string {
+      return `<tr><td>${label}</td><td><span class="result-highlight">${total.toLocaleString()}${unit}</span>${rem}</td></tr>`;
+    }
+
+    const remFromMonths = ` ${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
+    const remFromDays   = ` ${hours}시간 ${minutes}분 ${seconds}초`;
+    const remFromHours  = ` ${minutes}분 ${seconds}초`;
+    const remFromMins   = ` ${seconds}초`;
+
+    const html = `
+      <div class="result-headline">${headline}</div>
+      <table class="result-table">
+        ${fmtTotal('총 개월', totalMonths, '개월', remFromMonths)}
+        ${fmtTotal('총 일', totalDays, '일', remFromDays)}
+        ${fmtTotal('총 시간', totalHours, '시간', remFromMins.replace(remFromMins, remFromHours))}
+        ${fmtTotal('총 분', totalMinutes, '분', remFromMins)}
+        <tr><td>총 초</td><td><span class="result-highlight">${totalSeconds.toLocaleString()}초</span></td></tr>
+      </table>
+    `;
+
+    // totalHours 행 rem 수정
+    const htmlFixed = html.replace(
+      fmtTotal('총 시간', totalHours, '시간', remFromMins.replace(remFromMins, remFromHours)),
+      fmtTotal('총 시간', totalHours, '시간', remFromHours)
+    );
+
+    document.getElementById('result')!.innerHTML = htmlFixed;
+  }
+
+  /* ── 이벤트 ── */
+  document.getElementById('btnNext')!.addEventListener('click', () => {
+    clearError('error1');
+    const sy = getInt('startYear'), sm = getInt('startMonth'), sd = getInt('startDay');
+    const sh = getInt('startHour'), smin = getInt('startMin'), ss = getInt('startSec');
+    const err = validateDateFields(sy, sm, sd, sh, smin, ss);
+    if (err) { showError('error1', err); return; }
+    showScreen('screen2');
+  });
+
+  document.getElementById('btnBack')!.addEventListener('click', () => {
+    clearError('error2');
+    showScreen('screen1');
+  });
+
+  document.getElementById('btnCalc')!.addEventListener('click', () => {
+    clearError('error2');
+    const sy = getInt('startYear'), sm = getInt('startMonth'), sd = getInt('startDay');
+    const sh = getInt('startHour'), smin = getInt('startMin'), ss = getInt('startSec');
+    const ey = getInt('endYear'), em = getInt('endMonth'), ed = getInt('endDay');
+    const eh = getInt('endHour'), emin = getInt('endMin'), es = getInt('endSec');
+
+    const err = validateDateFields(ey, em, ed, eh, emin, es);
+    if (err) { showError('error2', err); return; }
+
+    const startDate = new Date(sy, sm - 1, sd, sh, smin, ss);
+    const endDate   = new Date(ey, em - 1, ed, eh, emin, es);
+    if (endDate.getTime() <= startDate.getTime()) {
+      showError('error2', '종료 시각이 시작 시각보다 나중이어야 합니다.');
+      return;
+    }
+
+    calculate();
+    showScreen('screen3');
+  });
+
+  document.getElementById('btnCopy')!.addEventListener('click', async () => {
+    const resultEl = document.getElementById('result')!;
+    const text = resultEl.innerText || resultEl.textContent || '';
+    const copyMsg = document.getElementById('copyMsg') as HTMLParagraphElement;
+    try {
+      await navigator.clipboard.writeText(text);
+      copyMsg.hidden = false;
+      setTimeout(() => { copyMsg.hidden = true; }, 2000);
+    } catch {
+      copyMsg.textContent = '복사에 실패했습니다.';
+      copyMsg.hidden = false;
+      setTimeout(() => { copyMsg.hidden = true; }, 2000);
+    }
+  });
+
+  document.getElementById('btnReset')!.addEventListener('click', () => {
+    // 입력값 초기화
+    ['startYear','startMonth','startDay','startHour','startMin','startSec',
+     'endYear','endMonth','endDay','endHour','endMin','endSec'].forEach(id => {
+      (document.getElementById(id) as HTMLInputElement).value = '';
+    });
+    document.getElementById('result')!.innerHTML = '';
+    document.getElementById('copyMsg')!.hidden = true;
+    clearError('error1');
+    clearError('error2');
+    showScreen('screen1');
+  });
+
+  // 포커스 시 값 비우기
+  ['startYear','startMonth','startDay','startHour','startMin','startSec',
+   'endYear','endMonth','endDay','endHour','endMin','endSec'].forEach(id => {
+    const el = document.getElementById(id) as HTMLInputElement;
+    el.addEventListener('focus', () => { el.select(); });
+  });
+</script>

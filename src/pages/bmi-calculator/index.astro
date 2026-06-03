@@ -1,0 +1,400 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'bmi-calculator');
+if (!entry) throw new Error('bmi-calculator entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="bmi-app">
+      <!-- 입력 화면 -->
+      <section id="screen1" class="screen">
+        <div class="form-group">
+          <label class="form-label">성별</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="gender" value="남성" />
+              <span>남성</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="gender" value="여성" />
+              <span>여성</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="age">나이</label>
+          <input id="age" type="number" min="0" step="1" placeholder="예: 30" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="height">키 (cm)</label>
+            <input id="height" type="number" min="0" step="0.1" placeholder="예: 170" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="weight">몸무게 (kg)</label>
+            <input id="weight" type="number" min="0" step="0.1" placeholder="예: 65" />
+          </div>
+        </div>
+
+        <p id="error-message" class="error-message" hidden></p>
+
+        <button id="calc-btn" class="btn btn-primary" type="button">비만도 계산하기</button>
+      </section>
+
+      <!-- 결과 화면 -->
+      <section id="screen2" class="screen result-screen" hidden>
+        <div class="result-card">
+          <p class="result-label">당신의 BMI</p>
+          <p id="bmi-value" class="bmi-value">0.0</p>
+          <p id="bmi-category" class="bmi-category">-</p>
+        </div>
+
+        <div class="advice-box">
+          <p id="advice1" class="advice-text"></p>
+          <p id="advice2" class="advice-text" hidden></p>
+        </div>
+
+        <button id="reset-btn" class="btn btn-outline" type="button">다시 계산하기</button>
+      </section>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .bmi-app {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .screen {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .screen[hidden] {
+    display: none;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .form-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  input[type="number"] {
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    border: 2px solid var(--color-border, #d1d5db);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--color-surface, #fff);
+    color: var(--color-text);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+  }
+  input[type="number"]:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .radio-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--color-border, #d1d5db);
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--color-surface, #fff);
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .radio-option:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+  }
+  .radio-option input[type="radio"] {
+    accent-color: var(--color-primary);
+  }
+  .radio-option:has(input:checked) {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: #fff;
+  }
+
+  .btn {
+    padding: 0.9rem 1.25rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+    width: 100%;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+  .btn-outline:hover {
+    background: var(--color-primary);
+    color: #fff;
+  }
+
+  .error-message {
+    color: #dc2626;
+    font-size: 0.9rem;
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    background: rgba(220, 38, 38, 0.08);
+    border-radius: 6px;
+  }
+  .error-message[hidden] {
+    display: none;
+  }
+
+  .result-card {
+    text-align: center;
+    padding: 2rem 1.25rem;
+    border-radius: 12px;
+    background: var(--color-surface-alt, #f9fafb);
+    border: 1px solid var(--color-border, #e5e7eb);
+  }
+
+  .result-label {
+    font-size: 0.95rem;
+    color: var(--color-text-muted, #6b7280);
+    margin: 0 0 0.5rem;
+  }
+
+  .bmi-value {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--color-text);
+    line-height: 1.1;
+  }
+
+  .bmi-category {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0.75rem 0 0;
+  }
+  .bmi-category.cat-green { color: #16a34a; }
+  .bmi-category.cat-orange { color: #ea580c; }
+  .bmi-category.cat-red { color: #dc2626; }
+
+  .advice-box {
+    padding: 1.25rem;
+    border-radius: 10px;
+    background: var(--color-surface-alt, #f9fafb);
+    border-left: 4px solid var(--color-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .advice-text {
+    margin: 0;
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+  .advice-text[hidden] {
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    .form-row {
+      flex-direction: column;
+    }
+    .bmi-value {
+      font-size: 2.5rem;
+    }
+  }
+</style>
+
+<script>
+  const screen1 = document.getElementById('screen1') as HTMLElement;
+  const screen2 = document.getElementById('screen2') as HTMLElement;
+  const calcBtn = document.getElementById('calc-btn');
+  const resetBtn = document.getElementById('reset-btn');
+  const errorEl = document.getElementById('error-message') as HTMLElement;
+  const bmiValueEl = document.getElementById('bmi-value') as HTMLElement;
+  const bmiCategoryEl = document.getElementById('bmi-category') as HTMLElement;
+  const advice1El = document.getElementById('advice1') as HTMLElement;
+  const advice2El = document.getElementById('advice2') as HTMLElement;
+
+  function showError(msg: string) {
+    errorEl.textContent = msg;
+    errorEl.hidden = false;
+  }
+  function hideError() {
+    errorEl.hidden = true;
+  }
+
+  function calculateBMI() {
+    hideError();
+
+    const genderInput = document.querySelector<HTMLInputElement>('input[name="gender"]:checked');
+    const ageVal = parseInt((document.getElementById('age') as HTMLInputElement).value, 10);
+    const heightVal = parseFloat((document.getElementById('height') as HTMLInputElement).value);
+    const weightVal = parseFloat((document.getElementById('weight') as HTMLInputElement).value);
+
+    if (!genderInput) {
+      showError('성별을 선택해주세요.');
+      return;
+    }
+    if (isNaN(ageVal) || ageVal <= 0) {
+      showError('나이를 올바르게 입력해주세요.');
+      return;
+    }
+    if (isNaN(heightVal) || heightVal <= 0) {
+      showError('키를 올바르게 입력해주세요.');
+      return;
+    }
+    if (isNaN(weightVal) || weightVal <= 0) {
+      showError('몸무게를 올바르게 입력해주세요.');
+      return;
+    }
+
+    const heightM = heightVal / 100;
+    const bmi = Math.round((weightVal / (heightM * heightM)) * 10) / 10;
+
+    let category = '';
+    let colorClass = '';
+    let advice1 = '';
+    let isNormal = false;
+
+    if (bmi < 18.5) {
+      category = '저체중';
+      colorClass = 'cat-red';
+      advice1 = '저체중에 해당합니다. 충분한 영양 섭취와 규칙적인 식사 습관이 필요합니다.';
+    } else if (bmi <= 22.9) {
+      category = '정상 체중';
+      colorClass = 'cat-green';
+      advice1 = '정상 체중 범위에 속합니다. 현재의 건강한 생활 습관을 유지하세요!';
+      isNormal = true;
+    } else if (bmi <= 24.9) {
+      category = '비만 전단계 (과체중)';
+      colorClass = 'cat-orange';
+      advice1 = '과체중 단계입니다. 식단 조절과 규칙적인 운동으로 정상 체중을 유지하세요.';
+    } else if (bmi <= 29.9) {
+      category = '1단계 비만';
+      colorClass = 'cat-red';
+      advice1 = '1단계 비만에 해당합니다. 꾸준한 운동과 식이요법이 권장됩니다.';
+    } else if (bmi <= 34.9) {
+      category = '2단계 비만';
+      colorClass = 'cat-red';
+      advice1 = '2단계 비만입니다. 건강에 영향을 줄 수 있으니 전문가와 상담을 권장합니다.';
+    } else {
+      category = '3단계 비만';
+      colorClass = 'cat-red';
+      advice1 = '3단계 비만(고도비만)에 해당합니다. 반드시 전문 의료기관의 도움을 받으세요.';
+    }
+
+    bmiValueEl.textContent = bmi.toFixed(1);
+    bmiCategoryEl.textContent = category;
+    bmiCategoryEl.classList.remove('cat-green', 'cat-orange', 'cat-red');
+    bmiCategoryEl.classList.add(colorClass);
+
+    advice1El.textContent = advice1;
+
+    if (!isNormal) {
+      const minW = Math.round(18.5 * heightM * heightM * 10) / 10;
+      const maxW = Math.round(22.9 * heightM * heightM * 10) / 10;
+      advice2El.textContent = `당신의 키 기준 권장 체중은 ${minW}kg ~ ${maxW}kg 입니다.`;
+      advice2El.hidden = false;
+    } else {
+      advice2El.hidden = true;
+      advice2El.textContent = '';
+    }
+
+    screen1.hidden = true;
+    screen2.hidden = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetApp() {
+    (document.getElementById('age') as HTMLInputElement).value = '';
+    (document.getElementById('height') as HTMLInputElement).value = '';
+    (document.getElementById('weight') as HTMLInputElement).value = '';
+    document.querySelectorAll<HTMLInputElement>('input[name="gender"]').forEach(r => (r.checked = false));
+    hideError();
+    screen2.hidden = true;
+    screen1.hidden = false;
+  }
+
+  calcBtn?.addEventListener('click', calculateBMI);
+  resetBtn?.addEventListener('click', resetApp);
+
+  // 입력 시 포커스 깔끔하게
+  ['age', 'height', 'weight'].forEach(id => {
+    const el = document.getElementById(id) as HTMLInputElement | null;
+    el?.addEventListener('focus', () => hideError());
+  });
+</script>
