@@ -41,54 +41,29 @@ if (related.length === 0) {
           rows="10"
         ></textarea>
 
-        <div class="live-stats" id="liveStats">
-          <div class="stat-item">
-            <span class="stat-label">실시간 글자 수</span>
-            <span class="stat-value" id="liveCharCount">0</span>
+        <div class="stats-container">
+          <div class="live-stats">
+            <div class="stat-item">
+              <span class="stat-label">글자 수 (공백 포함)</span>
+              <span class="stat-value"><span id="charWithSpaces">0</span><span class="stat-unit">자</span></span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">글자 수 (공백 제외)</span>
+              <span class="stat-value"><span id="charWithoutSpaces">0</span><span class="stat-unit">자</span></span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">단어 수</span>
+              <span class="stat-value"><span id="wordCount">0</span><span class="stat-unit">개</span></span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">줄 수</span>
+              <span class="stat-value"><span id="lineCount">0</span><span class="stat-unit">줄</span></span>
+            </div>
           </div>
-          <div class="stat-item">
-            <span class="stat-label">실시간 단어 수</span>
-            <span class="stat-value" id="liveWordCount">0</span>
-          </div>
-        </div>
-
-        <p class="error-message" id="errorMessage" hidden>텍스트를 입력해주세요.</p>
-
-        <div class="button-group">
-          <button type="button" class="app-btn app-btn-primary" id="analyzeBtn">
-            글자 및 단어 수 세기
-          </button>
-          <button type="button" class="app-btn app-btn-outline" id="clearBtn">
+          <button type="button" class="app-btn app-btn-outline clear-btn" id="clearBtn">
             지우기
           </button>
         </div>
-      </div>
-
-      <div class="result-section" id="resultSection" hidden>
-        <h2 class="result-title">분석 결과</h2>
-        <div class="result-grid">
-          <div class="result-card">
-            <span class="result-label">공백 포함 글자 수</span>
-            <span class="result-value" id="charWithSpaces">0</span>
-            <span class="result-unit">자</span>
-          </div>
-          <div class="result-card">
-            <span class="result-label">공백 제외 글자 수</span>
-            <span class="result-value" id="charWithoutSpaces">0</span>
-            <span class="result-unit">자</span>
-          </div>
-          <div class="result-card">
-            <span class="result-label">단어 수</span>
-            <span class="result-value" id="wordCount">0</span>
-            <span class="result-unit">개</span>
-          </div>
-          <div class="result-card">
-            <span class="result-label">줄 수</span>
-            <span class="result-value" id="lineCount">0</span>
-            <span class="result-unit">줄</span>
-          </div>
-        </div>
-
       </div>
     </div>
   </Fragment>
@@ -142,130 +117,78 @@ if (related.length === 0) {
     border-color: var(--color-primary);
   }
 
-  .live-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  .stats-container {
+    display: flex;
     gap: 0.75rem;
     margin-top: 1rem;
+    align-items: stretch;
+  }
+
+  .live-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    flex: 1;
   }
 
   .stat-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0.75rem;
-    background: var(--color-background);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-border);
-  }
-
-  .stat-label {
-    font-size: 0.85rem;
-    color: var(--color-text-muted);
-    margin-bottom: 0.25rem;
-  }
-
-  .stat-value {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-primary);
-  }
-
-  .error-message {
-    color: #dc2626;
-    font-size: 0.9rem;
-    margin-top: 0.75rem;
-    padding: 0.5rem 0.75rem;
-    background: #fef2f2;
-    border-radius: var(--radius-sm);
-    border-left: 3px solid #dc2626;
-  }
-
-  .error-message[hidden] {
-    display: none;
-  }
-
-  .button-group {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 1rem;
-  }
-
-  .button-group .app-btn:first-child {
-    flex: 3;
-  }
-
-  .button-group .app-btn:last-child {
-    flex: 1;
-  }
-
-  .result-section[hidden] {
-    display: none;
-  }
-
-  .result-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin: 0 0 1rem 0;
-    color: var(--color-text);
-  }
-
-  .result-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-
-  .result-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    padding: 1.25rem 0.75rem;
+    padding: 0.75rem 0.5rem;
     background: var(--color-background);
-    border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
     text-align: center;
   }
 
-  .result-label {
-    font-size: 0.85rem;
+  .stat-label {
+    font-size: 0.8rem;
     color: var(--color-text-muted);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
   }
 
-  .result-value {
-    font-size: 1.75rem;
+  .stat-value {
+    font-size: 1.35rem;
     font-weight: 700;
     color: var(--color-primary);
-    line-height: 1.2;
+    display: flex;
+    align-items: baseline;
+    gap: 0.15rem;
   }
 
-  .result-unit {
-    font-size: 0.85rem;
+  .stat-unit {
+    font-size: 0.8rem;
+    font-weight: 500;
     color: var(--color-text-muted);
-    margin-top: 0.25rem;
   }
 
-  @media (max-width: 480px) {
-    .button-group {
+  .clear-btn {
+    width: 80px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (max-width: 640px) {
+    .stats-container {
       flex-direction: column;
     }
-
-    .result-value {
-      font-size: 1.5rem;
+    .live-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .clear-btn {
+      width: 100%;
+      padding: 0.875rem;
     }
   }
 </style>
 
 <script>
   const textInput = document.getElementById('textInput') as HTMLTextAreaElement | null;
-  const liveCharCount = document.getElementById('liveCharCount');
-  const liveWordCount = document.getElementById('liveWordCount');
-  const errorMessage = document.getElementById('errorMessage');
-  const analyzeBtn = document.getElementById('analyzeBtn');
   const clearBtn = document.getElementById('clearBtn');
-  const resultSection = document.getElementById('resultSection');
 
   const charWithSpaces = document.getElementById('charWithSpaces');
   const charWithoutSpaces = document.getElementById('charWithoutSpaces');
@@ -286,29 +209,7 @@ if (related.length === 0) {
   function updateLiveStats() {
     if (!textInput) return;
     const text = textInput.value;
-    if (liveCharCount) liveCharCount.textContent = String(text.length);
-    if (liveWordCount) liveWordCount.textContent = String(countWords(text));
-    if (errorMessage && text.trim().length > 0) {
-      errorMessage.hidden = true;
-    }
-    if (resultSection && !resultSection.hidden) {
-      resultSection.hidden = true;
-    }
-  }
-
-  function analyzeText() {
-    if (!textInput) return;
-    const text = textInput.value;
-
-    if (!text.trim()) {
-      if (errorMessage) errorMessage.hidden = false;
-      if (resultSection) resultSection.hidden = true;
-      textInput.focus();
-      return;
-    }
-
-    if (errorMessage) errorMessage.hidden = true;
-
+    
     const withSpaces = text.length;
     const withoutSpaces = text.replace(/\s/g, '').length;
     const words = countWords(text);
@@ -318,23 +219,16 @@ if (related.length === 0) {
     if (charWithoutSpaces) charWithoutSpaces.textContent = withoutSpaces.toLocaleString('ko-KR');
     if (wordCountEl) wordCountEl.textContent = words.toLocaleString('ko-KR');
     if (lineCountEl) lineCountEl.textContent = lines.toLocaleString('ko-KR');
-
-    if (resultSection) {
-      resultSection.hidden = false;
-    }
   }
 
   function clearText() {
     if (!textInput) return;
     textInput.value = '';
     updateLiveStats();
-    if (resultSection) resultSection.hidden = true;
-    if (errorMessage) errorMessage.hidden = true;
     textInput.focus();
   }
 
   textInput?.addEventListener('input', updateLiveStats);
-  analyzeBtn?.addEventListener('click', analyzeText);
   clearBtn?.addEventListener('click', clearText);
 
   updateLiveStats();
