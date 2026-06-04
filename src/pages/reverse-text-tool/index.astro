@@ -45,7 +45,9 @@ if (related.length === 0) {
     <div class="reverse-app">
       <!-- 단일 패널 (입력 및 결과) -->
       <section class="panel" id="mainSection">
-        <label for="inputText" class="field-label">텍스트 입력 및 결과 확인</label>
+        <label for="inputText" class="field-label"
+          >텍스트 입력 및 결과 확인</label
+        >
         <textarea
           id="inputText"
           class="text-area"
@@ -63,7 +65,7 @@ if (related.length === 0) {
           </div>
           <div class="action-row">
             <button type="button" class="app-btn app-btn-outline" id="copyBtn">
-              클립보드 저장
+              클립보드저장
             </button>
             <button type="button" class="app-btn app-btn-outline" id="resetBtn">
               지우기
@@ -185,7 +187,6 @@ if (related.length === 0) {
   .toast[hidden] {
     display: none;
   }
-
 </style>
 
 <script>
@@ -199,14 +200,7 @@ if (related.length === 0) {
     const resetBtn = document.getElementById("resetBtn");
     const toast = document.getElementById("toast");
 
-    if (
-      !inputText ||
-      !charBtn ||
-      !wordBtn ||
-      !copyBtn ||
-      !resetBtn ||
-      !toast
-    ) {
+    if (!inputText || !charBtn || !wordBtn || !copyBtn || !resetBtn || !toast) {
       return;
     }
 
