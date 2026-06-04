@@ -486,14 +486,9 @@ if (related.length === 0) {
     });
 
     $('btnReset').addEventListener('click', () => {
-      ['startHour', 'startMin', 'startSec', 'endHour', 'endMin', 'endSec'].forEach(id => {
-        $i(id).value = '';
-      });
       hideError(error1);
       hideError(error2);
       $('copyFeedback').hidden = true;
-      startTime = { h: 0, m: 0, s: 0 };
-      endTime = { h: 0, m: 0, s: 0 };
       showScreen(1);
     });
 
