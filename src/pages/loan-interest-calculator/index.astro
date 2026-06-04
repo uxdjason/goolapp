@@ -73,6 +73,8 @@ if (related.length === 0) {
       </section>
 
       <section class="result-screen" id="resultScreen" hidden>
+        <div class="input-summary" id="inputSummary"></div>
+
         <div class="result-summary" id="resultText"></div>
 
         <div class="schedule-wrapper">
@@ -140,7 +142,7 @@ if (related.length === 0) {
 
   .radio-item {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.75rem;
     padding: 1rem;
     border: 2px solid var(--color-border);
@@ -154,7 +156,7 @@ if (related.length === 0) {
   }
 
   .radio-item input[type="radio"] {
-    margin-top: 0.25rem;
+    margin-top: 0.2rem;
     flex-shrink: 0;
     accent-color: var(--color-primary);
     width: 1.1rem;
@@ -169,7 +171,13 @@ if (related.length === 0) {
   .radio-content {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.2rem;
+  }
+
+  .radio-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
   }
 
   .radio-content strong {
@@ -207,7 +215,9 @@ if (related.length === 0) {
 
   .btn-primary:hover {
     background: var(--color-primary-dark, var(--color-primary));
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+    transform: translateY(-1px);
+    filter: brightness(1.08);
   }
 
   .btn-outline {
@@ -235,6 +245,50 @@ if (related.length === 0) {
   .result-screen[hidden],
   .schedule-table-wrapper[hidden] {
     display: none !important;
+  }
+
+  .input-summary {
+    background: var(--color-surface-alt, #f9fafb);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+
+  .input-summary-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-secondary, #6b7280);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    width: 100%;
+  }
+
+  .input-summary-items {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .input-summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .input-summary-label {
+    font-size: 0.78rem;
+    color: var(--color-text-secondary, #6b7280);
+  }
+
+  .input-summary-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text);
   }
 
   .result-summary {
@@ -409,12 +463,32 @@ if (related.length === 0) {
     const methodLabel = repayMethod === 'annuity' ? '원리금 균등분할상환' : '원금 균등분할상환';
     const firstMonthLabel = repayMethod === 'annuity' ? '월 상환 금액' : '첫 달 상환 금액';
 
+    // 입력값 요약 렌더링
+    const inputSummaryEl = document.getElementById('inputSummary') as HTMLElement;
+    inputSummaryEl.innerHTML = `
+      <div class="input-summary-title">입력 조건</div>
+      <div class="input-summary-items">
+        <div class="input-summary-item">
+          <span class="input-summary-label">대출 원금</span>
+          <span class="input-summary-value">${formatNumber(principal)}원</span>
+        </div>
+        <div class="input-summary-item">
+          <span class="input-summary-label">대출 기간</span>
+          <span class="input-summary-value">${years}년 (${months}개월)</span>
+        </div>
+        <div class="input-summary-item">
+          <span class="input-summary-label">연 금리</span>
+          <span class="input-summary-value">${rate}%</span>
+        </div>
+        <div class="input-summary-item">
+          <span class="input-summary-label">상환 방식</span>
+          <span class="input-summary-value">${methodLabel}</span>
+        </div>
+      </div>
+    `;
+
     const resultText = document.getElementById('resultText') as HTMLElement;
     resultText.innerHTML = `
-      <div class="summary-row">
-        <span class="summary-label">상환 방식</span>
-        <span class="summary-value">${methodLabel}</span>
-      </div>
       <div class="summary-row">
         <span class="summary-label">${firstMonthLabel}</span>
         <span class="summary-value highlight">${formatNumber(monthlyPayment)}원</span>
