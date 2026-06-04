@@ -95,6 +95,9 @@ if (related.length === 0) {
             <span class="result-label">시간 차이</span>
             <span class="result-value" id="resultMain">-</span>
           </div>
+          <div id="overnightBadge" class="overnight-badge" hidden>
+            🌙 자정을 넘는 시간으로 계산되었습니다 (다음날 기준)
+          </div>
           <div class="result-grid">
             <div class="result-item">
               <span class="result-label">시작 시간</span>
@@ -319,6 +322,20 @@ if (related.length === 0) {
     display: none;
   }
 
+  .overnight-badge {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #7c3aed;
+    background: rgba(124, 58, 237, 0.08);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: var(--radius-md);
+    padding: 0.55rem 0.9rem;
+  }
+
+  .overnight-badge[hidden] {
+    display: none;
+  }
+
   @media (max-width: 480px) {
     .screen {
       padding: 1.1rem;
@@ -416,11 +433,12 @@ if (related.length === 0) {
       endTime = { h: res.h, m: res.m, s: res.s };
 
       const startSec = startTime.h * 3600 + startTime.m * 60 + startTime.s;
-      const endSec = endTime.h * 3600 + endTime.m * 60 + endTime.s;
+      let endSec = endTime.h * 3600 + endTime.m * 60 + endTime.s;
 
-      if (endSec <= startSec) {
-        showError(error2, '종료 시간은 시작 시간보다 늦어야 합니다. (같은 날 기준)');
-        return;
+      // 자정을 넘는 경우: 종료 시간이 시작 시간보다 이르면 다음 날 기준으로 자동 보정
+      const isOvernight = endSec <= startSec;
+      if (isOvernight) {
+        endSec += 24 * 3600;
       }
 
       hideError(error2);
@@ -434,10 +452,13 @@ if (related.length === 0) {
 
       $('resultMain').textContent = `${diffH}시간 ${diffM}분 ${diffS}초`;
       $('resultStart').textContent = formatTime(startTime);
-      $('resultEnd').textContent = formatTime(endTime);
+      $('resultEnd').textContent = `${formatTime(endTime)}${isOvernight ? ' (다음날)' : ''}`;
       $('resultDecimal').textContent = `${diffDecimal} 시간`;
       $('resultMinutes').textContent = `${diffMinutes.toLocaleString()} 분`;
       $('resultSeconds').textContent = `${diffSec.toLocaleString()} 초`;
+
+      const badge = $('overnightBadge');
+      badge.hidden = !isOvernight;
 
       showScreen(3);
     });
