@@ -291,6 +291,9 @@ if (related.length === 0) {
     if (errorMessage && text.trim().length > 0) {
       errorMessage.hidden = true;
     }
+    if (resultSection && !resultSection.hidden) {
+      resultSection.hidden = true;
+    }
   }
 
   function analyzeText() {
