@@ -449,9 +449,11 @@ if (related.length === 0) {
       if (errorMessage) errorMessage.hidden = true;
       updateProgressBar(screenNumber);
       
-      // 스크롤 상단 이동 (모바일 사용성 개선)
+      // 스크롤 상단 이동 (모바일 사용성 개선, 헤더 여백 고려)
       if (app) {
-        app.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const offset = 80; // 고정 헤더 높이를 고려한 여백
+        const top = app.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
       }
     }
     
