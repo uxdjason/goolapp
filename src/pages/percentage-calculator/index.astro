@@ -75,7 +75,7 @@ if (related.length === 0) {
       <section id="screen2-1" class="screen" hidden>
         <h2 class="screen-title">결과</h2>
         <div class="result-box">
-          <span class="result-label">Y는 X의</span>
+          <span class="result-label" id="result-label-1">Y는 X의</span>
           <span class="result-value" id="result1">-</span>
         </div>
         <div class="actions">
@@ -106,7 +106,7 @@ if (related.length === 0) {
       <section id="screen3-1" class="screen" hidden>
         <h2 class="screen-title">결과</h2>
         <div class="result-box">
-          <span class="result-label">X의 Z%는</span>
+          <span class="result-label" id="result-label-2">X의 Z%는</span>
           <span class="result-value" id="result2">-</span>
         </div>
         <div class="actions">
@@ -137,7 +137,7 @@ if (related.length === 0) {
       <section id="screen4-1" class="screen" hidden>
         <h2 class="screen-title">결과</h2>
         <div class="result-box">
-          <span class="result-label">전체값은</span>
+          <span class="result-label" id="result-label-3">전체값은</span>
           <span class="result-value" id="result3">-</span>
         </div>
         <div class="actions">
@@ -373,9 +373,6 @@ if (related.length === 0) {
           s.hidden = true;
         }
       });
-      // scroll to top of app
-      const app = document.querySelector('.calc-app');
-      if (app) app.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     // 화면 전환 버튼
@@ -392,7 +389,7 @@ if (related.length === 0) {
     };
 
     const fmt = (n: number) =>
-      n.toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      n.toLocaleString('ko-KR', { maximumFractionDigits: 2 });
 
     // 유형1: Y는 X의 몇 %?
     function calc1() {
@@ -404,7 +401,9 @@ if (related.length === 0) {
       }
       const result = (part / total) * 100;
       const el = document.getElementById('result1');
-      if (el) el.textContent = result.toFixed(2) + ' %';
+      if (el) el.textContent = fmt(result) + ' %';
+      const labelEl = document.getElementById('result-label-1');
+      if (labelEl) labelEl.textContent = `${fmt(part)}은(는) ${fmt(total)}의`;
       showScreen('screen2-1');
     }
 
@@ -419,6 +418,8 @@ if (related.length === 0) {
       const result = (total * percent) / 100;
       const el = document.getElementById('result2');
       if (el) el.textContent = fmt(result);
+      const labelEl = document.getElementById('result-label-2');
+      if (labelEl) labelEl.textContent = `${fmt(total)}의 ${fmt(percent)}%는`;
       showScreen('screen3-1');
     }
 
@@ -433,6 +434,8 @@ if (related.length === 0) {
       const result = (part * 100) / percent;
       const el = document.getElementById('result3');
       if (el) el.textContent = fmt(result);
+      const labelEl = document.getElementById('result-label-3');
+      if (labelEl) labelEl.textContent = `${fmt(part)}이(가) 전체의 ${fmt(percent)}%라면, 전체값은`;
       showScreen('screen4-1');
     }
 
