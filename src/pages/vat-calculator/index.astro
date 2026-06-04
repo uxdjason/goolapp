@@ -404,7 +404,6 @@ if (related.length === 0) {
       screens.forEach(s => s.classList.remove('visible'));
       const target = document.getElementById('screen' + id);
       if (target) target.classList.add('visible');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function showToast(msg: string) {
