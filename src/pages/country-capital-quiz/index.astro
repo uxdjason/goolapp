@@ -40,7 +40,7 @@ if (related.length === 0) {
           <h2 class="intro-title">세계 수도 퀴즈</h2>
           <p class="intro-desc">전 세계 나라의 수도를 얼마나 알고 있나요?<br/>4지선다 퀴즈로 실력을 확인해보세요!</p>
         </div>
-        <button id="start-btn" class="btn btn-primary btn-large" type="button">시작하기</button>
+        <button id="start-btn" class="app-btn app-btn-primary app-btn-lg" type="button">시작하기</button>
       </section>
 
       <!-- 퀴즈 화면 -->
@@ -62,11 +62,11 @@ if (related.length === 0) {
 
         <div id="choices" class="choices"></div>
 
-        <div id="feedback" class="feedback" hidden></div>
+        <div id="feedback" class="app-feedback" hidden></div>
 
         <div class="quiz-actions">
-          <button id="next-btn" class="btn btn-primary" type="button" hidden>다음 문제</button>
-          <button id="quit-btn" class="btn btn-text" type="button">그만하기</button>
+          <button id="next-btn" class="app-btn app-btn-primary" type="button" hidden>다음 문제</button>
+          <button id="quit-btn" class="app-btn app-btn-text" type="button">그만하기</button>
         </div>
       </section>
 
@@ -80,7 +80,7 @@ if (related.length === 0) {
             <p class="score-detail">총 <span id="total-count">0</span>문제 중 <span id="correct-count">0</span>문제 정답</p>
           </div>
           <p id="result-comment" class="result-comment"></p>
-          <button id="restart-btn" class="btn btn-primary btn-large" type="button">처음으로</button>
+          <button id="restart-btn" class="app-btn app-btn-primary app-btn-lg" type="button">처음으로</button>
         </div>
       </section>
 
@@ -93,7 +93,7 @@ if (related.length === 0) {
       <!-- 에러 -->
       <div id="error-box" class="error-box" hidden>
         <p>퀴즈 데이터를 불러올 수 없습니다. 다시 시도해 주세요.</p>
-        <button id="retry-btn" class="btn btn-primary" type="button">다시 시도</button>
+        <button id="retry-btn" class="app-btn app-btn-primary" type="button">다시 시도</button>
       </div>
     </div>
   </Fragment>
@@ -500,7 +500,7 @@ if (related.length === 0) {
     progressFill.style.width = `${((currentIndex) / questionOrder.length) * 100}%`;
 
     feedbackEl.hidden = true;
-    feedbackEl.className = 'feedback';
+    feedbackEl.className = 'app-feedback';
     feedbackEl.textContent = '';
     nextBtn.hidden = true;
 
@@ -508,7 +508,7 @@ if (related.length === 0) {
     q.selection.forEach((choice, i) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'choice-btn';
+      btn.className = 'app-choice-btn';
       btn.innerHTML = `<span class="choice-num">${i + 1}</span><span>${choice}</span>`;
       btn.addEventListener('click', () => checkAnswer(i + 1, q.answer, q.selection[q.answer - 1], btn));
       choicesEl.appendChild(btn);
@@ -519,7 +519,7 @@ if (related.length === 0) {
     if (answered) return;
     answered = true;
 
-    const allBtns = choicesEl.querySelectorAll<HTMLButtonElement>('.choice-btn');
+    const allBtns = choicesEl.querySelectorAll<HTMLButtonElement>('.app-choice-btn');
     allBtns.forEach((b, idx) => {
       b.disabled = true;
       if (idx + 1 === correct) b.classList.add('correct');

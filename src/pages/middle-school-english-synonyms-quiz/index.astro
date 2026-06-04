@@ -46,7 +46,7 @@ if (related.length === 0) {
           제시된 영단어와 같은 의미를 가진 단어를 4개의 선택지에서 골라보세요.
           중학교 수준의 영단어로 구성된 퀴즈입니다.
         </p>
-        <button class="btn btn-primary" id="start-btn">시작하기</button>
+        <button class="app-btn app-btn-primary" id="start-btn">시작하기</button>
       </section>
 
       {/* 로딩 화면 */}
@@ -74,11 +74,11 @@ if (related.length === 0) {
 
         <div class="choices" id="choices"></div>
 
-        <p class="feedback" id="feedback"></p>
+        <p class="app-feedback" id="feedback"></p>
 
         <div class="quiz-actions">
-          <button class="btn btn-primary" id="next-btn" hidden>다음 문제</button>
-          <button class="btn btn-text" id="quit-btn">그만 하기</button>
+          <button class="app-btn app-btn-primary" id="next-btn" hidden>다음 문제</button>
+          <button class="app-btn app-btn-text" id="quit-btn">그만 하기</button>
         </div>
       </section>
 
@@ -94,7 +94,7 @@ if (related.length === 0) {
           총 <strong id="result-total">0</strong>문제 중
           <strong id="result-correct">0</strong>문제 정답
         </p>
-        <button class="btn btn-primary" id="restart-btn">처음으로</button>
+        <button class="app-btn app-btn-primary" id="restart-btn">처음으로</button>
       </section>
     </div>
   </Fragment>
@@ -426,7 +426,7 @@ if (related.length === 0) {
   function loadQuestion() {
     answered = false;
     feedbackEl.textContent = '';
-    feedbackEl.className = 'feedback';
+    feedbackEl.className = 'app-feedback';
     nextBtn.setAttribute('hidden', '');
 
     const q = quizData[questionOrder[currentIndex]];
@@ -440,7 +440,7 @@ if (related.length === 0) {
     choicesEl.innerHTML = '';
     q.selection.forEach((opt, i) => {
       const btn = document.createElement('button');
-      btn.className = 'choice-btn';
+      btn.className = 'app-choice-btn';
       btn.type = 'button';
       btn.textContent = opt;
       btn.addEventListener('click', () => checkAnswer(i + 1, q.answer, btn));
@@ -462,13 +462,13 @@ if (related.length === 0) {
     if (selected === correct) {
       btn.classList.add('correct');
       feedbackEl.textContent = '정답입니다! 🎉';
-      feedbackEl.className = 'feedback correct';
+      feedbackEl.className = 'app-feedback correct';
       correctCount++;
     } else {
       btn.classList.add('wrong');
       if (correctBtn) correctBtn.classList.add('correct');
       feedbackEl.textContent = `오답입니다. 정답: ${correctBtn?.textContent ?? ''}`;
-      feedbackEl.className = 'feedback wrong';
+      feedbackEl.className = 'app-feedback wrong';
     }
 
     scoreText.textContent = `정답 ${correctCount}`;

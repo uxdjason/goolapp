@@ -47,7 +47,7 @@ if (related.length === 0) {
             랜덤으로 출제되는 사자성어 퀴즈를 풀어보세요.<br />
             그만하기를 누르면 그동안의 정답률을 확인할 수 있어요.
           </p>
-          <button id="start-btn" class="btn btn-primary btn-lg">시작하기</button>
+          <button id="start-btn" class="app-btn app-btn-primary app-btn-lg">시작하기</button>
         </div>
       </section>
 
@@ -66,8 +66,8 @@ if (related.length === 0) {
         <p id="feedback-text" class="feedback-text" hidden></p>
 
         <div class="quiz-actions">
-          <button id="next-btn" class="btn btn-primary btn-lg" hidden>다음 문제</button>
-          <button id="quit-btn" class="btn-text">그만하기</button>
+          <button id="next-btn" class="app-btn app-btn-primary app-btn-lg" hidden>다음 문제</button>
+          <button id="quit-btn" class="app-btn app-btn-text">그만하기</button>
         </div>
       </section>
 
@@ -89,7 +89,7 @@ if (related.length === 0) {
               <span id="score-value" class="stat-value">0%</span>
             </div>
           </div>
-          <button id="restart-btn" class="btn btn-primary btn-lg">처음으로</button>
+          <button id="restart-btn" class="app-btn app-btn-primary app-btn-lg">처음으로</button>
         </div>
       </section>
 
@@ -457,7 +457,7 @@ if (related.length === 0) {
     choicesContainer.innerHTML = '';
     q.selection.forEach((sel, i) => {
       const btn = document.createElement('button');
-      btn.className = 'choice-btn';
+      btn.className = 'app-choice-btn';
       btn.type = 'button';
       btn.textContent = sel;
       btn.addEventListener('click', () => {
@@ -471,7 +471,7 @@ if (related.length === 0) {
     if (answered) return;
     answered = true;
 
-    const allBtns = choicesContainer.querySelectorAll<HTMLButtonElement>('.choice-btn');
+    const allBtns = choicesContainer.querySelectorAll<HTMLButtonElement>('.app-choice-btn');
     allBtns.forEach((b, idx) => {
       b.disabled = true;
       if (idx + 1 === correct) {

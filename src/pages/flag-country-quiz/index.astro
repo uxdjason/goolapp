@@ -44,7 +44,7 @@ if (related.length === 0) {
       <section id="start-screen" class="screen start-screen">
         <h2 class="screen-title">🌍 국기로 나라 맞추기</h2>
         <p class="screen-desc">238개 나라의 국기를 보고 정답을 골라보세요!</p>
-        <button type="button" id="start-btn" class="btn btn-primary btn-lg">시작하기</button>
+        <button type="button" id="start-btn" class="app-btn app-btn-primary app-btn-lg">시작하기</button>
       </section>
 
       {/* 퀴즈 화면 */}
@@ -60,11 +60,11 @@ if (related.length === 0) {
 
         <div id="choices" class="choices"></div>
 
-        <div id="feedback" class="feedback" hidden></div>
+        <div id="feedback" class="app-feedback" hidden></div>
 
         <div class="quiz-actions">
-          <button type="button" id="next-btn" class="btn btn-primary btn-lg" hidden>다음 문제</button>
-          <button type="button" id="quit-btn" class="btn btn-text">그만 하기</button>
+          <button type="button" id="next-btn" class="app-btn app-btn-primary app-btn-lg" hidden>다음 문제</button>
+          <button type="button" id="quit-btn" class="app-btn app-btn-text">그만 하기</button>
         </div>
       </section>
 
@@ -85,7 +85,7 @@ if (related.length === 0) {
             <span class="result-value" id="result-score">0%</span>
           </div>
         </div>
-        <button type="button" id="restart-btn" class="btn btn-primary btn-lg">처음으로</button>
+        <button type="button" id="restart-btn" class="app-btn app-btn-primary app-btn-lg">처음으로</button>
       </section>
     </div>
   </Fragment>
@@ -388,7 +388,7 @@ if (related.length === 0) {
   function loadQuestion() {
     answered = false;
     feedbackEl.hidden = true;
-    feedbackEl.className = 'feedback';
+    feedbackEl.className = 'app-feedback';
     feedbackEl.textContent = '';
     nextBtn.hidden = true;
 
@@ -405,7 +405,7 @@ if (related.length === 0) {
     q.selection.forEach((label, i) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'choice-btn';
+      btn.className = 'app-choice-btn';
       btn.textContent = label;
       btn.addEventListener('click', () =>
         checkAnswer(i + 1, q.answer, q.selection[q.answer - 1], btn)
@@ -431,11 +431,11 @@ if (related.length === 0) {
 
     if (selected === correct) {
       correctCount++;
-      feedbackEl.className = 'feedback correct';
+      feedbackEl.className = 'app-feedback correct';
       feedbackEl.textContent = '🎉 정답입니다!';
     } else {
       btnEl.classList.add('wrong');
-      feedbackEl.className = 'feedback wrong';
+      feedbackEl.className = 'app-feedback wrong';
       feedbackEl.textContent = `❌ 오답입니다. 정답: ${answerText}`;
     }
     feedbackEl.hidden = false;

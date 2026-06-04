@@ -43,7 +43,7 @@ if (related.length === 0) {
       <section id="start-screen" class="screen start-screen">
         <h2 class="screen-title">수도를 보고 나라를 맞춰보세요!</h2>
         <p class="screen-desc">제시된 수도가 어느 나라의 수도인지 4개의 보기 중에서 선택하세요.</p>
-        <button id="start-btn" class="btn btn-primary">시작하기</button>
+        <button id="start-btn" class="app-btn app-btn-primary app-btn-lg">시작하기</button>
       </section>
 
       {/* 퀴즈 화면 */}
@@ -60,11 +60,11 @@ if (related.length === 0) {
 
         <div id="choices" class="choices"></div>
 
-        <p id="feedback" class="feedback" hidden></p>
+        <p id="feedback" class="app-feedback" hidden></p>
 
         <div class="quiz-actions">
-          <button id="next-btn" class="btn btn-primary" hidden>다음 문제</button>
-          <button id="quit-btn" class="btn btn-text">그만하기</button>
+          <button id="next-btn" class="app-btn app-btn-primary" hidden>다음 문제</button>
+          <button id="quit-btn" class="app-btn app-btn-text">그만하기</button>
         </div>
       </section>
 
@@ -85,17 +85,30 @@ if (related.length === 0) {
             <span id="score-percent" class="stat-value">0%</span>
           </div>
         </div>
-        <button id="restart-btn" class="btn btn-primary">처음으로</button>
+        <button id="restart-btn" class="app-btn app-btn-primary app-btn-lg">처음으로</button>
       </section>
 
-      {/* 로딩 / 에러 */}
+      <!-- 로딩 / 에러 -->
       <section id="loading-screen" class="screen loading-screen" hidden>
         <p>퀴즈 데이터를 불러오는 중...</p>
       </section>
       <section id="error-screen" class="screen error-screen" hidden>
         <p id="error-message">데이터를 불러올 수 없습니다.</p>
-        <button id="error-retry-btn" class="btn btn-primary">다시 시도</button>
+        <button id="error-retry-btn" class="app-btn app-btn-primary">다시 시도</button>
       </section>
+
+      <!-- 그만하기 확인 모달 -->
+      <div id="quit-modal" class="app-modal-overlay" hidden>
+        <div class="app-modal">
+          <div class="app-modal-icon">🤔</div>
+          <p class="app-modal-title">그만하시겠습니까?</p>
+          <p class="app-modal-body">지금까지의 점수로 결과가 표시됩니다.</p>
+          <div class="app-modal-actions">
+            <button id="quit-cancel-btn" class="app-btn app-btn-secondary">계속하기</button>
+            <button id="quit-confirm-btn" class="app-btn app-btn-primary">그만하기</button>
+          </div>
+        </div>
+      </div>
     </div>
   </Fragment>
 
@@ -195,62 +208,7 @@ if (related.length === 0) {
     }
   }
 
-  .choices :global(.choice-btn) {
-    width: 100%;
-    padding: 0.95rem 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--color-text);
-    background: var(--color-surface);
-    border: 2px solid #d1d5db;
-    border-radius: var(--radius-md, 8px);
-    cursor: pointer;
-    text-align: center;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-  }
-
-  .choices :global(.choice-btn:hover:not(:disabled)) {
-    transform: translateY(-2px);
-    border-color: var(--color-primary);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  }
-
-  .choices :global(.choice-btn:disabled) {
-    cursor: not-allowed;
-    opacity: 0.85;
-  }
-
-  .choices :global(.choice-btn.correct) {
-    background-color: #dcfce7;
-    border-color: #16a34a;
-    color: #14532d;
-  }
-
-  .choices :global(.choice-btn.incorrect) {
-    background-color: #fee2e2;
-    border-color: #dc2626;
-    color: #7f1d1d;
-  }
-
-  .feedback {
-    text-align: center;
-    font-weight: 700;
-    font-size: 1rem;
-    margin: 0 0 1.25rem;
-    padding: 0.75rem;
-    border-radius: var(--radius-md, 8px);
-  }
-
-  .feedback.correct {
-    color: #14532d;
-    background: #dcfce7;
-  }
-
-  .feedback.incorrect {
-    color: #7f1d1d;
-    background: #fee2e2;
-  }
+  /* 피드백 — app-feedback 공통 스타일 사용 */
 
   .quiz-actions {
     display: flex;
@@ -258,42 +216,7 @@ if (related.length === 0) {
     gap: 0.5rem;
   }
 
-  .btn {
-    width: 100%;
-    padding: 0.85rem 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: var(--radius-md, 8px);
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
-  }
-
-  .btn-primary {
-    background: var(--color-primary);
-    color: #fff;
-  }
-
-  .btn-primary:hover {
-    opacity: 0.92;
-  }
-
-  .btn-primary:active {
-    transform: translateY(1px);
-  }
-
-  .btn-text {
-    background: transparent;
-    color: var(--color-text-muted, #6b7280);
-    border: none;
-    font-weight: 500;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .btn-text:hover {
-    color: var(--color-text);
-  }
+  /* 버튼 — app-btn 공통 스타일 사용 */
 
   .result-stats {
     margin: 1.25rem 0 1.5rem;
@@ -404,7 +327,7 @@ if (related.length === 0) {
     answered = false;
     feedback.setAttribute('hidden', '');
     feedback.textContent = '';
-    feedback.className = 'feedback';
+    feedback.className = 'app-feedback';
     nextBtn.setAttribute('hidden', '');
 
     const realIdx = questionOrder[currentIndex];
@@ -418,7 +341,7 @@ if (related.length === 0) {
     q.selection.forEach((label, i) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'choice-btn';
+      btn.className = 'app-choice-btn';
       btn.textContent = label;
       btn.addEventListener('click', () => checkAnswer(i + 1, q.answer, btn));
       choicesBox.appendChild(btn);
@@ -429,7 +352,7 @@ if (related.length === 0) {
     if (answered) return;
     answered = true;
 
-    const buttons = choicesBox.querySelectorAll<HTMLButtonElement>('.choice-btn');
+    const buttons = choicesBox.querySelectorAll<HTMLButtonElement>('.app-choice-btn');
     buttons.forEach((b, idx) => {
       b.disabled = true;
       if (idx + 1 === correct) b.classList.add('correct');
@@ -438,12 +361,12 @@ if (related.length === 0) {
     if (selected === correct) {
       correctCount++;
       feedback.textContent = '정답입니다! 🎉';
-      feedback.className = 'feedback correct';
+      feedback.className = 'app-feedback correct';
     } else {
-      clickedBtn.classList.add('incorrect');
+      clickedBtn.classList.add('wrong');
       const correctText = quizData[questionOrder[currentIndex]].selection[correct - 1];
       feedback.textContent = `오답입니다. 정답: ${correctText}`;
-      feedback.className = 'feedback incorrect';
+      feedback.className = 'app-feedback wrong';
     }
     feedback.removeAttribute('hidden');
     scoreEl.textContent = `정답: ${correctCount}`;
@@ -476,23 +399,28 @@ if (related.length === 0) {
     showOnly(resultScreen);
   }
 
-  function quitQuiz() {
-    if (!confirm('정말 그만하시겠습니까? 지금까지의 점수로 결과가 표시됩니다.')) return;
-    const totalAnswered = answered ? currentIndex + 1 : currentIndex;
-    if (totalAnswered === 0) {
-      showOnly(startScreen);
-      return;
-    }
-    showResult(totalAnswered);
-  }
+  const quitModal      = document.getElementById('quit-modal')      as HTMLElement;
+  const quitCancelBtn  = document.getElementById('quit-cancel-btn') as HTMLButtonElement;
+  const quitConfirmBtn = document.getElementById('quit-confirm-btn')as HTMLButtonElement;
 
-  function restartQuiz() {
-    showOnly(startScreen);
-  }
+  function openQuitModal() { quitModal.removeAttribute('hidden'); }
+  function closeQuitModal() { quitModal.setAttribute('hidden', ''); }
+
+  function quitQuiz() { openQuitModal(); }
+
+  function restartQuiz() { showOnly(startScreen); }
 
   startBtn.addEventListener('click', startQuiz);
   nextBtn.addEventListener('click', nextQuestion);
   quitBtn.addEventListener('click', quitQuiz);
+  quitCancelBtn.addEventListener('click', closeQuitModal);
+  quitConfirmBtn.addEventListener('click', () => {
+    closeQuitModal();
+    const totalAnswered = answered ? currentIndex + 1 : currentIndex;
+    if (totalAnswered === 0) { showOnly(startScreen); return; }
+    showResult(totalAnswered);
+  });
   restartBtn.addEventListener('click', restartQuiz);
   retryBtn.addEventListener('click', startQuiz);
+  quitModal.addEventListener('click', (e) => { if (e.target === quitModal) closeQuitModal(); });
 </script>

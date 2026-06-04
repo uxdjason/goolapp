@@ -45,7 +45,7 @@ if (related.length === 0) {
         <div class="card">
           <h2 class="screen-title">영단어 반의어 맞추기</h2>
           <p class="screen-desc">고등학교 수준 영어 단어의 반의어를 4개의 선택지 중에서 골라보세요. 정답을 맞추면 즉시 결과가 표시되고, 마지막에 점수를 확인할 수 있습니다.</p>
-          <button class="btn btn-primary" id="start-btn">시작하기</button>
+          <button class="app-btn app-btn-primary" id="start-btn">시작하기</button>
         </div>
       </section>
 
@@ -64,11 +64,11 @@ if (related.length === 0) {
 
           <div id="choices" class="choices"></div>
 
-          <p id="feedback" class="feedback" hidden></p>
+          <p id="feedback" class="app-feedback" hidden></p>
 
           <div class="quiz-actions">
-            <button class="btn btn-primary" id="next-btn" hidden>다음 문제</button>
-            <button class="btn btn-text" id="quit-btn">그만 하기</button>
+            <button class="app-btn app-btn-primary" id="next-btn" hidden>다음 문제</button>
+            <button class="app-btn app-btn-text" id="quit-btn">그만 하기</button>
           </div>
         </div>
       </section>
@@ -91,7 +91,7 @@ if (related.length === 0) {
               <span class="result-value" id="result-score">0%</span>
             </div>
           </div>
-          <button class="btn btn-primary" id="restart-btn">처음으로</button>
+          <button class="app-btn app-btn-primary" id="restart-btn">처음으로</button>
         </div>
       </section>
 
@@ -105,7 +105,7 @@ if (related.length === 0) {
         <div class="card">
           <h2 class="screen-title">불러오기 실패</h2>
           <p class="screen-desc" id="error-message">문제 데이터를 불러오지 못했습니다.</p>
-          <button class="btn btn-primary" id="retry-btn">다시 시도</button>
+          <button class="app-btn app-btn-primary" id="retry-btn">다시 시도</button>
         </div>
       </section>
     </div>
@@ -429,7 +429,7 @@ if (related.length === 0) {
     q.selection.forEach((choice, i) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'choice-btn';
+      btn.className = 'app-choice-btn';
       btn.textContent = choice;
       btn.addEventListener('click', () => {
         checkAnswer(i + 1, q.answer, q.selection[q.answer - 1], btn);

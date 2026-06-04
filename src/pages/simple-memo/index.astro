@@ -68,10 +68,10 @@ const { Content } = await render(entry);
           <span id="char-count">0</span>자
         </div>
         <div class="editor-actions">
-          <button type="button" class="btn btn-primary" id="btn-save">저장</button>
-          <button type="button" class="btn btn-secondary" id="btn-cancel">취소</button>
-          <button type="button" class="btn btn-secondary" id="btn-copy">클립보드 복사</button>
-          <button type="button" class="btn btn-danger" id="btn-delete" hidden>삭제</button>
+          <button type="button" class="app-btn app-btn-primary" id="btn-save">저장</button>
+          <button type="button" class="app-btn app-btn-secondary" id="btn-cancel">취소</button>
+          <button type="button" class="app-btn app-btn-secondary" id="btn-copy">클립보드 복사</button>
+          <button type="button" class="app-btn app-btn-danger" id="btn-delete" hidden>삭제</button>
         </div>
       </div>
 
@@ -81,8 +81,8 @@ const { Content } = await render(entry);
           <h3 id="dialog-title" class="dialog-title">메모를 삭제할까요?</h3>
           <p class="dialog-desc">삭제한 메모는 복구할 수 없습니다.</p>
           <div class="dialog-actions">
-            <button type="button" class="btn btn-secondary" id="btn-cancel-delete">삭제 안함</button>
-            <button type="button" class="btn btn-danger" id="btn-confirm-delete">삭제</button>
+            <button type="button" class="app-btn app-btn-secondary" id="btn-cancel-delete">삭제 안함</button>
+            <button type="button" class="app-btn app-btn-danger" id="btn-confirm-delete">삭제</button>
           </div>
         </div>
       </div>
