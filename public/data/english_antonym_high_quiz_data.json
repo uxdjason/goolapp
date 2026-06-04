@@ -1,0 +1,902 @@
+[
+  {
+    "quiz": "abundant",
+    "selection": [
+      "plentiful",
+      "common",
+      "scarce",
+      "rich"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "benevolent",
+    "selection": [
+      "kind",
+      "malevolent",
+      "generous",
+      "caring"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "concise",
+    "selection": [
+      "brief",
+      "short",
+      "terse",
+      "verbose"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "ephemeral",
+    "selection": [
+      "permanent",
+      "fleeting",
+      "short-lived",
+      "temporary"
+    ],
+    "answer": 1
+  },
+  {
+    "quiz": "mitigate",
+    "selection": [
+      "lessen",
+      "reduce",
+      "aggravate",
+      "soothe"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "pragmatic",
+    "selection": [
+      "practical",
+      "idealistic",
+      "realistic",
+      "sensible"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "reluctant",
+    "selection": [
+      "unwilling",
+      "hesitant",
+      "eager",
+      "resistant"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "superficial",
+    "selection": [
+      "shallow",
+      "trivial",
+      "profound",
+      "exterior"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "validate",
+    "selection": [
+      "confirm",
+      "approve",
+      "support",
+      "invalidate"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "zealous",
+    "selection": [
+      "apathetic",
+      "eager",
+      "passionate",
+      "enthusiastic"
+    ],
+    "answer": 1
+  },
+  {
+    "quiz": "ambiguous",
+    "selection": [
+      "unclear",
+      "vague",
+      "explicit",
+      "doubtful"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "antagonize",
+    "selection": [
+      "provoke",
+      "pacify",
+      "irritate",
+      "oppose"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "commence",
+    "selection": [
+      "start",
+      "begin",
+      "initiate",
+      "conclude"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "deplete",
+    "selection": [
+      "use up",
+      "exhaust",
+      "replenish",
+      "reduce"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "exonerate",
+    "selection": [
+      "convict",
+      "free",
+      "pardon",
+      "absolve"
+    ],
+    "answer": 1
+  },
+  {
+    "quiz": "frugal",
+    "selection": [
+      "thrifty",
+      "economical",
+      "extravagant",
+      "saving"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "lethargic",
+    "selection": [
+      "sluggish",
+      "tired",
+      "lazy",
+      "energetic"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "obscure",
+    "selection": [
+      "unclear",
+      "hidden",
+      "vague",
+      "apparent"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "ostentatious",
+    "selection": [
+      "showy",
+      "modest",
+      "flashy",
+      "gaudy"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "renowned",
+    "selection": [
+      "famous",
+      "known",
+      "celebrated",
+      "unknown"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "skeptical",
+    "selection": [
+      "doubtful",
+      "convinced",
+      "suspicious",
+      "unbelieving"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "tranquil",
+    "selection": [
+      "agitated",
+      "calm",
+      "peaceful",
+      "serene"
+    ],
+    "answer": 1
+  },
+  {
+    "quiz": "trivial",
+    "selection": [
+      "unimportant",
+      "minor",
+      "significant",
+      "small"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "benign",
+    "selection": [
+      "kind",
+      "gentle",
+      "harmless",
+      "malignant"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "elaborate",
+    "selection": [
+      "detailed",
+      "complex",
+      "simple",
+      "intricate"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "gregarious",
+    "selection": [
+      "sociable",
+      "outgoing",
+      "friendly",
+      "reclusive"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "impulsive",
+    "selection": [
+      "spontaneous",
+      "cautious",
+      "hasty",
+      "reckless"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "innovative",
+    "selection": [
+      "traditional",
+      "new",
+      "creative",
+      "original"
+    ],
+    "answer": 1
+  },
+  {
+    "quiz": "naive",
+    "selection": [
+      "innocent",
+      "unsuspecting",
+      "sophisticated",
+      "simple"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "prolific",
+    "selection": [
+      "productive",
+      "fruitful",
+      "creative",
+      "unproductive"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "alleviate",
+    "selection": [
+      "lessen",
+      "worsen",
+      "relieve",
+      "ease"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "austere",
+    "selection": [
+      "strict",
+      "simple",
+      "ornate",
+      "severe"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "capricious",
+    "selection": [
+      "whimsical",
+      "erratic",
+      "unpredictable",
+      "steadfast"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "diligent",
+    "selection": [
+      "hardworking",
+      "lazy",
+      "careful",
+      "thorough"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "dubious",
+    "selection": [
+      "doubtful",
+      "certain",
+      "suspicious",
+      "unlikely"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "eloquent",
+    "selection": [
+      "articulate",
+      "fluent",
+      "expressive",
+      "inarticulate"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "fortuitous",
+    "selection": [
+      "accidental",
+      "lucky",
+      "deliberate",
+      "chance"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "inconspicuous",
+    "selection": [
+      "unnoticeable",
+      "hidden",
+      "obvious",
+      "subtle"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "inevitable",
+    "selection": [
+      "unavoidable",
+      "certain",
+      "preventable",
+      "fated"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "lucid",
+    "selection": [
+      "clear",
+      "confusing",
+      "bright",
+      "understandable"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "meticulous",
+    "selection": [
+      "careful",
+      "thorough",
+      "precise",
+      "careless"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "negligent",
+    "selection": [
+      "careless",
+      "inattentive",
+      "conscientious",
+      "remiss"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "pertinent",
+    "selection": [
+      "relevant",
+      "related",
+      "irrelevant",
+      "appropriate"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "placate",
+    "selection": [
+      "soothe",
+      "calm",
+      "appease",
+      "provoke"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "precarious",
+    "selection": [
+      "unstable",
+      "risky",
+      "safe",
+      "uncertain"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "prevalent",
+    "selection": [
+      "widespread",
+      "common",
+      "rare",
+      "usual"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "redundant",
+    "selection": [
+      "unnecessary",
+      "superfluous",
+      "essential",
+      "repetitive"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "repudiate",
+    "selection": [
+      "reject",
+      "deny",
+      "disown",
+      "accept"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "scrupulous",
+    "selection": [
+      "honest",
+      "principled",
+      "unethical",
+      "meticulous"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "sporadic",
+    "selection": [
+      "occasional",
+      "intermittent",
+      "frequent",
+      "irregular"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "subtle",
+    "selection": [
+      "faint",
+      "understated",
+      "obvious",
+      "delicate"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "taciturn",
+    "selection": [
+      "silent",
+      "reserved",
+      "uncommunicative",
+      "talkative"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "tenuous",
+    "selection": [
+      "flimsy",
+      "weak",
+      "slight",
+      "strong"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "ubiquitous",
+    "selection": [
+      "everywhere",
+      "common",
+      "scarce",
+      "omnipresent"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "venerate",
+    "selection": [
+      "respect",
+      "revere",
+      "honor",
+      "despise"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "volatile",
+    "selection": [
+      "unstable",
+      "explosive",
+      "changeable",
+      "stable"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "wane",
+    "selection": [
+      "decrease",
+      "fade",
+      "diminish",
+      "increase"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "adversity",
+    "selection": [
+      "hardship",
+      "misfortune",
+      "difficulty",
+      "prosperity"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "clandestine",
+    "selection": [
+      "secret",
+      "covert",
+      "underground",
+      "overt"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "disparage",
+    "selection": [
+      "belittle",
+      "criticize",
+      "praise",
+      "deride"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "acquiesce",
+    "selection": [
+      "agree",
+      "consent",
+      "comply",
+      "resist"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "audacious",
+    "selection": [
+      "bold",
+      "daring",
+      "timid",
+      "fearless"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "autonomous",
+    "selection": [
+      "independent",
+      "self-governing",
+      "free",
+      "dependent"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "banal",
+    "selection": [
+      "commonplace",
+      "trite",
+      "original",
+      "dull"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "bolster",
+    "selection": [
+      "support",
+      "strengthen",
+      "reinforce",
+      "undermine"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "conspicuous",
+    "selection": [
+      "obvious",
+      "visible",
+      "hidden",
+      "noticeable"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "converge",
+    "selection": [
+      "meet",
+      "unite",
+      "join",
+      "diverge"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "denounce",
+    "selection": [
+      "condemn",
+      "criticize",
+      "praise",
+      "attack"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "deter",
+    "selection": [
+      "discourage",
+      "prevent",
+      "stop",
+      "encourage"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "empathy",
+    "selection": [
+      "understanding",
+      "compassion",
+      "indifference",
+      "sympathy"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "expedite",
+    "selection": [
+      "hasten",
+      "accelerate",
+      "speed up",
+      "delay"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "feasible",
+    "selection": [
+      "possible",
+      "workable",
+      "likely",
+      "impractical"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "gullible",
+    "selection": [
+      "trusting",
+      "naive",
+      "credulous",
+      "skeptical"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "homogeneous",
+    "selection": [
+      "uniform",
+      "alike",
+      "similar",
+      "heterogeneous"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "impartial",
+    "selection": [
+      "neutral",
+      "unbiased",
+      "fair",
+      "biased"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "lethargic",
+    "selection": [
+      "sluggish",
+      "energetic",
+      "apathetic",
+      "listless"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "malicious",
+    "selection": [
+      "spiteful",
+      "hateful",
+      "malevolent",
+      "benevolent"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "mundane",
+    "selection": [
+      "ordinary",
+      "common",
+      "dull",
+      "extraordinary"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "notorious",
+    "selection": [
+      "infamous",
+      "renowned",
+      "disreputable",
+      "scandalous"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "obsolete",
+    "selection": [
+      "outdated",
+      "archaic",
+      "modern",
+      "antiquated"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "optimistic",
+    "selection": [
+      "hopeful",
+      "positive",
+      "pessimistic",
+      "confident"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "pompous",
+    "selection": [
+      "arrogant",
+      "pretentious",
+      "self-important",
+      "humble"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "prudent",
+    "selection": [
+      "wise",
+      "careful",
+      "cautious",
+      "reckless"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "revere",
+    "selection": [
+      "honor",
+      "respect",
+      "admire",
+      "despise"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "sparse",
+    "selection": [
+      "thin",
+      "scant",
+      "dense",
+      "scattered"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "stagnant",
+    "selection": [
+      "still",
+      "motionless",
+      "flowing",
+      "sluggish"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "succinct",
+    "selection": [
+      "brief",
+      "concise",
+      "terse",
+      "lengthy"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "transparent",
+    "selection": [
+      "clear",
+      "obvious",
+      "opaque",
+      "lucid"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "vigilant",
+    "selection": [
+      "watchful",
+      "alert",
+      "observant",
+      "negligent"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "zenith",
+    "selection": [
+      "peak",
+      "summit",
+      "climax",
+      "nadir"
+    ],
+    "answer": 4
+  }
+]

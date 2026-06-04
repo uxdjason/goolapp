@@ -1,0 +1,1192 @@
+[
+  {
+    "nation": "안도라",
+    "selection": ["ae.svg","ad.svg","ag.svg","af.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "아랍에미리트",
+    "selection": ["ae.svg","ai.svg","ag.svg","af.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "아프가니스탄",
+    "selection": ["al.svg","ai.svg","ag.svg","af.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "앤티가바부다",
+    "selection": ["al.svg","ai.svg","ag.svg","am.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "앵귈라",
+    "selection": ["al.svg","ai.svg","ao.svg","am.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "알바니아",
+    "selection": ["al.svg","aq.svg","ao.svg","am.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "아르메니아",
+    "selection": ["ar.svg","aq.svg","ao.svg","am.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "앙골라",
+    "selection": ["ar.svg","aq.svg","ao.svg","as.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "남극",
+    "selection": ["ar.svg","aq.svg","at.svg","as.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "아르헨티나",
+    "selection": ["ar.svg","au.svg","at.svg","as.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "아메리칸사모아",
+    "selection": ["aw.svg","au.svg","at.svg","as.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "오스트리아",
+    "selection": ["aw.svg","au.svg","at.svg","ax.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "호주",
+    "selection": ["aw.svg","au.svg","az.svg","ax.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "아루바",
+    "selection": ["aw.svg","ba.svg","az.svg","ax.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "올란드제도",
+    "selection": ["bb.svg","ba.svg","az.svg","ax.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "아제르바이잔",
+    "selection": ["bb.svg","ba.svg","az.svg","bd.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "보스니아헤르체고비나",
+    "selection": ["bb.svg","ba.svg","be.svg","bd.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "바베이도스",
+    "selection": ["bb.svg","bf.svg","be.svg","bd.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "방글라데시",
+    "selection": ["bg.svg","bf.svg","be.svg","bd.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "벨기에",
+    "selection": ["bg.svg","bf.svg","be.svg","bh.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "부르키나파소",
+    "selection": ["bg.svg","bf.svg","bi.svg","bh.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "불가리아",
+    "selection": ["bg.svg","bj.svg","bi.svg","bh.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "바레인",
+    "selection": ["bm.svg","bj.svg","bi.svg","bh.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "부룬디",
+    "selection": ["bm.svg","bj.svg","bi.svg","bn.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "베냉",
+    "selection": ["bm.svg","bj.svg","bo.svg","bn.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "버뮤다",
+    "selection": ["bm.svg","br.svg","bo.svg","bn.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "브루나이",
+    "selection": ["bs.svg","br.svg","bo.svg","bn.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "볼리비아",
+    "selection": ["bs.svg","br.svg","bo.svg","bt.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "브라질",
+    "selection": ["bs.svg","br.svg","bw.svg","bt.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "바하마",
+    "selection": ["bs.svg","by.svg","bw.svg","bt.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "부탄",
+    "selection": ["bz.svg","by.svg","bw.svg","bt.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "보츠와나",
+    "selection": ["bz.svg","by.svg","bw.svg","ca.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "벨라루스",
+    "selection": ["bz.svg","by.svg","cc.svg","ca.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "벨리즈",
+    "selection": ["bz.svg","cd.svg","cc.svg","ca.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "캐나다",
+    "selection": ["cf.svg","cd.svg","cc.svg","ca.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "코코스제도",
+    "selection": ["cf.svg","cd.svg","cc.svg","cg.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "콩고민주공화국",
+    "selection": ["cf.svg","cd.svg","ch.svg","cg.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "중앙아프리카공화국",
+    "selection": ["cf.svg","ci.svg","ch.svg","cg.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "콩고",
+    "selection": ["ck.svg","ci.svg","ch.svg","cg.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "스위스",
+    "selection": ["ck.svg","ci.svg","ch.svg","cl.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "코트디부아르",
+    "selection": ["ck.svg","ci.svg","cm.svg","cl.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "쿡제도",
+    "selection": ["ck.svg","cn.svg","cm.svg","cl.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "칠레",
+    "selection": ["co.svg","cn.svg","cm.svg","cl.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "카메룬",
+    "selection": ["co.svg","cn.svg","cm.svg","cr.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "중국",
+    "selection": ["co.svg","cn.svg","cu.svg","cr.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "콜롬비아",
+    "selection": ["co.svg","cv.svg","cu.svg","cr.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "코스타리카",
+    "selection": ["cw.svg","cv.svg","cu.svg","cr.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "쿠바",
+    "selection": ["cw.svg","cv.svg","cu.svg","cx.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "카보베르데",
+    "selection": ["cw.svg","cv.svg","cy.svg","cx.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "퀴라소",
+    "selection": ["cw.svg","cz.svg","cy.svg","cx.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "크리스마스섬",
+    "selection": ["de.svg","cz.svg","cy.svg","cx.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "키프로스",
+    "selection": ["de.svg","cz.svg","cy.svg","dj.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "체코",
+    "selection": ["de.svg","cz.svg","dk.svg","dj.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "독일",
+    "selection": ["de.svg","dm.svg","dk.svg","dj.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "지부티",
+    "selection": ["do.svg","dm.svg","dk.svg","dj.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "덴마크",
+    "selection": ["do.svg","dm.svg","dk.svg","dz.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "도미니카연방",
+    "selection": ["do.svg","dm.svg","ec.svg","dz.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "도미니카공화국",
+    "selection": ["do.svg","ee.svg","ec.svg","dz.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "알제리",
+    "selection": ["eg.svg","ee.svg","ec.svg","dz.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "에콰도르",
+    "selection": ["eg.svg","ee.svg","ec.svg","eh.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "에스토니아",
+    "selection": ["eg.svg","ee.svg","er.svg","eh.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "이집트",
+    "selection": ["eg.svg","es.svg","er.svg","eh.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "서사하라",
+    "selection": ["et.svg","es.svg","er.svg","eh.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "에리트레아",
+    "selection": ["et.svg","es.svg","er.svg","eu.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "스페인",
+    "selection": ["et.svg","es.svg","fi.svg","eu.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "에티오피아",
+    "selection": ["et.svg","fj.svg","fi.svg","eu.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "유럽연합",
+    "selection": ["fk.svg","fj.svg","fi.svg","eu.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "핀란드",
+    "selection": ["fk.svg","fj.svg","fi.svg","fm.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "피지",
+    "selection": ["fk.svg","fj.svg","fo.svg","fm.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "포클랜드제도",
+    "selection": ["fk.svg","fr.svg","fo.svg","fm.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "미크로네시아",
+    "selection": ["ga.svg","fr.svg","fo.svg","fm.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "페로제도",
+    "selection": ["ga.svg","fr.svg","fo.svg","gb.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "프랑스",
+    "selection": ["ga.svg","fr.svg","gbe.svg","gb.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "가봉",
+    "selection": ["ga.svg","gbs.svg","gbe.svg","gb.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "영국",
+    "selection": ["gbw.svg","gbs.svg","gbe.svg","gb.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "잉글랜드(영국)",
+    "selection": ["gbw.svg","gbs.svg","gbe.svg","gbn.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "스코틀랜드(영국)",
+    "selection": ["gbw.svg","gbs.svg","gd.svg","gbn.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "웨일즈(영국)",
+    "selection": ["gbw.svg","ge.svg","gd.svg","gbn.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "북아일랜드(영국)",
+    "selection": ["gbw.svg","ge.svg","gd.svg","gbn.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "그레나다",
+    "selection": ["gbn.svg","ge.svg","gd.svg","gh.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "조지아",
+    "selection": ["gg.svg","ge.svg","gi.svg","gh.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "건지",
+    "selection": ["gg.svg","gl.svg","gi.svg","gh.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "가나",
+    "selection": ["gm.svg","gl.svg","gi.svg","gh.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "지브롤터",
+    "selection": ["gm.svg","gl.svg","gi.svg","gn.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "그린란드",
+    "selection": ["gm.svg","gl.svg","gq.svg","gn.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "감비아",
+    "selection": ["gm.svg","gr.svg","gq.svg","gn.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "기니",
+    "selection": ["gs.svg","gr.svg","gq.svg","gn.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "적도기니",
+    "selection": ["gs.svg","gr.svg","gq.svg","gt.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "그리스",
+    "selection": ["gs.svg","gr.svg","gu.svg","gt.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "사우스조지아사우스샌드위치제도",
+    "selection": ["gs.svg","gw.svg","gu.svg","gt.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "과테말라",
+    "selection": ["gy.svg","gw.svg","gu.svg","gt.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "괌",
+    "selection": ["gy.svg","gw.svg","gu.svg","hk.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "기니비사우",
+    "selection": ["gy.svg","gw.svg","hn.svg","hk.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "가이아나",
+    "selection": ["gy.svg","hr.svg","hn.svg","hk.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "홍콩",
+    "selection": ["ht.svg","hr.svg","hn.svg","hk.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "온두라스",
+    "selection": ["ht.svg","hr.svg","hn.svg","hu.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "크로아티아",
+    "selection": ["ht.svg","hr.svg","id.svg","hu.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "아이티",
+    "selection": ["ht.svg","ie.svg","id.svg","hu.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "헝가리",
+    "selection": ["il.svg","ie.svg","id.svg","hu.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "인도네시아",
+    "selection": ["il.svg","ie.svg","id.svg","im.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "아일랜드",
+    "selection": ["il.svg","ie.svg","in.svg","im.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "이스라엘",
+    "selection": ["il.svg","is.svg","in.svg","im.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "맨섬",
+    "selection": ["io.svg","is.svg","in.svg","im.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "인도",
+    "selection": ["io.svg","is.svg","in.svg","iq.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "영국령인도양식민지",
+    "selection": ["io.svg","is.svg","ir.svg","iq.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "이라크",
+    "selection": ["it.svg","is.svg","ir.svg","iq.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "이란",
+    "selection": ["it.svg","is.svg","ir.svg","je.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "아이슬란드",
+    "selection": ["it.svg","is.svg","jm.svg","je.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "이탈리아",
+    "selection": ["it.svg","jo.svg","jm.svg","je.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "저지",
+    "selection": ["jp.svg","jo.svg","jm.svg","je.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "자메이카",
+    "selection": ["jp.svg","jo.svg","jm.svg","ke.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "요르단",
+    "selection": ["jp.svg","jo.svg","kh.svg","ke.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "일본",
+    "selection": ["jp.svg","ki.svg","kh.svg","ke.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "케냐",
+    "selection": ["km.svg","ki.svg","kh.svg","ke.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "키르기스스탄",
+    "selection": ["km.svg","ki.svg","kh.svg","kg.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "캄보디아",
+    "selection": ["km.svg","ki.svg","kh.svg","kn.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "키리바시",
+    "selection": ["km.svg","ki.svg","kp.svg","kn.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "코모로",
+    "selection": ["km.svg","kr.svg","kp.svg","kn.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "세인트키츠네비스",
+    "selection": ["kw.svg","kr.svg","kp.svg","kn.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "북한",
+    "selection": ["kw.svg","kr.svg","kp.svg","ky.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "대한민국",
+    "selection": ["kw.svg","kr.svg","kz.svg","ky.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "쿠웨이트",
+    "selection": ["kw.svg","la.svg","kz.svg","ky.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "케이맨제도",
+    "selection": ["lb.svg","la.svg","kz.svg","ky.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "카자흐스탄",
+    "selection": ["lb.svg","la.svg","kz.svg","lc.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "라오스",
+    "selection": ["lb.svg","la.svg","li.svg","lc.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "레바논",
+    "selection": ["lb.svg","lk.svg","li.svg","lc.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "세인트루시아",
+    "selection": ["lr.svg","lk.svg","li.svg","lc.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "리히텐슈타인",
+    "selection": ["lr.svg","lk.svg","li.svg","ls.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "스리랑카",
+    "selection": ["lr.svg","lk.svg","lt.svg","ls.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "라이베리아",
+    "selection": ["lr.svg","lu.svg","lt.svg","ls.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "레소토",
+    "selection": ["lv.svg","lu.svg","lt.svg","ls.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "리투아니아",
+    "selection": ["lv.svg","lu.svg","lt.svg","ly.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "룩셈부르크",
+    "selection": ["lv.svg","lu.svg","ma.svg","ly.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "라트비아",
+    "selection": ["lv.svg","mc.svg","ma.svg","ly.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "리비아",
+    "selection": ["md.svg","mc.svg","ma.svg","ly.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "모로코",
+    "selection": ["md.svg","mc.svg","ma.svg","me.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "모나코",
+    "selection": ["md.svg","mc.svg","mg.svg","me.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "몰도바",
+    "selection": ["md.svg","mh.svg","mg.svg","me.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "몬테네그로",
+    "selection": ["mk.svg","mh.svg","mg.svg","me.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "마다가스카르",
+    "selection": ["mk.svg","mh.svg","mg.svg","ml.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "마셜제도",
+    "selection": ["mk.svg","mh.svg","mm.svg","ml.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "북마케도니아",
+    "selection": ["mk.svg","mn.svg","mm.svg","ml.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "말리",
+    "selection": ["mo.svg","mn.svg","mm.svg","ml.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "미얀마",
+    "selection": ["mo.svg","mn.svg","mm.svg","mp.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "몽골",
+    "selection": ["mo.svg","mn.svg","mr.svg","mp.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "마카오",
+    "selection": ["mo.svg","ms.svg","mr.svg","mp.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "북마리아나제도",
+    "selection": ["mt.svg","ms.svg","mr.svg","mp.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "모리타니",
+    "selection": ["mt.svg","ms.svg","mr.svg","mu.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "몬트세랫",
+    "selection": ["mt.svg","ms.svg","mv.svg","mu.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "몰타",
+    "selection": ["mt.svg","mw.svg","mv.svg","mu.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "모리셔스",
+    "selection": ["mx.svg","mw.svg","mv.svg","mu.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "몰디브",
+    "selection": ["mx.svg","mw.svg","mv.svg","my.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "말라위",
+    "selection": ["mx.svg","mw.svg","mz.svg","my.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "멕시코",
+    "selection": ["mx.svg","na.svg","mz.svg","my.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "말레이시아",
+    "selection": ["ne.svg","na.svg","mz.svg","my.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "모잠비크",
+    "selection": ["ne.svg","na.svg","mz.svg","nf.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "나미비아",
+    "selection": ["ne.svg","na.svg","ng.svg","nf.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "니제르",
+    "selection": ["ne.svg","ni.svg","ng.svg","nf.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "노퍽섬",
+    "selection": ["nl.svg","ni.svg","ng.svg","nf.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "나이지리아",
+    "selection": ["nl.svg","ni.svg","ng.svg","no.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "니카라과",
+    "selection": ["nl.svg","ni.svg","np.svg","no.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "네덜란드",
+    "selection": ["nl.svg","nr.svg","np.svg","no.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "노르웨이",
+    "selection": ["nu.svg","nr.svg","np.svg","no.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "네팔",
+    "selection": ["nu.svg","nr.svg","np.svg","nz.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "나우루",
+    "selection": ["nu.svg","nr.svg","om.svg","nz.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "니우에",
+    "selection": ["nu.svg","pa.svg","om.svg","nz.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "뉴질랜드",
+    "selection": ["pe.svg","pa.svg","om.svg","nz.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "오만",
+    "selection": ["pe.svg","pa.svg","om.svg","pf.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "파나마",
+    "selection": ["pe.svg","pa.svg","pg.svg","pf.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "페루",
+    "selection": ["pe.svg","ph.svg","pg.svg","pf.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "프랑스령폴리네시아",
+    "selection": ["pk.svg","ph.svg","pg.svg","pf.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "파푸아뉴기니",
+    "selection": ["pk.svg","ph.svg","pg.svg","pl.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "필리핀",
+    "selection": ["pk.svg","ph.svg","pn.svg","pl.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "파키스탄",
+    "selection": ["pk.svg","pr.svg","pn.svg","pl.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "폴란드",
+    "selection": ["ps.svg","pr.svg","pn.svg","pl.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "핏케언제도",
+    "selection": ["ps.svg","pr.svg","pn.svg","pt.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "푸에르토리코",
+    "selection": ["ps.svg","pr.svg","pw.svg","pt.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "팔레스타인",
+    "selection": ["ps.svg","py.svg","pw.svg","pt.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "포르투갈",
+    "selection": ["qa.svg","py.svg","pw.svg","pt.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "팔라우",
+    "selection": ["qa.svg","py.svg","pw.svg","ro.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "파라과이",
+    "selection": ["qa.svg","py.svg","rs.svg","ro.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "카타르",
+    "selection": ["qa.svg","ru.svg","rs.svg","ro.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "루마니아",
+    "selection": ["rw.svg","ru.svg","rs.svg","ro.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "세르비아",
+    "selection": ["rw.svg","ru.svg","rs.svg","sa.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "러시아",
+    "selection": ["rw.svg","ru.svg","sb.svg","sa.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "르완다",
+    "selection": ["rw.svg","sc.svg","sb.svg","sa.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "사우디아라비아",
+    "selection": ["sd.svg","sc.svg","sb.svg","sa.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "솔로몬제도",
+    "selection": ["sd.svg","sc.svg","sb.svg","se.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "세이셸",
+    "selection": ["sd.svg","sc.svg","sg.svg","se.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "수단",
+    "selection": ["sd.svg","si.svg","sg.svg","se.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "스웨덴",
+    "selection": ["sk.svg","si.svg","sg.svg","se.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "싱가포르",
+    "selection": ["sk.svg","si.svg","sg.svg","sl.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "슬로베니아",
+    "selection": ["sk.svg","si.svg","sm.svg","sl.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "슬로바키아",
+    "selection": ["sk.svg","sn.svg","sm.svg","sl.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "시에라리온",
+    "selection": ["so.svg","sn.svg","sm.svg","sl.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "산마리노",
+    "selection": ["so.svg","sn.svg","sm.svg","sr.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "세네갈",
+    "selection": ["so.svg","sn.svg","ss.svg","sr.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "소말리아",
+    "selection": ["so.svg","st.svg","ss.svg","sr.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "수리남",
+    "selection": ["sv.svg","st.svg","ss.svg","sr.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "남수단",
+    "selection": ["sv.svg","st.svg","ss.svg","sx.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "상투메프린시페",
+    "selection": ["sv.svg","st.svg","sy.svg","sx.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "엘살바도르",
+    "selection": ["sv.svg","sz.svg","sy.svg","sx.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "신트마르턴",
+    "selection": ["tc.svg","sz.svg","sy.svg","sx.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "시리아",
+    "selection": ["tc.svg","sz.svg","sy.svg","td.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "에스와티니",
+    "selection": ["tc.svg","sz.svg","tg.svg","td.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "터크스케이커스제도",
+    "selection": ["tc.svg","th.svg","tg.svg","td.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "차드",
+    "selection": ["tj.svg","th.svg","tg.svg","td.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "토고",
+    "selection": ["tj.svg","th.svg","tg.svg","tk.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "태국",
+    "selection": ["tj.svg","th.svg","tl.svg","tk.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "타지키스탄",
+    "selection": ["tj.svg","tm.svg","tl.svg","tk.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "토켈라우",
+    "selection": ["tn.svg","tm.svg","tl.svg","tk.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "동티모르",
+    "selection": ["tn.svg","tm.svg","tl.svg","to.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "투르크메니스탄",
+    "selection": ["tn.svg","tm.svg","tr.svg","to.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "튀니지",
+    "selection": ["tn.svg","tt.svg","tr.svg","to.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "통가",
+    "selection": ["tv.svg","tt.svg","tr.svg","to.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "튀르키예",
+    "selection": ["tv.svg","tt.svg","tr.svg","tz.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "트리니다드토바고",
+    "selection": ["tv.svg","tt.svg","ua.svg","tz.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "투발루",
+    "selection": ["tv.svg","ug.svg","ua.svg","tz.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "탄자니아",
+    "selection": ["un.svg","ug.svg","ua.svg","tz.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "우크라이나",
+    "selection": ["un.svg","ug.svg","ua.svg","us.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "우간다",
+    "selection": ["un.svg","ug.svg","uy.svg","us.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "유엔",
+    "selection": ["un.svg","uz.svg","uy.svg","us.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "미국",
+    "selection": ["va.svg","uz.svg","uy.svg","us.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "우루과이",
+    "selection": ["va.svg","uz.svg","uy.svg","vc.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "우즈베키스탄",
+    "selection": ["va.svg","uz.svg","ve.svg","vc.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "바티칸시국",
+    "selection": ["va.svg","vg.svg","ve.svg","vc.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "세인트빈센트그레나딘",
+    "selection": ["vi.svg","vg.svg","ve.svg","vc.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "베네수엘라",
+    "selection": ["vi.svg","vg.svg","ve.svg","vn.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "영국령버진아일랜드",
+    "selection": ["vi.svg","vg.svg","vu.svg","vn.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "미국령버진아일랜드",
+    "selection": ["vi.svg","ws.svg","vu.svg","vn.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "베트남",
+    "selection": ["tw.svg","ws.svg","vu.svg","vn.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "바누아투",
+    "selection": ["tw.svg","ws.svg","vu.svg","ye.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "사모아",
+    "selection": ["tw.svg","ws.svg","za.svg","ye.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "대만",
+    "selection": ["tw.svg","zm.svg","za.svg","ye.svg"],
+    "answer": 1
+  },
+  {
+    "nation": "예멘",
+    "selection": ["zw.svg","zm.svg","za.svg","ye.svg"],
+    "answer": 4
+  },
+  {
+    "nation": "남아프리카공화국",
+    "selection": ["zw.svg","zm.svg","za.svg","us.svg"],
+    "answer": 3
+  },
+  {
+    "nation": "잠비아",
+    "selection": ["zw.svg","zm.svg","cn.svg","us.svg"],
+    "answer": 2
+  },
+  {
+    "nation": "짐바브웨",
+    "selection": ["zw.svg","jp.svg","cn.svg","us.svg"],
+    "answer": 1
+  }
+]
