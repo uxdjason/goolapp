@@ -87,6 +87,18 @@ if (related.length === 0) {
         </div>
         <button type="button" id="restart-btn" class="app-btn app-btn-primary app-btn-lg">처음으로</button>
       </section>
+
+      <!-- 공통 경고 모달 -->
+      <div id="app-alert-modal" class="app-modal-overlay" hidden>
+        <div class="app-modal">
+          <div class="app-modal-icon">⚠️</div>
+          <p class="app-modal-title" id="app-alert-title">알림</p>
+          <p class="app-modal-body" id="app-alert-message"></p>
+          <div class="app-modal-actions">
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+          </div>
+        </div>
+      </div>
     </div>
   </Fragment>
 
@@ -353,6 +365,24 @@ if (related.length === 0) {
     resultScreen.hidden = name !== 'result';
   }
 
+  const appAlertModal = document.getElementById('app-alert-modal') as HTMLElement;
+  const appAlertMessage = document.getElementById('app-alert-message') as HTMLElement;
+  const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn') as HTMLButtonElement;
+
+  function showAlert(msg: string) {
+    appAlertMessage.textContent = msg;
+    appAlertModal.removeAttribute('hidden');
+  }
+
+  function hideAlert() {
+    appAlertModal.setAttribute('hidden', '');
+  }
+
+  appAlertConfirmBtn?.addEventListener('click', hideAlert);
+  appAlertModal?.addEventListener('click', (e) => {
+    if (e.target === appAlertModal) hideAlert();
+  });
+
   function shuffle<T>(arr: T[]): T[] {
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -377,7 +407,7 @@ if (related.length === 0) {
       showScreen('quiz');
       loadQuestion();
     } catch (e) {
-      alert('퀴즈 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      showAlert('퀴즈 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
       console.error(e);
     } finally {
       startBtn.disabled = false;

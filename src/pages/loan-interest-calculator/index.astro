@@ -123,6 +123,18 @@ if (related.length === 0) {
 
         <button class="app-btn app-btn-secondary" id="resetBtn">처음으로</button>
       </section>
+
+      <!-- 공통 경고 모달 -->
+      <div id="app-alert-modal" class="app-modal-overlay" hidden>
+        <div class="app-modal">
+          <div class="app-modal-icon">⚠️</div>
+          <p class="app-modal-title" id="app-alert-title">알림</p>
+          <p class="app-modal-body" id="app-alert-message"></p>
+          <div class="app-modal-actions">
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+          </div>
+        </div>
+      </div>
     </div>
   </Fragment>
 
@@ -433,6 +445,24 @@ if (related.length === 0) {
     remaining: number;
   }> = [];
 
+  const appAlertModal = document.getElementById('app-alert-modal') as HTMLElement;
+  const appAlertMessage = document.getElementById('app-alert-message') as HTMLElement;
+  const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn') as HTMLButtonElement;
+
+  function showAlert(msg: string) {
+    appAlertMessage.textContent = msg;
+    appAlertModal.removeAttribute('hidden');
+  }
+
+  function hideAlert() {
+    appAlertModal.setAttribute('hidden', '');
+  }
+
+  appAlertConfirmBtn?.addEventListener('click', hideAlert);
+  appAlertModal?.addEventListener('click', (e) => {
+    if (e.target === appAlertModal) hideAlert();
+  });
+
   function calculate() {
     const principal = parseFloat(
       (document.getElementById("principal") as HTMLInputElement).value,
@@ -449,15 +479,15 @@ if (related.length === 0) {
     const repayMethod = repayMethodEl ? repayMethodEl.value : "annuity";
 
     if (!principal || principal <= 0 || isNaN(principal)) {
-      alert("대출 원금을 올바르게 입력해주세요.");
+      showAlert("대출 원금을 올바르게 입력해주세요.");
       return;
     }
     if (!years || years <= 0 || isNaN(years)) {
-      alert("대출 기간을 올바르게 입력해주세요.");
+      showAlert("대출 기간을 올바르게 입력해주세요.");
       return;
     }
     if (rate === null || isNaN(rate) || rate < 0) {
-      alert("대출 금리를 올바르게 입력해주세요.");
+      showAlert("대출 금리를 올바르게 입력해주세요.");
       return;
     }
 

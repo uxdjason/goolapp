@@ -495,18 +495,7 @@ if (related.length === 0) {
       }
 
       try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(text);
-        } else {
-          const ta = document.createElement('textarea');
-          ta.value = text;
-          ta.style.position = 'fixed';
-          ta.style.left = '-9999px';
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand('copy');
-          document.body.removeChild(ta);
-        }
+        await navigator.clipboard.writeText(text);
         showToast('클립보드에 복사되었습니다.');
       } catch (e) {
         showToast('복사에 실패했습니다.');

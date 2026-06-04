@@ -82,7 +82,6 @@ if (related.length === 0) {
         </div>
       </section>
 
-      {/* 결과 화면 */}
       <section class="screen result-screen" id="result-screen" hidden>
         <h2 class="screen-title">퀴즈 결과</h2>
         <div class="result-score">
@@ -96,6 +95,18 @@ if (related.length === 0) {
         </p>
         <button class="app-btn app-btn-primary" id="restart-btn">처음으로</button>
       </section>
+
+      <!-- 공통 경고 모달 -->
+      <div id="app-alert-modal" class="app-modal-overlay" hidden>
+        <div class="app-modal">
+          <div class="app-modal-icon">⚠️</div>
+          <p class="app-modal-title" id="app-alert-title">알림</p>
+          <p class="app-modal-body" id="app-alert-message"></p>
+          <div class="app-modal-actions">
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+          </div>
+        </div>
+      </div>
     </div>
   </Fragment>
 
@@ -362,6 +373,24 @@ if (related.length === 0) {
   let correctCount = 0;
   let answered = false;
 
+  const appAlertModal = document.getElementById('app-alert-modal') as HTMLElement;
+  const appAlertMessage = document.getElementById('app-alert-message') as HTMLElement;
+  const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn') as HTMLButtonElement;
+
+  function showAlert(msg: string) {
+    appAlertMessage.textContent = msg;
+    appAlertModal.removeAttribute('hidden');
+  }
+
+  function hideAlert() {
+    appAlertModal.setAttribute('hidden', '');
+  }
+
+  appAlertConfirmBtn?.addEventListener('click', hideAlert);
+  appAlertModal?.addEventListener('click', (e) => {
+    if (e.target === appAlertModal) hideAlert();
+  });
+
   const $ = <T extends HTMLElement = HTMLElement>(id: string) =>
     document.getElementById(id) as T | null;
 
@@ -418,7 +447,7 @@ if (related.length === 0) {
       loadQuestion();
     } catch (err) {
       console.error(err);
-      alert('문제를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
+      showAlert('문제를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
       showScreen(startScreen);
     }
   }

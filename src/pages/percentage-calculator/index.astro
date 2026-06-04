@@ -145,6 +145,18 @@ if (related.length === 0) {
           <button type="button" class="app-btn app-btn-text" data-goto="screen1">처음으로</button>
         </div>
       </section>
+
+      <!-- 공통 경고 모달 -->
+      <div id="app-alert-modal" class="app-modal-overlay" hidden>
+        <div class="app-modal">
+          <div class="app-modal-icon">⚠️</div>
+          <p class="app-modal-title" id="app-alert-title">알림</p>
+          <p class="app-modal-body" id="app-alert-message"></p>
+          <div class="app-modal-actions">
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+          </div>
+        </div>
+      </div>
     </div>
   </Fragment>
 
@@ -333,6 +345,24 @@ if (related.length === 0) {
 
 <script>
   (() => {
+    const appAlertModal = document.getElementById('app-alert-modal') as HTMLElement;
+    const appAlertMessage = document.getElementById('app-alert-message') as HTMLElement;
+    const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn') as HTMLButtonElement;
+
+    function showAlert(msg: string) {
+      appAlertMessage.textContent = msg;
+      appAlertModal.removeAttribute('hidden');
+    }
+
+    function hideAlert() {
+      appAlertModal.setAttribute('hidden', '');
+    }
+
+    appAlertConfirmBtn?.addEventListener('click', hideAlert);
+    appAlertModal?.addEventListener('click', (e) => {
+      if (e.target === appAlertModal) hideAlert();
+    });
+
     const screens = document.querySelectorAll<HTMLElement>('.screen');
 
     function showScreen(id: string) {
@@ -369,7 +399,7 @@ if (related.length === 0) {
       const total = getVal('total1');
       const part = getVal('part1');
       if (!isFinite(total) || !isFinite(part) || total <= 0 || part < 0) {
-        alert('전체는 0보다 커야 하고, 부분은 0 이상이어야 합니다.');
+        showAlert('전체는 0보다 커야 하고, 부분은 0 이상이어야 합니다.');
         return;
       }
       const result = (part / total) * 100;
@@ -383,7 +413,7 @@ if (related.length === 0) {
       const total = getVal('total2');
       const percent = getVal('percent2');
       if (!isFinite(total) || !isFinite(percent) || total <= 0 || percent < 0) {
-        alert('전체는 0보다 커야 하고, 퍼센트는 0 이상이어야 합니다.');
+        showAlert('전체는 0보다 커야 하고, 퍼센트는 0 이상이어야 합니다.');
         return;
       }
       const result = (total * percent) / 100;
@@ -397,7 +427,7 @@ if (related.length === 0) {
       const part = getVal('part3');
       const percent = getVal('percent3');
       if (!isFinite(part) || !isFinite(percent) || part < 0 || percent <= 0) {
-        alert('부분은 0 이상이어야 하고, 퍼센트는 0보다 커야 합니다.');
+        showAlert('부분은 0 이상이어야 하고, 퍼센트는 0보다 커야 합니다.');
         return;
       }
       const result = (part * 100) / percent;

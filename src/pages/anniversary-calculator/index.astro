@@ -87,6 +87,18 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
 
         <p class="copy-feedback" id="copyFeedback" hidden>✅ 복사되었습니다!</p>
       </section>
+
+      <!-- 공통 경고 모달 -->
+      <div id="app-alert-modal" class="app-modal-overlay" hidden>
+        <div class="app-modal">
+          <div class="app-modal-icon">⚠️</div>
+          <p class="app-modal-title" id="app-alert-title">알림</p>
+          <p class="app-modal-body" id="app-alert-message"></p>
+          <div class="app-modal-actions">
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+          </div>
+        </div>
+      </div>
     </div>
   </Fragment>
 
@@ -311,6 +323,24 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
     const resultBody = document.getElementById('resultBody');
     const copyFeedback = document.getElementById('copyFeedback');
 
+    const appAlertModal = document.getElementById('app-alert-modal');
+    const appAlertMessage = document.getElementById('app-alert-message');
+    const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn');
+
+    function showAlert(msg) {
+      appAlertMessage.textContent = msg;
+      appAlertModal.removeAttribute('hidden');
+    }
+
+    function hideAlert() {
+      appAlertModal.setAttribute('hidden', '');
+    }
+
+    if (appAlertConfirmBtn) appAlertConfirmBtn.addEventListener('click', hideAlert);
+    if (appAlertModal) appAlertModal.addEventListener('click', (e) => {
+      if (e.target === appAlertModal) hideAlert();
+    });
+
     const weekdayNames = ['일', '월', '화', '수', '목', '금', '토'];
 
     function showError(msg) {
@@ -425,7 +455,7 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
           copyFeedback.hidden = true;
         }, 2000);
       } catch (e) {
-        alert('복사에 실패했습니다. 브라우저 설정을 확인해주세요.');
+        showAlert('복사에 실패했습니다. 브라우저 설정을 확인해주세요.');
       }
     }
 

@@ -105,6 +105,18 @@ if (related.length === 0) {
           <ul id="lap-list" class="lap-list"></ul>
         </div>
       </div>
+
+      <!-- 공통 경고 모달 -->
+      <div id="app-alert-modal" class="app-modal-overlay" hidden>
+        <div class="app-modal">
+          <div class="app-modal-icon">⚠️</div>
+          <p class="app-modal-title" id="app-alert-title">알림</p>
+          <p class="app-modal-body" id="app-alert-message"></p>
+          <div class="app-modal-actions">
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+          </div>
+        </div>
+      </div>
     </div>
   </Fragment>
 
@@ -368,6 +380,24 @@ if (related.length === 0) {
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', function() {
+    const appAlertModal = document.getElementById('app-alert-modal');
+    const appAlertMessage = document.getElementById('app-alert-message');
+    const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn');
+
+    function showAlert(msg) {
+      appAlertMessage.textContent = msg;
+      appAlertModal.removeAttribute('hidden');
+    }
+
+    function hideAlert() {
+      appAlertModal.setAttribute('hidden', '');
+    }
+
+    if (appAlertConfirmBtn) appAlertConfirmBtn.addEventListener('click', hideAlert);
+    if (appAlertModal) appAlertModal.addEventListener('click', (e) => {
+      if (e.target === appAlertModal) hideAlert();
+    });
+
     let mode = 'countdown'; // 'countdown' or 'stopwatch'
     const tabBtns = document.querySelectorAll('.tab-btn');
     const cdView = document.getElementById('countdown-view');
@@ -375,7 +405,6 @@ if (related.length === 0) {
 
     // Countdown elements
     const cdStateLabel = document.getElementById('cd-state-label');
-    const cdInputs = document.getElementById('cd-inputs');
     const cdH = document.getElementById('cd-h');
     const cdM = document.getElementById('cd-m');
     const cdS = document.getElementById('cd-s');
@@ -413,15 +442,8 @@ if (related.length === 0) {
     function playAlarm() {
       if(alarmSound) {
         alarmSound.currentTime = 0;
-        alarmSound.play().catch(e => console.log('Audio play blocked'));
+        alarmSound.play().catch(() => console.log('Audio play blocked'));
       }
-    }
-
-    function formatTime(totalSecs) {
-      const h = Math.floor(totalSecs / 3600);
-      const m = Math.floor((totalSecs % 3600) / 60);
-      const s = totalSecs % 60;
-      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     }
 
     function formatStopwatchTime(ms) {
@@ -439,7 +461,7 @@ if (related.length === 0) {
 
     // Tab Switching
     tabBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         tabBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         mode = btn.dataset.target;
@@ -499,7 +521,7 @@ if (related.length === 0) {
               cdStartBtn.style.display = 'block';
               cdStopBtn.style.display = 'none';
               playAlarm();
-              alert("타이머가 종료되었습니다!");
+              showAlert("타이머가 종료되었습니다!");
             }
           }, 1000);
         }

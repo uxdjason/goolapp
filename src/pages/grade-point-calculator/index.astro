@@ -76,6 +76,18 @@ if (related.length === 0) {
       <div id="emptyState" class="empty-state">
         <p>과목별 학점과 성적을 입력하면<br />GPA가 자동으로 계산됩니다.</p>
       </div>
+
+      <!-- 공통 경고 모달 -->
+      <div id="app-alert-modal" class="app-modal-overlay" hidden>
+        <div class="app-modal">
+          <div class="app-modal-icon">⚠️</div>
+          <p class="app-modal-title" id="app-alert-title">알림</p>
+          <p class="app-modal-body" id="app-alert-message"></p>
+          <div class="app-modal-actions">
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+          </div>
+        </div>
+      </div>
     </div>
   </Fragment>
 
@@ -367,6 +379,24 @@ if (related.length === 0) {
   const passGrades = ['S', 'U', 'P'];
   const gradeOptions = ['A+','A0','A-','B+','B0','B-','C+','C0','C-','D+','D0','D-','F','S','U','P'];
 
+  const appAlertModal = document.getElementById('app-alert-modal') as HTMLElement;
+  const appAlertMessage = document.getElementById('app-alert-message') as HTMLElement;
+  const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn') as HTMLButtonElement;
+
+  function showAlert(msg: string) {
+    appAlertMessage.textContent = msg;
+    appAlertModal.removeAttribute('hidden');
+  }
+
+  function hideAlert() {
+    appAlertModal.setAttribute('hidden', '');
+  }
+
+  appAlertConfirmBtn?.addEventListener('click', hideAlert);
+  appAlertModal?.addEventListener('click', (e) => {
+    if (e.target === appAlertModal) hideAlert();
+  });
+
   const subjectList = document.getElementById('subjectList') as HTMLDivElement;
   const addBtn = document.getElementById('addSubjectBtn') as HTMLButtonElement;
   const resultsBox = document.getElementById('resultsBox') as HTMLDivElement;
@@ -505,9 +535,9 @@ if (related.length === 0) {
     const text = `[GPA 계산 결과]\n총 이수 과목: ${totalSubjectsEl.textContent}과목\n총 이수 학점: ${totalCreditsEl.textContent}학점\nGPA 평점: ${gpaValueEl.textContent} / ${scale}`;
     try {
       await navigator.clipboard.writeText(text);
-      alert('결과가 클립보드에 복사되었습니다.');
+      showAlert('결과가 클립보드에 복사되었습니다.');
     } catch {
-      alert('복사에 실패했습니다. 브라우저 환경을 확인해 주세요.');
+      showAlert('복사에 실패했습니다. 브라우저 환경을 확인해 주세요.');
     }
   });
 

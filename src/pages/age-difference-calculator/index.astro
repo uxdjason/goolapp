@@ -141,6 +141,18 @@ if (related.length === 0) {
 
         <div class="toast" id="toast" hidden>클립보드에 복사되었습니다!</div>
       </section>
+
+      <!-- 공통 경고 모달 -->
+      <div id="app-alert-modal" class="app-modal-overlay" hidden>
+        <div class="app-modal">
+          <div class="app-modal-icon">⚠️</div>
+          <p class="app-modal-title" id="app-alert-title">알림</p>
+          <p class="app-modal-body" id="app-alert-message"></p>
+          <div class="app-modal-actions">
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+          </div>
+        </div>
+      </div>
     </div>
   </Fragment>
 
@@ -384,6 +396,25 @@ if (related.length === 0) {
   const $ = (id: string) => document.getElementById(id) as HTMLElement;
   const $i = (id: string) => document.getElementById(id) as HTMLInputElement;
 
+  // ===== 경고 모달 =====
+  const appAlertModal = document.getElementById('app-alert-modal') as HTMLElement;
+  const appAlertMessage = document.getElementById('app-alert-message') as HTMLElement;
+  const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn') as HTMLButtonElement;
+
+  function showAlert(msg: string) {
+    appAlertMessage.textContent = msg;
+    appAlertModal.removeAttribute('hidden');
+  }
+
+  function hideAlert() {
+    appAlertModal.setAttribute('hidden', '');
+  }
+
+  appAlertConfirmBtn?.addEventListener('click', hideAlert);
+  appAlertModal?.addEventListener('click', (e) => {
+    if (e.target === appAlertModal) hideAlert();
+  });
+
   // ===== 화면 전환 =====
   function goTo(n: number) {
     [1, 2, 3].forEach(i => {
@@ -536,7 +567,7 @@ if (related.length === 0) {
       toast.hidden = false;
       setTimeout(() => { toast.hidden = true; }, 1800);
     } catch (e) {
-      alert('복사에 실패했습니다. 직접 선택하여 복사해주세요.');
+      showAlert('복사에 실패했습니다. 직접 선택하여 복사해주세요.');
     }
   });
 

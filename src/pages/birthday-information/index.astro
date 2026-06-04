@@ -95,6 +95,18 @@ if (related.length === 0) {
       </section>
 
       <div id="toast" class="toast hidden">결과가 복사되었어요!</div>
+
+      <!-- 공통 경고 모달 -->
+      <div id="app-alert-modal" class="app-modal-overlay" hidden>
+        <div class="app-modal">
+          <div class="app-modal-icon">⚠️</div>
+          <p class="app-modal-title" id="app-alert-title">알림</p>
+          <p class="app-modal-body" id="app-alert-message"></p>
+          <div class="app-modal-actions">
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+          </div>
+        </div>
+      </div>
     </div>
   </Fragment>
 
@@ -278,6 +290,24 @@ if (related.length === 0) {
 
 <script>
   (function () {
+    const appAlertModal = document.getElementById('app-alert-modal') as HTMLElement;
+    const appAlertMessage = document.getElementById('app-alert-message') as HTMLElement;
+    const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn') as HTMLButtonElement;
+
+    function showAlert(msg: string) {
+      appAlertMessage.textContent = msg;
+      appAlertModal.removeAttribute('hidden');
+    }
+
+    function hideAlert() {
+      appAlertModal.setAttribute('hidden', '');
+    }
+
+    appAlertConfirmBtn?.addEventListener('click', hideAlert);
+    appAlertModal?.addEventListener('click', (e) => {
+      if (e.target === appAlertModal) hideAlert();
+    });
+
     const GAN = ["갑", "을", "병", "정", "무", "기", "경", "신", "임", "계"];
     const JI = [
       "자",
@@ -446,7 +476,7 @@ if (related.length === 0) {
         toast.classList.remove("hidden");
         setTimeout(() => toast.classList.add("hidden"), 2000);
       } catch {
-        alert("복사에 실패했습니다.");
+        showAlert("복사에 실패했습니다.");
       }
     });
   })();

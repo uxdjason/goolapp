@@ -297,16 +297,7 @@ if (related.length === 0) {
         return;
       }
       try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(value);
-        } else {
-          // Fallback
-          resultText!.removeAttribute('readonly');
-          resultText!.select();
-          document.execCommand('copy');
-          resultText!.setAttribute('readonly', '');
-          window.getSelection()?.removeAllRanges();
-        }
+        await navigator.clipboard.writeText(value);
         showToast('클립보드에 저장되었습니다.');
       } catch (err) {
         console.error(err);

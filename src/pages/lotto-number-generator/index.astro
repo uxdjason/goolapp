@@ -225,15 +225,15 @@ if (related.length === 0) {
 
     if (!genOneBtn || !genFiveBtn || !clearBtn || !resultsContainer || !emptyState || !toast) return;
 
-    function generateLottoNumbers() {
-      const numbers = new Set();
+    function generateLottoNumbers(): number[] {
+      const numbers = new Set<number>();
       while (numbers.size < 6) {
         numbers.add(Math.floor(Math.random() * 45) + 1);
       }
       return Array.from(numbers).sort((a, b) => a - b);
     }
 
-    function getBallColor(n) {
+    function getBallColor(n: number): string {
       if (n <= 10) return '#fbc400';
       if (n <= 20) return '#69c8f2';
       if (n <= 30) return '#ff7272';
@@ -241,7 +241,7 @@ if (related.length === 0) {
       return '#b0d840';
     }
 
-    function createLottoSetElement(numbers) {
+    function createLottoSetElement(numbers: number[]) {
       const setDiv = document.createElement('div');
       setDiv.className = 'lotto-set';
 
@@ -268,6 +268,7 @@ if (related.length === 0) {
     }
 
     function updateEmptyState() {
+      if (!resultsContainer || !emptyState) return;
       const hasResults = resultsContainer.children.length > 0;
       if (hasResults) {
         emptyState.setAttribute('hidden', '');
@@ -277,6 +278,7 @@ if (related.length === 0) {
     }
 
     function saveToStorage() {
+      if (!resultsContainer) return;
       try {
         localStorage.setItem(STORAGE_KEY, resultsContainer.innerHTML);
       } catch (e) {
@@ -285,6 +287,7 @@ if (related.length === 0) {
     }
 
     function loadFromStorage() {
+      if (!resultsContainer) return false;
       try {
         let saved = localStorage.getItem(STORAGE_KEY);
         if (!saved) {
@@ -304,7 +307,8 @@ if (related.length === 0) {
       return false;
     }
 
-    function generateSets(count) {
+    function generateSets(count: number) {
+      if (!resultsContainer || !emptyState) return;
       resultsContainer.innerHTML = '';
       for (let i = 0; i < count; i++) {
         const nums = generateLottoNumbers();
@@ -314,8 +318,9 @@ if (related.length === 0) {
       updateEmptyState();
     }
 
-    let toastTimer = null;
-    function showToast(message) {
+    let toastTimer: number | null = null;
+    function showToast(message: string) {
+      if (!toast) return;
       toast.textContent = message;
       toast.classList.remove('fade-out');
       toast.removeAttribute('hidden');
@@ -329,25 +334,10 @@ if (related.length === 0) {
       }, 1500);
     }
 
-    async function copyText(text) {
+    async function copyText(text: string) {
       try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(text);
-          return true;
-        }
-      } catch (e) {
-        /* fall through */
-      }
-      try {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        const ok = document.execCommand('copy');
-        document.body.removeChild(ta);
-        return ok;
+        await navigator.clipboard.writeText(text);
+        return true;
       } catch (e) {
         return false;
       }

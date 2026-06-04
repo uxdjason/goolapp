@@ -367,13 +367,15 @@ if (related.length === 0) {
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const app = document.getElementById('calculator-app');
+    if (!app) return;
     const screens = app.querySelectorAll('.screen');
-    const progressBar = app.querySelector('#progressBar');
-    const errorMessage = app.querySelector('#error-message');
+    const progressBar = app.querySelector('#progress-bar') as HTMLElement | null;
+    const errorMessage = app.querySelector('#error-message') as HTMLElement | null;
     const totalSteps = 6;
 
-    const navigate = (e) => {
-      const target = e.target;
+    const navigate = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (!target) return;
       const gotoScreen = target.dataset.goto;
       const validateScreenNum = target.dataset.validate;
 
@@ -392,36 +394,45 @@ if (related.length === 0) {
       }
     };
 
-    app.addEventListener('click', (e) => {
-      if (e.target.matches('button')) {
+    app.addEventListener('click', (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (target && target.matches && target.matches('button')) {
         navigate(e);
       }
     });
 
-    document.getElementById('start-btn').addEventListener('click', () => showScreen(2));
-    document.getElementById('restart-btn').addEventListener('click', () => {
-        app.querySelector('form, #calculator-app').reset();
+    document.getElementById('start-btn')?.addEventListener('click', () => showScreen(2));
+    document.getElementById('restart-btn')?.addEventListener('click', () => {
+        app.querySelectorAll('input').forEach(input => {
+          if (input.type === 'radio') input.checked = false;
+          else input.value = '';
+        });
         showScreen(1);
     });
 
-    const tallInput = document.getElementById('Tall');
-    const weightInput = document.getElementById('Weight');
+    const tallInput = document.getElementById('Tall') as HTMLInputElement | null;
+    const weightInput = document.getElementById('Weight') as HTMLInputElement | null;
     [tallInput, weightInput].forEach(input => {
+      if (!input) return;
       input.addEventListener('input', updateBmiStatus);
-      input.addEventListener('focus', (e) => e.target.value = '');
+      input.addEventListener('focus', (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        if (target) target.value = '';
+      });
     });
      
-    function showScreen(screenNumber) {
-      screens.forEach(s => s.hidden = true);
+    function showScreen(screenNumber: number) {
+      screens.forEach(s => (s as HTMLElement).hidden = true);
       const screenToShow = document.getElementById(`screen${screenNumber}`);
       if (screenToShow) {
         screenToShow.hidden = false;
       }
-      errorMessage.hidden = true;
+      if (errorMessage) errorMessage.hidden = true;
       updateProgressBar(screenNumber);
     }
     
-    function updateProgressBar(screenNumber) {
+    function updateProgressBar(screenNumber: number) {
+        if (!progressBar) return;
         if (screenNumber > 1 && screenNumber <= totalSteps + 1) {
             const progress = ((screenNumber - 2) / totalSteps) * 100;
             progressBar.style.width = `${progress}%`;
@@ -432,51 +443,56 @@ if (related.length === 0) {
         }
     }
 
-    function showError(message) {
+    function showError(message: string) {
+      if (!errorMessage) return;
       errorMessage.textContent = message;
       errorMessage.hidden = false;
     }
 
-    function validateAndProceed(screenNum) {
+    function validateAndProceed(screenNum: number) {
       const screen = document.getElementById(`screen${screenNum}`);
-      const questions = new Set();
-      screen.querySelectorAll('input[type="radio"]').forEach(radio => questions.add(radio.name));
+      if (!screen) return false;
+      const questions = new Set<string>();
+      screen.querySelectorAll('input[type="radio"]').forEach(radio => questions.add((radio as HTMLInputElement).name));
       
       for (const name of questions) {
         if (!screen.querySelector(`input[name="${name}"]:checked`)) {
-          const label = screen.querySelector(`input[name="${name}"]`).closest('.question-group').querySelector('.form-label');
-          showError(`'${label.textContent}' 질문에 답해주세요.`);
+          const radioInput = screen.querySelector(`input[name="${name}"]`);
+          const label = radioInput?.closest('.question-group')?.querySelector('.form-label');
+          if (label) showError(`'${label.textContent}' 질문에 답해주세요.`);
           return false;
         }
       }
 
       if (screenNum === 2) {
-        const ageInput = document.getElementById('MyAge');
-        if (!ageInput.value || parseInt(ageInput.value) <= 0) {
+        const ageInput = document.getElementById('MyAge') as HTMLInputElement | null;
+        if (!ageInput || !ageInput.value || parseInt(ageInput.value) <= 0) {
           showError('올바른 만 나이를 입력해주세요.');
           return false;
         }
       }
 
       if (screenNum === 7) {
-        if (!tallInput.value || parseInt(tallInput.value) <= 0) {
+        if (!tallInput || !tallInput.value || parseInt(tallInput.value) <= 0) {
           showError('올바른 키를 입력해주세요.');
           return false;
         }
-        if (!weightInput.value || parseInt(weightInput.value) <= 0) {
+        if (!weightInput || !weightInput.value || parseInt(weightInput.value) <= 0) {
           showError('올바른 몸무게를 입력해주세요.');
           return false;
         }
       }
       
-      errorMessage.hidden = true;
+      if (errorMessage) errorMessage.hidden = true;
       return true;
     }
 
     function updateBmiStatus() {
+        if (!tallInput || !weightInput) return;
         const tall = parseFloat(tallInput.value);
         const weight = parseFloat(weightInput.value);
         const feedbackEl = document.getElementById('Biman');
+        if (!feedbackEl) return;
 
         if (!tall || !weight || tall <= 0 || weight <= 0) {
             feedbackEl.textContent = '';
@@ -504,50 +520,60 @@ if (related.length === 0) {
     function calculateAndShowResult() {
       let totalScore = 0;
       
-      const form = app.querySelector('#calculator-app');
-      const formData = new FormData(form);
-      const radioValues = {};
-      form.querySelectorAll('input[type=radio]:checked').forEach(radio => {
+      const form = (app ? app.querySelector('#calculator-app') || app : null) as HTMLElement | null;
+      if (!form) return;
+      const radioValues: Record<string, string> = {};
+      form.querySelectorAll('input[type=radio]:checked').forEach((radio: any) => {
         radioValues[radio.name] = radio.value;
       });
 
       // 1. 삶의 방식
-      totalScore += parseInt(radioValues['MyLife'] || 0);
+      totalScore += parseInt(radioValues['MyLife'] || '0', 10);
 
       // 2. a1 ~ a24 합산
       for (let i = 1; i <= 24; i++) {
-        totalScore += parseInt(radioValues[`a${i}`] || 0);
+        totalScore += parseInt(radioValues[`a${i}`] || '0', 10);
       }
       
       // 3. 나이 보정
-      const age = parseInt(document.getElementById('MyAge').value);
+      const ageInput = document.getElementById('MyAge') as HTMLInputElement | null;
+      const age = parseInt(ageInput?.value || '0', 10);
       if (age >= 70) totalScore += 5;
       else if (age >= 50) totalScore += 4;
       else if (age >= 40) totalScore += 3;
       else if (age >= 30) totalScore += 2;
 
       // 4. 비만 보정
-      const tall = parseFloat(tallInput.value);
-      const weight = parseFloat(weightInput.value);
-      const stdWeight = (tall - 100) * 0.9;
-      const over = weight - (stdWeight + 10);
-      if (over >= 23) totalScore -= 8;
-      else if (over >= 13) totalScore -= 4;
-      else if (over >= 5) totalScore -= 2;
+      if (tallInput && weightInput) {
+        const tall = parseFloat(tallInput.value);
+        const weight = parseFloat(weightInput.value);
+        if (!isNaN(tall) && !isNaN(weight)) {
+          const stdWeight = (tall - 100) * 0.9;
+          const over = weight - (stdWeight + 10);
+          if (over >= 23) totalScore -= 8;
+          else if (over >= 13) totalScore -= 4;
+          else if (over >= 5) totalScore -= 2;
+        }
+      }
       
       const expectedLife = totalScore;
       const remainYears = expectedLife - age;
 
-      document.getElementById('lifeResult').textContent = `${expectedLife}살`;
-      if (remainYears > 0) {
+      const lifeResult = document.getElementById('lifeResult');
+      if (lifeResult) lifeResult.textContent = `${expectedLife}살`;
+
+      const lifeDetail = document.getElementById('lifeDetail');
+      if (lifeDetail) {
+        if (remainYears > 0) {
           const remainMonths = Math.round(remainYears * 12);
           const remainDays = Math.round(remainYears * 365);
-          document.getElementById('lifeDetail').innerHTML = `
+          lifeDetail.innerHTML = `
               앞으로 약 <strong>${remainYears.toFixed(1)}년</strong><br>
               (${remainMonths.toLocaleString()}개월, ${remainDays.toLocaleString()}일)
           `;
-      } else {
-          document.getElementById('lifeDetail').textContent = '이미 예상 수명을 넘으셨습니다. 대단하십니다!';
+        } else {
+          lifeDetail.textContent = '이미 예상 수명을 넘으셨습니다. 대단하십니다!';
+        }
       }
     }
     

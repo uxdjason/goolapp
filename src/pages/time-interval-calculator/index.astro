@@ -475,18 +475,7 @@ if (related.length === 0) {
 
       const feedback = $('copyFeedback');
       try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(text);
-        } else {
-          const ta = document.createElement('textarea');
-          ta.value = text;
-          ta.style.position = 'fixed';
-          ta.style.opacity = '0';
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand('copy');
-          document.body.removeChild(ta);
-        }
+        await navigator.clipboard.writeText(text);
         feedback.textContent = '클립보드에 복사되었습니다 ✓';
         feedback.hidden = false;
         setTimeout(() => { feedback.hidden = true; }, 1800);
