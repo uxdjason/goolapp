@@ -525,11 +525,6 @@ if (related.length === 0) {
   });
 
   document.getElementById('btnReset')!.addEventListener('click', () => {
-    // 입력값 초기화
-    ['startYear','startMonth','startDay','startHour','startMin','startSec',
-     'endYear','endMonth','endDay','endHour','endMin','endSec'].forEach(id => {
-      (document.getElementById(id) as HTMLInputElement).value = '';
-    });
     document.getElementById('result')!.innerHTML = '';
     document.getElementById('copyMsg')!.hidden = true;
     clearError('error1');
