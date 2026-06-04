@@ -1,21 +1,31 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'age-difference-calculator');
-if (!entry) throw new Error('age-difference-calculator entry not found');
+const entry = await getEntry("apps", "age-difference-calculator");
+if (!entry) throw new Error("age-difference-calculator entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
 }
 ---
 
@@ -33,39 +43,56 @@ if (related.length === 0) {
 >
   <Fragment slot="app">
     <div class="calc-wrap">
-      <!-- 스텝 인디케이터 -->
-      <div class="step-indicator">
-        <div class="step active" id="step-ind-1"><span>1</span><label>첫 번째</label></div>
-        <div class="step-line"></div>
-        <div class="step" id="step-ind-2"><span>2</span><label>두 번째</label></div>
-        <div class="step-line"></div>
-        <div class="step" id="step-ind-3"><span>3</span><label>결과</label></div>
-      </div>
-
       <!-- Screen 1: 첫번째 사람 -->
-      <section class="screen" id="screen1">
+      <section class="screen visible" id="screen1">
         <h2 class="screen-title">첫 번째 사람의 생년월일</h2>
-        <p class="screen-desc">정확한 나이 차이 계산을 위해 생년월일을 입력해주세요.</p>
+        <p class="screen-desc">
+          정확한 나이 차이 계산을 위해 생년월일을 입력해주세요.
+        </p>
 
         <div class="dob-grid">
           <div class="field">
             <label for="y1">생년 (년)</label>
-            <input id="y1" type="number" min="1" step="1" placeholder="예: 1990" />
+            <input
+              id="y1"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="예: 1990"
+            />
           </div>
           <div class="field">
             <label for="mo1">생월 (월)</label>
-            <input id="mo1" type="number" min="1" max="12" step="1" placeholder="1~12" />
+            <input
+              id="mo1"
+              type="number"
+              min="1"
+              max="12"
+              step="1"
+              placeholder="1~12"
+            />
           </div>
           <div class="field">
             <label for="d1">생일 (일)</label>
-            <input id="d1" type="number" min="1" max="31" step="1" placeholder="1~31" />
+            <input
+              id="d1"
+              type="number"
+              min="1"
+              max="31"
+              step="1"
+              placeholder="1~31"
+            />
           </div>
         </div>
 
-        <div class="error-msg" id="err1" hidden>올바른 생년월일을 입력해주세요.</div>
+        <div class="error-msg" id="err1" hidden>
+          올바른 생년월일을 입력해주세요.
+        </div>
 
         <div class="actions">
-          <button class="app-btn app-btn-primary" id="btn-next1">두 번째 사람 입력 →</button>
+          <button class="app-btn app-btn-primary" id="btn-next1"
+            >두 번째 사람 입력 →</button
+          >
         </div>
       </section>
 
@@ -77,23 +104,49 @@ if (related.length === 0) {
         <div class="dob-grid">
           <div class="field">
             <label for="y2">생년 (년)</label>
-            <input id="y2" type="number" min="1" step="1" placeholder="예: 1995" />
+            <input
+              id="y2"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="예: 1995"
+            />
           </div>
           <div class="field">
             <label for="mo2">생월 (월)</label>
-            <input id="mo2" type="number" min="1" max="12" step="1" placeholder="1~12" />
+            <input
+              id="mo2"
+              type="number"
+              min="1"
+              max="12"
+              step="1"
+              placeholder="1~12"
+            />
           </div>
           <div class="field">
             <label for="d2">생일 (일)</label>
-            <input id="d2" type="number" min="1" max="31" step="1" placeholder="1~31" />
+            <input
+              id="d2"
+              type="number"
+              min="1"
+              max="31"
+              step="1"
+              placeholder="1~31"
+            />
           </div>
         </div>
 
-        <div class="error-msg" id="err2" hidden>올바른 생년월일을 입력해주세요.</div>
+        <div class="error-msg" id="err2" hidden>
+          올바른 생년월일을 입력해주세요.
+        </div>
 
         <div class="actions">
-          <button class="app-btn app-btn-primary" id="btn-compare">나이 차이 계산하기</button>
-          <button class="app-btn app-btn-text" id="btn-back1">← 뒤로 가기</button>
+          <button class="app-btn app-btn-primary" id="btn-compare"
+            >나이 차이 계산하기</button
+          >
+          <button class="app-btn app-btn-text" id="btn-back1"
+            >← 뒤로 가기</button
+          >
         </div>
       </section>
 
@@ -134,9 +187,15 @@ if (related.length === 0) {
         </div>
 
         <div class="actions">
-          <button class="app-btn app-btn-primary" id="btn-copy">📋 결과 복사하기</button>
-          <button class="app-btn app-btn-secondary" id="btn-back2">← 뒤로 가기</button>
-          <button class="app-btn app-btn-text" id="btn-reset">처음부터 다시</button>
+          <button class="app-btn app-btn-primary" id="btn-copy"
+            >📋 결과 복사하기</button
+          >
+          <button class="app-btn app-btn-secondary" id="btn-back2"
+            >← 뒤로 가기</button
+          >
+          <button class="app-btn app-btn-text" id="btn-reset"
+            >처음부터 다시</button
+          >
         </div>
 
         <div class="toast" id="toast" hidden>클립보드에 복사되었습니다!</div>
@@ -149,7 +208,9 @@ if (related.length === 0) {
           <p class="app-modal-title" id="app-alert-title">알림</p>
           <p class="app-modal-body" id="app-alert-message"></p>
           <div class="app-modal-actions">
-            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary"
+              >확인</button
+            >
           </div>
         </div>
       </div>
@@ -168,59 +229,17 @@ if (related.length === 0) {
     margin: 0 auto;
   }
 
-  /* Step Indicator */
-  .step-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-  }
-  .step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.35rem;
-    opacity: 0.4;
-    transition: opacity 0.2s;
-  }
-  .step.active { opacity: 1; }
-  .step span {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--color-surface-alt, #f1f5f9);
-    color: var(--color-text, #1f2937);
-    font-weight: 700;
-    font-size: 0.9rem;
-    border: 2px solid transparent;
-  }
-  .step.active span {
-    background: var(--color-primary);
-    color: #fff;
-  }
-  .step label {
-    font-size: 0.75rem;
-    color: var(--color-text-muted, #6b7280);
-  }
-  .step-line {
-    flex: 0 1 40px;
-    height: 2px;
-    background: var(--color-border, #e5e7eb);
-  }
-
   /* Screen */
   .screen {
     background: var(--color-surface, #fff);
     border: 1px solid var(--color-border, #e5e7eb);
     border-radius: 12px;
     padding: 1.75rem 1.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   }
-  .screen[hidden] { display: none; }
+  .screen[hidden] {
+    display: none;
+  }
 
   .screen-title {
     font-size: 1.25rem;
@@ -259,7 +278,9 @@ if (related.length === 0) {
     border-radius: 8px;
     background: var(--color-surface, #fff);
     color: var(--color-text, #1f2937);
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
     -moz-appearance: textfield;
   }
   .field input::-webkit-outer-spin-button,
@@ -282,7 +303,9 @@ if (related.length === 0) {
     font-size: 0.9rem;
     margin-bottom: 1rem;
   }
-  .error-msg[hidden] { display: none; }
+  .error-msg[hidden] {
+    display: none;
+  }
 
   /* Actions */
   .actions {
@@ -340,8 +363,12 @@ if (related.length === 0) {
     color: #fff;
     border-color: var(--color-primary);
   }
-  .result-card.highlight .result-label { color: rgba(255,255,255,0.85); }
-  .result-card.highlight .result-value { color: #fff; }
+  .result-card.highlight .result-label {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .result-card.highlight .result-value {
+    color: #fff;
+  }
 
   .result-row {
     display: grid;
@@ -349,7 +376,9 @@ if (related.length === 0) {
     gap: 0.75rem;
     margin-bottom: 0.75rem;
   }
-  .result-row .result-card { margin-bottom: 0; }
+  .result-row .result-card {
+    margin-bottom: 0;
+  }
 
   .result-label {
     font-size: 0.8rem;
@@ -380,14 +409,20 @@ if (related.length === 0) {
     padding: 0.7rem 1.2rem;
     border-radius: 8px;
     font-size: 0.9rem;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
     z-index: 9999;
   }
-  .toast[hidden] { display: none; }
+  .toast[hidden] {
+    display: none;
+  }
 
   @media (max-width: 480px) {
-    .dob-grid { grid-template-columns: 1fr 1fr 1fr; }
-    .screen { padding: 1.25rem 1rem; }
+    .dob-grid {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    .screen {
+      padding: 1.25rem 1rem;
+    }
   }
 </style>
 
@@ -397,33 +432,36 @@ if (related.length === 0) {
   const $i = (id: string) => document.getElementById(id) as HTMLInputElement;
 
   // ===== 경고 모달 =====
-  const appAlertModal = document.getElementById('app-alert-modal') as HTMLElement;
-  const appAlertMessage = document.getElementById('app-alert-message') as HTMLElement;
-  const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn') as HTMLButtonElement;
+  const appAlertModal = document.getElementById(
+    "app-alert-modal",
+  ) as HTMLElement;
+  const appAlertMessage = document.getElementById(
+    "app-alert-message",
+  ) as HTMLElement;
+  const appAlertConfirmBtn = document.getElementById(
+    "app-alert-confirm-btn",
+  ) as HTMLButtonElement;
 
   function showAlert(msg: string) {
     appAlertMessage.textContent = msg;
-    appAlertModal.removeAttribute('hidden');
+    appAlertModal.removeAttribute("hidden");
   }
 
   function hideAlert() {
-    appAlertModal.setAttribute('hidden', '');
+    appAlertModal.setAttribute("hidden", "");
   }
 
-  appAlertConfirmBtn?.addEventListener('click', hideAlert);
-  appAlertModal?.addEventListener('click', (e) => {
+  appAlertConfirmBtn?.addEventListener("click", hideAlert);
+  appAlertModal?.addEventListener("click", (e) => {
     if (e.target === appAlertModal) hideAlert();
   });
 
   // ===== 화면 전환 =====
   function goTo(n: number) {
-    [1, 2, 3].forEach(i => {
+    [1, 2, 3].forEach((i) => {
       const sec = $(`screen${i}`);
-      const ind = $(`step-ind-${i}`);
-      if (sec) sec.hidden = (i !== n);
-      if (ind) ind.classList.toggle('active', i <= n);
+      if (sec) sec.hidden = i !== n;
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // ===== 유효성 검사 =====
@@ -434,7 +472,8 @@ if (related.length === 0) {
     if (!y || !m || !d) return null;
     if (y < 1 || m < 1 || m > 12 || d < 1 || d > 31) return null;
     const dt = new Date(y, m - 1, d);
-    if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
+    if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d)
+      return null;
     return { y, m, d, date: dt };
   }
 
@@ -453,9 +492,9 @@ if (related.length === 0) {
   }
 
   // ===== Step 1 → Step 2 =====
-  $('btn-next1').addEventListener('click', () => {
-    const res = validateDOB('y1', 'mo1', 'd1');
-    const err = $('err1');
+  $("btn-next1").addEventListener("click", () => {
+    const res = validateDOB("y1", "mo1", "d1");
+    const err = $("err1");
     if (!res) {
       err.hidden = false;
       return;
@@ -465,10 +504,10 @@ if (related.length === 0) {
   });
 
   // ===== Step 2 → 계산 =====
-  $('btn-compare').addEventListener('click', () => {
-    const b1 = validateDOB('y1', 'mo1', 'd1');
-    const b2 = validateDOB('y2', 'mo2', 'd2');
-    const err = $('err2');
+  $("btn-compare").addEventListener("click", () => {
+    const b1 = validateDOB("y1", "mo1", "d1");
+    const b2 = validateDOB("y2", "mo2", "d2");
+    const err = $("err2");
     if (!b1 || !b2) {
       err.hidden = false;
       return;
@@ -477,17 +516,19 @@ if (related.length === 0) {
     compare(b1, b2);
   });
 
-  $('btn-back1').addEventListener('click', () => goTo(1));
-  $('btn-back2').addEventListener('click', () => goTo(2));
-  $('btn-reset').addEventListener('click', () => {
-    ['y1','mo1','d1','y2','mo2','d2'].forEach(id => { $i(id).value = ''; });
+  $("btn-back1").addEventListener("click", () => goTo(1));
+  $("btn-back2").addEventListener("click", () => goTo(2));
+  $("btn-reset").addEventListener("click", () => {
+    ["y1", "mo1", "d1", "y2", "mo2", "d2"].forEach((id) => {
+      $i(id).value = "";
+    });
     goTo(1);
   });
 
   // ===== 비교 로직 =====
   function compare(
     b1: { y: number; m: number; d: number; date: Date },
-    b2: { y: number; m: number; d: number; date: Date }
+    b2: { y: number; m: number; d: number; date: Date },
   ) {
     const a1 = b1.date;
     const a2 = b2.date;
@@ -495,7 +536,7 @@ if (related.length === 0) {
     const isSame = a1.getTime() === a2.getTime();
     const first = a1 <= a2 ? a1 : a2;
     const second = a1 <= a2 ? a2 : a1;
-    const firstLabel = a1 <= a2 ? '첫 번째 사람' : '두 번째 사람';
+    const firstLabel = a1 <= a2 ? "첫 번째 사람" : "두 번째 사람";
 
     const diffMs = second.getTime() - first.getTime();
     const daysTotal = Math.floor(diffMs / 86400000);
@@ -514,67 +555,72 @@ if (related.length === 0) {
 
     // 결과 출력
     if (isSame) {
-      $('r-first').innerText = '두 사람은 같은 날에 태어났습니다 🎉';
-      $('r-diff').innerText = '0년 0개월 0일';
-      $('r-diff-total').innerText = '총 0개월 / 총 0일';
+      $("r-first").innerText = "두 사람은 같은 날에 태어났습니다 🎉";
+      $("r-diff").innerText = "0년 0개월 0일";
+      $("r-diff-total").innerText = "총 0개월 / 총 0일";
     } else {
-      $('r-first').innerText = `${firstLabel}이(가) 먼저 태어났어요`;
-      $('r-diff').innerText = `${yrs}년 ${mons}개월 ${remDays}일 먼저 태어남`;
-      $('r-diff-total').innerText = `총 ${totalMons}개월 / 총 ${daysTotal.toLocaleString()}일`;
+      $("r-first").innerText = `${firstLabel}이 먼저 태어났어요`;
+      $("r-diff").innerText = `${yrs}년 ${mons}개월 ${remDays}일 먼저 태어남`;
+      $("r-diff-total").innerText =
+        `총 ${totalMons}개월 / 총 ${daysTotal.toLocaleString()}일`;
     }
 
-    $('r-age1').innerText = `한국 나이 ${k1}세 · 만 ${m1}세`;
-    $('r-age2').innerText = `한국 나이 ${k2}세 · 만 ${m2}세`;
+    $("r-age1").innerText = `한국 나이 ${k1}세 · 만 ${m1}세`;
+    $("r-age2").innerText = `한국 나이 ${k2}세 · 만 ${m2}세`;
 
-    $('r-korea-diff').innerText =
-      koreaDiff === 0 ? '동갑입니다' : `${koreaDiff}살 차이`;
-    $('r-man-diff').innerText =
-      manDiff === 0 ? '동갑입니다' : `${manDiff}살 차이`;
+    $("r-korea-diff").innerText =
+      koreaDiff === 0 ? "동갑입니다" : `${koreaDiff}살 차이`;
+    $("r-man-diff").innerText =
+      manDiff === 0 ? "동갑입니다" : `${manDiff}살 차이`;
 
     goTo(3);
   }
 
   // ===== 클립보드 복사 =====
-  $('btn-copy').addEventListener('click', async () => {
+  $("btn-copy").addEventListener("click", async () => {
     const lines = [
-      '[나이 차이 계산 결과]',
-      `먼저 태어난 사람: ${$('r-first').innerText}`,
-      `생일 차이: ${$('r-diff').innerText}`,
-      `${$('r-diff-total').innerText}`,
-      `첫 번째 사람: ${$('r-age1').innerText}`,
-      `두 번째 사람: ${$('r-age2').innerText}`,
-      `한국 나이 차이: ${$('r-korea-diff').innerText}`,
-      `만 나이 차이: ${$('r-man-diff').innerText}`,
-      '',
-      'via goolapp.com'
+      "[나이 차이 계산 결과]",
+      `먼저 태어난 사람: ${$("r-first").innerText}`,
+      `생일 차이: ${$("r-diff").innerText}`,
+      `${$("r-diff-total").innerText}`,
+      `첫 번째 사람: ${$("r-age1").innerText}`,
+      `두 번째 사람: ${$("r-age2").innerText}`,
+      `한국 나이 차이: ${$("r-korea-diff").innerText}`,
+      `만 나이 차이: ${$("r-man-diff").innerText}`,
+      "",
+      "via goolapp.com",
     ];
-    const text = lines.join('\n');
+    const text = lines.join("\n");
 
     try {
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(text);
       } else {
-        const ta = document.createElement('textarea');
+        const ta = document.createElement("textarea");
         ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
         document.body.appendChild(ta);
         ta.select();
-        document.execCommand('copy');
+        document.execCommand("copy");
         document.body.removeChild(ta);
       }
-      const toast = $('toast');
+      const toast = $("toast");
       toast.hidden = false;
-      setTimeout(() => { toast.hidden = true; }, 1800);
+      setTimeout(() => {
+        toast.hidden = true;
+      }, 1800);
     } catch (e) {
-      showAlert('복사에 실패했습니다. 직접 선택하여 복사해주세요.');
+      showAlert("복사에 실패했습니다. 직접 선택하여 복사해주세요.");
     }
   });
 
   // 포커스 시 placeholder만 보이도록 (기존 값 그대로 두되, 0 입력 방지 등은 사용자 판단)
-  ['y1','mo1','d1','y2','mo2','d2'].forEach(id => {
+  ["y1", "mo1", "d1", "y2", "mo2", "d2"].forEach((id) => {
     const el = $i(id);
     if (!el) return;
-    el.addEventListener('focus', () => { el.select(); });
+    el.addEventListener("focus", () => {
+      el.select();
+    });
   });
 </script>
