@@ -58,7 +58,7 @@ if (related.length === 0) {
           <button type="button" class="app-btn app-btn-primary" id="analyzeBtn">
             글자 및 단어 수 세기
           </button>
-          <button type="button" class="btn-secondary" id="clearBtn">
+          <button type="button" class="app-btn app-btn-outline" id="clearBtn">
             지우기
           </button>
         </div>
@@ -89,9 +89,6 @@ if (related.length === 0) {
           </div>
         </div>
 
-        <button type="button" class="btn-secondary full-width" id="resetBtn">
-          처음으로
-        </button>
       </div>
     </div>
   </Fragment>
@@ -194,44 +191,12 @@ if (related.length === 0) {
     margin-top: 1rem;
   }
 
-  .btn-primary,
-  .btn-secondary {
+  .button-group .app-btn:first-child {
+    flex: 3;
+  }
+
+  .button-group .app-btn:last-child {
     flex: 1;
-    padding: 0.875rem 1.25rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 2px solid transparent;
-    font-family: inherit;
-  }
-
-  .btn-primary {
-    background: var(--color-primary);
-    color: #fff;
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    filter: brightness(1.05);
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--color-primary);
-    border: 2px solid var(--color-primary);
-  }
-
-  .btn-secondary:hover {
-    background: var(--color-primary);
-    color: #fff;
-  }
-
-  .btn-secondary.full-width {
-    width: 100%;
-    margin-top: 1.25rem;
   }
 
   .result-section[hidden] {
@@ -300,7 +265,6 @@ if (related.length === 0) {
   const errorMessage = document.getElementById('errorMessage');
   const analyzeBtn = document.getElementById('analyzeBtn');
   const clearBtn = document.getElementById('clearBtn');
-  const resetBtn = document.getElementById('resetBtn');
   const resultSection = document.getElementById('resultSection');
 
   const charWithSpaces = document.getElementById('charWithSpaces');
@@ -354,7 +318,6 @@ if (related.length === 0) {
 
     if (resultSection) {
       resultSection.hidden = false;
-      resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
@@ -367,20 +330,9 @@ if (related.length === 0) {
     textInput.focus();
   }
 
-  function resetApp() {
-    if (!textInput) return;
-    textInput.value = '';
-    updateLiveStats();
-    if (resultSection) resultSection.hidden = true;
-    if (errorMessage) errorMessage.hidden = true;
-    textInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    textInput.focus();
-  }
-
   textInput?.addEventListener('input', updateLiveStats);
   analyzeBtn?.addEventListener('click', analyzeText);
   clearBtn?.addEventListener('click', clearText);
-  resetBtn?.addEventListener('click', resetApp);
 
   updateLiveStats();
 </script>
