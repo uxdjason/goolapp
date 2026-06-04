@@ -1,21 +1,31 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'reverse-text-tool');
-if (!entry) throw new Error('reverse-text-tool entry not found');
+const entry = await getEntry("apps", "reverse-text-tool");
+if (!entry) throw new Error("reverse-text-tool entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
 }
 ---
 
@@ -33,15 +43,14 @@ if (related.length === 0) {
 >
   <Fragment slot="app">
     <div class="reverse-app">
-      <!-- 입력 섹션 -->
-      <section class="panel" id="inputSection">
-        <label for="inputText" class="field-label">텍스트 입력</label>
+      <!-- 단일 패널 (입력 및 결과) -->
+      <section class="panel" id="mainSection">
+        <label for="inputText" class="field-label">텍스트 입력 및 결과 확인</label>
         <textarea
           id="inputText"
           class="text-area"
           placeholder="여기에 텍스트를 입력하거나 붙여넣기 하세요."
-          rows="6"
-        ></textarea>
+          rows="8"></textarea>
 
         <div class="action-row">
           <button type="button" class="app-btn app-btn-primary" id="charBtn">
@@ -50,31 +59,18 @@ if (related.length === 0) {
           <button type="button" class="app-btn app-btn-primary" id="wordBtn">
             단어 뒤집기
           </button>
-        </div>
-
-        <p class="hint">
-          예) "안녕하세요" → 글자 뒤집기: "요세하녕안" / 단어 뒤집기: 공백 기준 단어 순서를 뒤집습니다.
-        </p>
-      </section>
-
-      <!-- 결과 섹션 -->
-      <section class="panel result-section" id="resultSection" hidden>
-        <label for="resultText" class="field-label">변환 결과</label>
-        <textarea
-          id="resultText"
-          class="text-area result-area"
-          readonly
-          rows="6"
-        ></textarea>
-
-        <div class="action-row">
           <button type="button" class="app-btn app-btn-primary" id="copyBtn">
             클립보드 저장
           </button>
           <button type="button" class="app-btn app-btn-outline" id="resetBtn">
-            처음으로
+            지우기
           </button>
         </div>
+
+        <p class="hint">
+          예) "안녕하세요" → 글자 뒤집기: "요세하녕안" / 단어 뒤집기: 공백 기준
+          단어 순서를 뒤집습니다.
+        </p>
       </section>
 
       <!-- 토스트 알림 -->
@@ -97,18 +93,11 @@ if (related.length === 0) {
   }
 
   .panel {
-    background: var(--color-surface, #ffffff);
-    border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: var(--radius-lg, 12px);
+    background: none;
     padding: 1.25rem;
     display: flex;
     flex-direction: column;
     gap: 0.875rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  }
-
-  .result-section[hidden] {
-    display: none;
   }
 
   .field-label {
@@ -129,7 +118,9 @@ if (related.length === 0) {
     border-radius: var(--radius-md, 8px);
     resize: vertical;
     font-family: inherit;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
     box-sizing: border-box;
   }
 
@@ -137,10 +128,6 @@ if (related.length === 0) {
     outline: none;
     border-color: var(--color-primary, #2563eb);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-  }
-
-  .result-area {
-    background: var(--color-surface-alt, #f9fafb);
   }
 
   .action-row {
@@ -158,7 +145,10 @@ if (related.length === 0) {
     border-radius: var(--radius-md, 8px);
     border: 2px solid transparent;
     cursor: pointer;
-    transition: transform 0.1s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    transition:
+      transform 0.1s ease,
+      box-shadow 0.15s ease,
+      background-color 0.15s ease;
     font-family: inherit;
   }
 
@@ -211,7 +201,9 @@ if (related.length === 0) {
     z-index: 9999;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
   }
 
   .toast.show {
@@ -232,17 +224,23 @@ if (related.length === 0) {
 
 <script>
   (function () {
-    const inputText = document.getElementById('inputText') as HTMLTextAreaElement | null;
-    const resultText = document.getElementById('resultText') as HTMLTextAreaElement | null;
-    const charBtn = document.getElementById('charBtn');
-    const wordBtn = document.getElementById('wordBtn');
-    const copyBtn = document.getElementById('copyBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const inputSection = document.getElementById('inputSection');
-    const resultSection = document.getElementById('resultSection');
-    const toast = document.getElementById('toast');
+    const inputText = document.getElementById(
+      "inputText",
+    ) as HTMLTextAreaElement | null;
+    const charBtn = document.getElementById("charBtn");
+    const wordBtn = document.getElementById("wordBtn");
+    const copyBtn = document.getElementById("copyBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const toast = document.getElementById("toast");
 
-    if (!inputText || !resultText || !charBtn || !wordBtn || !copyBtn || !resetBtn || !resultSection || !toast) {
+    if (
+      !inputText ||
+      !charBtn ||
+      !wordBtn ||
+      !copyBtn ||
+      !resetBtn ||
+      !toast
+    ) {
       return;
     }
 
@@ -253,11 +251,11 @@ if (related.length === 0) {
       toast.hidden = false;
       // 다음 프레임에서 show 클래스 부여 (transition 트리거)
       requestAnimationFrame(() => {
-        toast.classList.add('show');
+        toast.classList.add("show");
       });
       if (toastTimer) window.clearTimeout(toastTimer);
       toastTimer = window.setTimeout(() => {
-        toast.classList.remove('show');
+        toast.classList.remove("show");
         window.setTimeout(() => {
           toast.hidden = true;
         }, 220);
@@ -266,53 +264,45 @@ if (related.length === 0) {
 
     // 유니코드 안전 글자 뒤집기 (서로게이트 페어 처리)
     function reverseChars(str: string): string {
-      return Array.from(str).reverse().join('');
+      return Array.from(str).reverse().join("");
     }
 
     function reverseWords(str: string): string {
-      return str.split(/\s+/).reverse().join(' ');
+      return str.split(/\s+/).reverse().join(" ");
     }
 
-    function doReverse(mode: 'char' | 'word') {
-      const text = (inputText!.value || '').trim();
+    function doReverse(mode: "char" | "word") {
+      const text = (inputText!.value || "").trim();
       if (!text) {
-        showToast('텍스트를 입력해 주세요.');
+        showToast("텍스트를 입력해 주세요.");
         inputText!.focus();
         return;
       }
-      const result = mode === 'char' ? reverseChars(text) : reverseWords(text);
-      resultText!.value = result;
-      resultSection!.hidden = false;
-      // 결과 영역으로 부드럽게 스크롤
-      resultSection!.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const result = mode === "char" ? reverseChars(text) : reverseWords(text);
+      inputText!.value = result;
     }
 
-    charBtn.addEventListener('click', () => doReverse('char'));
-    wordBtn.addEventListener('click', () => doReverse('word'));
+    charBtn.addEventListener("click", () => doReverse("char"));
+    wordBtn.addEventListener("click", () => doReverse("word"));
 
-    copyBtn.addEventListener('click', async () => {
-      const value = resultText!.value;
+    copyBtn.addEventListener("click", async () => {
+      const value = inputText!.value;
       if (!value) {
-        showToast('복사할 결과가 없습니다.');
+        showToast("복사할 텍스트가 없습니다.");
         return;
       }
       try {
         await navigator.clipboard.writeText(value);
-        showToast('클립보드에 저장되었습니다.');
+        showToast("클립보드에 저장되었습니다.");
       } catch (err) {
         console.error(err);
-        showToast('복사에 실패했습니다.');
+        showToast("복사에 실패했습니다.");
       }
     });
 
-    resetBtn.addEventListener('click', () => {
-      resultText!.value = '';
-      resultSection!.hidden = true;
-      inputText!.value = '';
+    resetBtn.addEventListener("click", () => {
+      inputText!.value = "";
       inputText!.focus();
-      if (inputSection) {
-        inputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
     });
   })();
 </script>
