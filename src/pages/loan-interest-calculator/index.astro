@@ -53,18 +53,18 @@ if (related.length === 0) {
           <label class="group-label">상환 방식</label>
           <div class="radio-group">
             <label class="radio-item">
-              <input type="radio" name="repayMethod" value="annuity" checked />
-              <div class="radio-content">
+              <div class="radio-title-row">
+                <input type="radio" name="repayMethod" value="annuity" checked />
                 <strong>원리금 균등분할상환</strong>
-                <span>매월 같은 금액으로 원금과 이자를 함께 상환 (일반적)</span>
               </div>
+              <span class="radio-desc">매월 같은 금액으로 원금과 이자를 함께 상환 (일반적)</span>
             </label>
             <label class="radio-item">
-              <input type="radio" name="repayMethod" value="principal" />
-              <div class="radio-content">
+              <div class="radio-title-row">
+                <input type="radio" name="repayMethod" value="principal" />
                 <strong>원금 균등분할상환</strong>
-                <span>매월 같은 원금 상환, 이자는 남은 원금에 따라 감소</span>
               </div>
+              <span class="radio-desc">매월 같은 원금 상환, 이자는 남은 원금에 따라 감소</span>
             </label>
           </div>
         </div>
@@ -142,8 +142,8 @@ if (related.length === 0) {
 
   .radio-item {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
+    flex-direction: column;
+    gap: 0.3rem;
     padding: 1rem;
     border: 2px solid var(--color-border);
     border-radius: 8px;
@@ -155,39 +155,34 @@ if (related.length === 0) {
     border-color: var(--color-primary);
   }
 
-  .radio-item input[type="radio"] {
-    margin-top: 0.2rem;
-    flex-shrink: 0;
-    accent-color: var(--color-primary);
-    width: 1.1rem;
-    height: 1.1rem;
-  }
-
   .radio-item:has(input[type="radio"]:checked) {
     border-color: var(--color-primary);
     background: var(--color-surface-alt, rgba(0, 0, 0, 0.02));
   }
 
-  .radio-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
-
   .radio-title-row {
     display: flex;
     align-items: center;
-    gap: 0;
+    gap: 0.6rem;
   }
 
-  .radio-content strong {
+  .radio-title-row input[type="radio"] {
+    flex-shrink: 0;
+    accent-color: var(--color-primary);
+    width: 1.1rem;
+    height: 1.1rem;
+    cursor: pointer;
+  }
+
+  .radio-title-row strong {
     font-size: 1rem;
     color: var(--color-text);
   }
 
-  .radio-content span {
+  .radio-desc {
     font-size: 0.85rem;
     color: var(--color-text-secondary, #6b7280);
+    padding-left: 1.7rem;
   }
 
   .btn {
@@ -251,43 +246,39 @@ if (related.length === 0) {
     background: var(--color-surface-alt, #f9fafb);
     border: 1px solid var(--color-border);
     border-radius: 12px;
-    padding: 1.25rem 1.5rem;
+    padding: 1.5rem;
     margin-bottom: 1rem;
-    display: flex;
-    gap: 0;
-    flex-wrap: wrap;
   }
 
-  .input-summary-title {
-    font-size: 0.8rem;
+  .input-summary :global(.summary-section-label) {
+    display: block;
+    color: var(--color-text-secondary, #6b7280);
+    font-size: 0.95rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 0;
+  }
+
+  .input-summary :global(.summary-row) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .input-summary :global(.summary-row:last-child) {
+    border-bottom: none;
+  }
+
+  .input-summary :global(.summary-label) {
+    color: var(--color-text-secondary, #6b7280);
+    font-size: 0.95rem;
+  }
+
+  .input-summary :global(.summary-value) {
     font-weight: 600;
-    color: var(--color-text-secondary, #6b7280);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.75rem;
-    width: 100%;
-  }
-
-  .input-summary-items {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-  }
-
-  .input-summary-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
-
-  .input-summary-label {
-    font-size: 0.78rem;
-    color: var(--color-text-secondary, #6b7280);
-  }
-
-  .input-summary-value {
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: 0.95rem;
     color: var(--color-text);
   }
 
@@ -466,24 +457,22 @@ if (related.length === 0) {
     // 입력값 요약 렌더링
     const inputSummaryEl = document.getElementById('inputSummary') as HTMLElement;
     inputSummaryEl.innerHTML = `
-      <div class="input-summary-title">입력 조건</div>
-      <div class="input-summary-items">
-        <div class="input-summary-item">
-          <span class="input-summary-label">대출 원금</span>
-          <span class="input-summary-value">${formatNumber(principal)}원</span>
-        </div>
-        <div class="input-summary-item">
-          <span class="input-summary-label">대출 기간</span>
-          <span class="input-summary-value">${years}년 (${months}개월)</span>
-        </div>
-        <div class="input-summary-item">
-          <span class="input-summary-label">연 금리</span>
-          <span class="input-summary-value">${rate}%</span>
-        </div>
-        <div class="input-summary-item">
-          <span class="input-summary-label">상환 방식</span>
-          <span class="input-summary-value">${methodLabel}</span>
-        </div>
+      <span class="summary-section-label">입력 조건</span>
+      <div class="summary-row">
+        <span class="summary-label">대출 원금</span>
+        <span class="summary-value">${formatNumber(principal)}원</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">대출 기간</span>
+        <span class="summary-value">${years}년 (${months}개월)</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">연 금리</span>
+        <span class="summary-value">${rate}%</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">상환 방식</span>
+        <span class="summary-value">${methodLabel}</span>
       </div>
     `;
 
