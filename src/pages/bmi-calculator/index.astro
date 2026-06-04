@@ -73,6 +73,7 @@ if (related.length === 0) {
       <!-- 결과 화면 -->
       <section id="screen2" class="screen result-screen" hidden>
         <div class="result-card">
+          <div class="input-summary" id="input-summary"></div>
           <p class="result-label">당신의 BMI</p>
           <p id="bmi-value" class="bmi-value">0.0</p>
           <p id="bmi-category" class="bmi-category">-</p>
@@ -226,6 +227,25 @@ if (related.length === 0) {
     border: 1px solid var(--color-border, #e5e7eb);
   }
 
+  .input-summary {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--color-text-muted, #6b7280);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-border, #e5e7eb);
+    flex-wrap: wrap;
+  }
+  .input-summary span {
+    background: #fff;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border, #e5e7eb);
+    font-weight: 500;
+  }
+
   .result-label {
     font-size: 0.95rem;
     color: var(--color-text-muted, #6b7280);
@@ -322,6 +342,16 @@ if (related.length === 0) {
       return;
     }
 
+    const inputSummaryEl = document.getElementById('input-summary') as HTMLElement;
+    if (inputSummaryEl) {
+      inputSummaryEl.innerHTML = `
+        <span>${genderInput.value}</span>
+        <span>${ageVal}세</span>
+        <span>${heightVal}cm</span>
+        <span>${weightVal}kg</span>
+      `;
+    }
+
     const heightM = heightVal / 100;
     const bmi = Math.round((weightVal / (heightM * heightM)) * 10) / 10;
 
@@ -380,10 +410,6 @@ if (related.length === 0) {
   }
 
   function resetApp() {
-    (document.getElementById('age') as HTMLInputElement).value = '';
-    (document.getElementById('height') as HTMLInputElement).value = '';
-    (document.getElementById('weight') as HTMLInputElement).value = '';
-    document.querySelectorAll<HTMLInputElement>('input[name="gender"]').forEach(r => (r.checked = false));
     hideError();
     screen2.hidden = true;
     screen1.hidden = false;
