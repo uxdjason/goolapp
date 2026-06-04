@@ -1,21 +1,31 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'capital-country-quiz');
-if (!entry) throw new Error('capital-country-quiz entry not found');
+const entry = await getEntry("apps", "capital-country-quiz");
+if (!entry) throw new Error("capital-country-quiz entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
 }
 ---
 
@@ -32,69 +42,87 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    {/*
-      [중요] 외부 리소스 안내:
-      이 앱은 퀴즈 데이터를 /data/capital_country.json 에서 불러옵니다.
-      원본 URL: https://goolapp.com/wp-content/json/capital_country.json
-      → 위 파일을 다운로드하여 public/data/capital_country.json 경로에 배치해야 합니다.
-    */}
-    <div class="quiz-app">
-      {/* 시작 화면 */}
-      <section id="start-screen" class="screen start-screen">
-        <h2 class="screen-title">수도를 보고 나라를 맞춰보세요!</h2>
-        <p class="screen-desc">제시된 수도가 어느 나라의 수도인지 4개의 보기 중에서 선택하세요.</p>
-        <button id="start-btn" class="app-btn app-btn-primary app-btn-lg">시작하기</button>
-      </section>
-
-      {/* 퀴즈 화면 */}
-      <section id="quiz-screen" class="screen quiz-screen" hidden>
-        <div class="quiz-meta">
-          <span id="question-progress" class="question-progress">문제 1</span>
-          <span id="score-display" class="score-display">정답: 0</span>
-        </div>
-
-        <div class="question-box">
-          <p class="question-label">다음 수도의 나라는?</p>
-          <h3 id="question-text" class="question-text">-</h3>
-        </div>
-
-        <div id="choices" class="choices"></div>
-
-        <p id="feedback" class="app-feedback" hidden></p>
-
-        <div class="quiz-actions">
-          <button id="next-btn" class="app-btn app-btn-primary" hidden>다음 문제</button>
-          <button id="quit-btn" class="app-btn app-btn-text">그만하기</button>
+    <div class="app-quiz-container">
+      <!-- 시작 화면 -->
+      <section id="start-screen" class="app-quiz-screen">
+        <div class="app-quiz-card app-quiz-start-card">
+          <h2 class="app-quiz-title">수도를 보고 나라 맞추기</h2>
+          <p class="app-quiz-subtitle">
+            제시된 수도가 어느 나라의 수도인지 4개의 보기 중에서 선택하세요.
+          </p>
+          <ul class="app-quiz-info-list">
+            <li>🌍 전 세계 주요 국가 포함</li>
+            <li>🎯 4지선다형 퀴즈</li>
+            <li>🔀 매번 다른 순서로 출제</li>
+          </ul>
+          <button id="start-btn" class="app-btn app-btn-primary app-btn-lg"
+            >시작하기</button
+          >
         </div>
       </section>
 
-      {/* 결과 화면 */}
-      <section id="result-screen" class="screen result-screen" hidden>
-        <h2 class="screen-title">퀴즈 종료!</h2>
-        <div class="result-stats">
-          <div class="stat-row">
-            <span class="stat-label">총 문제 수</span>
-            <span id="total-count" class="stat-value">0</span>
+      <!-- 퀴즈 화면 -->
+      <section id="quiz-screen" class="app-quiz-screen" hidden>
+        <div class="app-quiz-card">
+          <div class="app-quiz-header">
+            <span id="progress-text" class="app-quiz-progress-text">문제 1</span>
+            <span id="score-text" class="app-quiz-score-text">정답 0</span>
           </div>
-          <div class="stat-row">
-            <span class="stat-label">정답 수</span>
-            <span id="correct-count" class="stat-value">0</span>
+          <div class="app-progress-track">
+            <div id="progress-fill" class="app-progress-fill"></div>
           </div>
-          <div class="stat-row stat-row--highlight">
-            <span class="stat-label">점수</span>
-            <span id="score-percent" class="stat-value">0%</span>
+
+          <p class="app-quiz-prompt">
+            다음 수도는 어느 나라의 수도일까요?
+          </p>
+          <div id="quiz-word" class="app-quiz-word">—</div>
+
+          <div id="choices" class="app-quiz-choices"></div>
+
+          <div id="feedback" class="app-feedback" hidden></div>
+
+          <div class="app-quiz-actions">
+            <button id="next-btn" class="app-btn app-btn-primary" hidden
+              >다음 문제</button
+            >
+            <button id="quit-btn" class="app-btn app-btn-text">그만하기</button>
           </div>
         </div>
-        <button id="restart-btn" class="app-btn app-btn-primary app-btn-lg">처음으로</button>
       </section>
 
-      <!-- 로딩 / 에러 -->
-      <section id="loading-screen" class="screen loading-screen" hidden>
-        <p>퀴즈 데이터를 불러오는 중...</p>
+      <!-- 결과 화면 -->
+      <section id="result-screen" class="app-quiz-screen" hidden>
+        <div class="app-quiz-card app-quiz-result-card">
+          <h2 class="app-quiz-title">결과</h2>
+          <div class="app-quiz-score-circle">
+            <span id="score-value">0</span>
+            <span class="app-quiz-score-unit">점</span>
+          </div>
+          <p id="result-text" class="app-quiz-result-text">—</p>
+          <button id="restart-btn" class="app-btn app-btn-primary app-btn-lg"
+            >처음으로</button
+          >
+        </div>
       </section>
-      <section id="error-screen" class="screen error-screen" hidden>
-        <p id="error-message">데이터를 불러올 수 없습니다.</p>
-        <button id="error-retry-btn" class="app-btn app-btn-primary">다시 시도</button>
+
+      <!-- 로딩 화면 -->
+      <section id="loading-screen" class="app-quiz-screen" hidden>
+        <div class="app-quiz-card">
+          <div class="app-loading">
+            <div class="app-spinner"></div>
+            <p>문제를 불러오는 중...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 에러 화면 -->
+      <section id="error-screen" class="app-quiz-screen" hidden>
+        <div class="app-error-box">
+          <p id="error-text">문제를 불러오지 못했습니다.</p>
+          <button id="error-retry-btn" class="app-btn app-btn-primary"
+            >다시 시도</button
+          >
+        </div>
       </section>
 
       <!-- 그만하기 확인 모달 -->
@@ -102,10 +130,14 @@ if (related.length === 0) {
         <div class="app-modal">
           <div class="app-modal-icon">🤔</div>
           <p class="app-modal-title">그만하시겠습니까?</p>
-          <p class="app-modal-body">지금까지의 점수로 결과가 표시됩니다.</p>
+          <p class="app-modal-body">지금까지의 결과가 표시됩니다.</p>
           <div class="app-modal-actions">
-            <button id="quit-cancel-btn" class="app-btn app-btn-secondary">계속하기</button>
-            <button id="quit-confirm-btn" class="app-btn app-btn-primary">그만하기</button>
+            <button id="quit-cancel-btn" class="app-btn app-btn-secondary"
+              >계속하기</button
+            >
+            <button id="quit-confirm-btn" class="app-btn app-btn-primary"
+              >그만하기</button
+            >
           </div>
         </div>
       </div>
@@ -118,139 +150,47 @@ if (related.length === 0) {
   </Fragment>
 </AppLayout>
 
-<style>
-  .quiz-app {
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto;
-  }
-
-  .screen {
-    display: block;
-    background: var(--color-surface);
-    border-radius: var(--radius-lg, 12px);
-    padding: 1.75rem 1.5rem;
-    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
-  }
-
-  [hidden] {
-    display: none !important;
-  }
-
-  .screen-title {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--color-text);
-    margin: 0 0 0.75rem;
-    text-align: center;
-  }
-
-  .screen-desc {
-    text-align: center;
-    color: var(--color-text-muted, #6b7280);
-    margin: 0 0 1.5rem;
-    line-height: 1.6;
-  }
-
-  .start-screen,
-  .result-screen,
-  .loading-screen,
-  .error-screen {
-    text-align: center;
-  }
-
-  .quiz-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.25rem;
-    font-size: 0.9rem;
-    color: var(--color-text-muted, #6b7280);
-    font-weight: 600;
-  }
-
-  .score-display {
-    color: var(--color-primary);
-  }
-
-  .question-box {
-    background: var(--color-bg, #f9fafb);
-    border-radius: var(--radius-md, 8px);
-    padding: 1.5rem 1rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .question-label {
-    font-size: 0.9rem;
-    color: var(--color-text-muted, #6b7280);
-    margin: 0 0 0.5rem;
-  }
-
-  .question-text {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--color-text);
-    margin: 0;
-    word-break: keep-all;
-  }
-
-  .choices {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-  }
-
-  @media (min-width: 480px) {
-    .choices {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  /* 피드백 — app-feedback 공통 스타일 사용 */
-
-  .quiz-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  /* 버튼 — app-btn 공통 스타일 사용 */
-
-  .result-stats {
-    margin: 1.25rem 0 1.5rem;
-    border-top: 1px solid #e5e7eb;
-  }
-
-  .stat-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.85rem 0.25rem;
-    border-bottom: 1px solid #e5e7eb;
-  }
-
-  .stat-label {
-    color: var(--color-text-muted, #6b7280);
-    font-weight: 500;
-  }
-
-  .stat-value {
-    color: var(--color-text);
-    font-weight: 700;
-    font-size: 1.05rem;
-  }
-
-  .stat-row--highlight .stat-value {
-    color: var(--color-primary);
-    font-size: 1.4rem;
-  }
-</style>
-
 <script>
-  // 데이터 경로: public/data/capital_country.json 에 배치 필요
-  const JSON_URL = '/data/capital_country.json';
+  const JSON_URL = "/data/capital_country.json";
+
+  const startScreen = document.getElementById("start-screen") as HTMLElement;
+  const quizScreen = document.getElementById("quiz-screen") as HTMLElement;
+  const resultScreen = document.getElementById("result-screen") as HTMLElement;
+  const loadingScreen = document.getElementById(
+    "loading-screen",
+  ) as HTMLElement;
+  const errorScreen = document.getElementById("error-screen") as HTMLElement;
+  const quitModal = document.getElementById("quit-modal") as HTMLElement;
+
+  const startBtn = document.getElementById("start-btn") as HTMLButtonElement;
+  const nextBtn = document.getElementById("next-btn") as HTMLButtonElement;
+  const quitBtn = document.getElementById("quit-btn") as HTMLButtonElement;
+  const restartBtn = document.getElementById(
+    "restart-btn",
+  ) as HTMLButtonElement;
+  const retryBtn = document.getElementById(
+    "error-retry-btn",
+  ) as HTMLButtonElement;
+  const quitCancelBtn = document.getElementById(
+    "quit-cancel-btn",
+  ) as HTMLButtonElement;
+  const quitConfirmBtn = document.getElementById(
+    "quit-confirm-btn",
+  ) as HTMLButtonElement;
+
+  const quizWordEl = document.getElementById("quiz-word") as HTMLElement;
+  const choicesEl = document.getElementById("choices") as HTMLElement;
+  const feedbackEl = document.getElementById("feedback") as HTMLElement;
+  const progressTextEl = document.getElementById(
+    "progress-text",
+  ) as HTMLElement;
+  const scoreTextEl = document.getElementById("score-text") as HTMLElement;
+  const progressFillEl = document.getElementById(
+    "progress-fill",
+  ) as HTMLElement;
+  const scoreValueEl = document.getElementById("score-value") as HTMLElement;
+  const resultTextEl = document.getElementById("result-text") as HTMLElement;
+  const errorTextEl = document.getElementById("error-text") as HTMLElement;
 
   type QuizItem = { quiz: string; selection: string[]; answer: number };
 
@@ -260,167 +200,173 @@ if (related.length === 0) {
   let correctCount = 0;
   let answered = false;
 
-  const $ = <T extends HTMLElement = HTMLElement>(id: string) =>
-    document.getElementById(id) as T | null;
-
-  const startScreen = $('start-screen')!;
-  const quizScreen = $('quiz-screen')!;
-  const resultScreen = $('result-screen')!;
-  const loadingScreen = $('loading-screen')!;
-  const errorScreen = $('error-screen')!;
-
-  const startBtn = $<HTMLButtonElement>('start-btn')!;
-  const nextBtn = $<HTMLButtonElement>('next-btn')!;
-  const quitBtn = $<HTMLButtonElement>('quit-btn')!;
-  const restartBtn = $<HTMLButtonElement>('restart-btn')!;
-  const retryBtn = $<HTMLButtonElement>('error-retry-btn')!;
-
-  const questionText = $('question-text')!;
-  const choicesBox = $('choices')!;
-  const feedback = $('feedback')!;
-  const progressEl = $('question-progress')!;
-  const scoreEl = $('score-display')!;
-  const errorMsg = $('error-message')!;
-
-  function showOnly(el: HTMLElement) {
-    [startScreen, quizScreen, resultScreen, loadingScreen, errorScreen].forEach(s => {
-      if (s === el) s.removeAttribute('hidden');
-      else s.setAttribute('hidden', '');
-    });
+  function showOnly(screen: HTMLElement) {
+    [startScreen, quizScreen, resultScreen, loadingScreen, errorScreen].forEach(
+      (s) => {
+        if (s === screen) s.removeAttribute("hidden");
+        else s.setAttribute("hidden", "");
+      },
+    );
   }
 
   function shuffle<T>(arr: T[]): T[] {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
+    for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
+      [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-    return a;
+    return arr;
+  }
+
+  async function loadQuizData() {
+    showOnly(loadingScreen);
+    try {
+      const res = await fetch(JSON_URL);
+      if (!res.ok) throw new Error("네트워크 응답 오류");
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0)
+        throw new Error("데이터 형식 오류");
+      quizData = data as QuizItem[];
+      return true;
+    } catch (e) {
+      console.error(e);
+      errorTextEl.textContent =
+        "문제 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.";
+      showOnly(errorScreen);
+      return false;
+    }
   }
 
   async function startQuiz() {
-    showOnly(loadingScreen);
-    try {
-      if (quizData.length === 0) {
-        const res = await fetch(JSON_URL);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        if (!Array.isArray(data) || data.length === 0) {
-          throw new Error('퀴즈 데이터가 비어있습니다.');
-        }
-        quizData = data as QuizItem[];
-      }
-      questionOrder = shuffle(quizData.map((_, i) => i));
-      currentIndex = 0;
-      correctCount = 0;
-      answered = false;
-      showOnly(quizScreen);
-      loadQuestion();
-    } catch (err) {
-      console.error(err);
-      errorMsg.textContent = '퀴즈 데이터를 불러올 수 없습니다. 네트워크를 확인하고 다시 시도해 주세요.';
-      showOnly(errorScreen);
-    }
+    const ok = await loadQuizData();
+    if (!ok) return;
+
+    questionOrder = shuffle([...Array(quizData.length).keys()]);
+    currentIndex = 0;
+    correctCount = 0;
+    answered = false;
+    showOnly(quizScreen);
+    loadQuestion();
   }
 
   function loadQuestion() {
     answered = false;
-    feedback.setAttribute('hidden', '');
-    feedback.textContent = '';
-    feedback.className = 'app-feedback';
-    nextBtn.setAttribute('hidden', '');
+    feedbackEl.setAttribute("hidden", "");
+    feedbackEl.className = "app-feedback";
+    nextBtn.setAttribute("hidden", "");
 
-    const realIdx = questionOrder[currentIndex];
-    const q = quizData[realIdx];
+    const q = quizData[questionOrder[currentIndex]];
+    quizWordEl.textContent = (q.quiz || "");
 
-    progressEl.textContent = `문제 ${currentIndex + 1} / ${questionOrder.length}`;
-    scoreEl.textContent = `정답: ${correctCount}`;
-    questionText.textContent = q.quiz;
+    progressTextEl.textContent = `문제 ${currentIndex + 1} / ${quizData.length}`;
+    scoreTextEl.textContent = `정답 ${correctCount}`;
+    const pct = (currentIndex / quizData.length) * 100;
+    progressFillEl.style.width = `${pct}%`;
 
-    choicesBox.innerHTML = '';
-    q.selection.forEach((label, i) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'app-choice-btn';
-      btn.textContent = label;
-      btn.addEventListener('click', () => checkAnswer(i + 1, q.answer, btn));
-      choicesBox.appendChild(btn);
+    choicesEl.innerHTML = "";
+    q.selection.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "app-choice-btn";
+      btn.type = "button";
+      btn.innerHTML = `<span class="app-choice-num">${i + 1}</span>${opt}`;
+      btn.addEventListener("click", () =>
+        checkAnswer(i + 1, q.answer, q.selection[q.answer - 1], btn),
+      );
+      choicesEl.appendChild(btn);
     });
   }
 
-  function checkAnswer(selected: number, correct: number, clickedBtn: HTMLButtonElement) {
+  function checkAnswer(
+    selected: number,
+    correct: number,
+    answerText: string,
+    clickedBtn: HTMLButtonElement,
+  ) {
     if (answered) return;
     answered = true;
 
-    const buttons = choicesBox.querySelectorAll<HTMLButtonElement>('.app-choice-btn');
-    buttons.forEach((b, idx) => {
-      b.disabled = true;
-      if (idx + 1 === correct) b.classList.add('correct');
+    const allBtns = choicesEl.querySelectorAll("button");
+    allBtns.forEach((b, idx) => {
+      (b as HTMLButtonElement).disabled = true;
+      if (idx + 1 === correct) b.classList.add("correct");
     });
 
     if (selected === correct) {
       correctCount++;
-      feedback.textContent = '정답입니다! 🎉';
-      feedback.className = 'app-feedback correct';
+      feedbackEl.textContent = "✅ 정답입니다!";
+      feedbackEl.className = "app-feedback correct";
     } else {
-      clickedBtn.classList.add('wrong');
-      const correctText = quizData[questionOrder[currentIndex]].selection[correct - 1];
-      feedback.textContent = `오답입니다. 정답: ${correctText}`;
-      feedback.className = 'app-feedback wrong';
+      clickedBtn.classList.add("wrong");
+      feedbackEl.textContent = `❌ 정답이 아닙니다. 정답은 "${answerText}" 입니다.`;
+      feedbackEl.className = "app-feedback wrong";
     }
-    feedback.removeAttribute('hidden');
-    scoreEl.textContent = `정답: ${correctCount}`;
+    feedbackEl.removeAttribute("hidden");
 
-    const isLast = currentIndex === questionOrder.length - 1;
-    if (isLast) {
-      nextBtn.textContent = '결과 보기';
+    scoreTextEl.textContent = `정답 ${correctCount}`;
+
+    if (currentIndex < quizData.length - 1) {
+      nextBtn.removeAttribute("hidden");
     } else {
-      nextBtn.textContent = '다음 문제';
+      nextBtn.textContent = "결과 보기";
+      nextBtn.removeAttribute("hidden");
     }
-    nextBtn.removeAttribute('hidden');
   }
 
   function nextQuestion() {
     if (!answered) return;
     currentIndex++;
-    if (currentIndex < questionOrder.length) {
+    if (currentIndex < quizData.length) {
+      nextBtn.textContent = "다음 문제";
       loadQuestion();
     } else {
-      showResult(questionOrder.length);
+      showResult(false);
     }
   }
 
-  function showResult(totalAnswered: number) {
-    const total = totalAnswered;
-    const percent = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-    ($('total-count') as HTMLElement).textContent = String(total);
-    ($('correct-count') as HTMLElement).textContent = String(correctCount);
-    ($('score-percent') as HTMLElement).textContent = percent + '%';
+  function showResult(fromQuit: boolean) {
+    let attempted = currentIndex;
+    if (fromQuit && answered) attempted = currentIndex + 1;
+    if (!fromQuit) attempted = currentIndex;
+
+    if (attempted < 0) attempted = 0;
+
+    const score =
+      attempted > 0 ? Math.round((correctCount / attempted) * 100) : 0;
+    scoreValueEl.textContent = String(score);
+    resultTextEl.innerHTML = `총 <strong>${attempted}</strong> 문제를 풀었으며 <strong>${correctCount}</strong> 문제의 정답을 맞췄습니다.`;
+
+    progressFillEl.style.width = "100%";
     showOnly(resultScreen);
   }
 
-  const quitModal      = document.getElementById('quit-modal')      as HTMLElement;
-  const quitCancelBtn  = document.getElementById('quit-cancel-btn') as HTMLButtonElement;
-  const quitConfirmBtn = document.getElementById('quit-confirm-btn')as HTMLButtonElement;
+  function openQuitModal() {
+    quitModal.removeAttribute("hidden");
+  }
 
-  function openQuitModal() { quitModal.removeAttribute('hidden'); }
-  function closeQuitModal() { quitModal.setAttribute('hidden', ''); }
+  function closeQuitModal() {
+    quitModal.setAttribute("hidden", "");
+  }
 
-  function quitQuiz() { openQuitModal(); }
+  function restartQuiz() {
+    currentIndex = 0;
+    correctCount = 0;
+    answered = false;
+    nextBtn.textContent = "다음 문제";
+    showOnly(startScreen);
+  }
 
-  function restartQuiz() { showOnly(startScreen); }
-
-  startBtn.addEventListener('click', startQuiz);
-  nextBtn.addEventListener('click', nextQuestion);
-  quitBtn.addEventListener('click', quitQuiz);
-  quitCancelBtn.addEventListener('click', closeQuitModal);
-  quitConfirmBtn.addEventListener('click', () => {
+  startBtn.addEventListener("click", startQuiz);
+  nextBtn.addEventListener("click", nextQuestion);
+  quitBtn.addEventListener("click", openQuitModal);
+  quitCancelBtn.addEventListener("click", closeQuitModal);
+  quitConfirmBtn.addEventListener("click", () => {
     closeQuitModal();
-    const totalAnswered = answered ? currentIndex + 1 : currentIndex;
-    if (totalAnswered === 0) { showOnly(startScreen); return; }
-    showResult(totalAnswered);
+    showResult(true);
   });
-  restartBtn.addEventListener('click', restartQuiz);
-  retryBtn.addEventListener('click', startQuiz);
-  quitModal.addEventListener('click', (e) => { if (e.target === quitModal) closeQuitModal(); });
+  restartBtn.addEventListener("click", restartQuiz);
+  retryBtn.addEventListener("click", startQuiz);
+
+  // 모달 오버레이 클릭 시 닫기
+  quitModal.addEventListener("click", (e) => {
+    if (e.target === quitModal) closeQuitModal();
+  });
 </script>

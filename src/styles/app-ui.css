@@ -589,3 +589,148 @@
   color: var(--color-on-primary);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+
+/* ─────────────────────────────────────────────
+   QUIZ COMMON STYLES (공통 퀴즈 UI)
+───────────────────────────────────────────── */
+
+.app-quiz-container {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.app-quiz-screen {
+  display: block;
+  width: 100%;
+  animation: fadeIn var(--transition-base);
+}
+.app-quiz-screen[hidden] {
+  display: none;
+}
+
+.app-quiz-card {
+  background: none;
+  border-radius: 12px;
+  padding: 1.75rem 1.5rem;
+}
+
+.app-quiz-start-card,
+.app-quiz-result-card {
+  text-align: center;
+}
+
+.app-quiz-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-on-surface);
+  margin: 0 0 0.5rem 0;
+  font-family: var(--font-family-gothic);
+}
+
+.app-quiz-subtitle {
+  color: var(--color-on-surface-variant);
+  margin: 0 0 1.25rem 0;
+  font-size: 0.95rem;
+  font-family: var(--font-family-gothic);
+}
+
+.app-quiz-info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+  text-align: left;
+  display: inline-block;
+}
+.app-quiz-info-list li {
+  padding: 0.4rem 0;
+  color: var(--color-on-surface);
+  font-size: 0.95rem;
+  font-family: var(--font-family-gothic);
+}
+
+.app-quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--color-on-surface-variant);
+  font-family: var(--font-family-gothic);
+}
+
+.app-quiz-progress-text {
+  font-weight: 600;
+}
+.app-quiz-score-text {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.app-quiz-prompt {
+  text-align: center;
+  color: var(--color-on-surface-variant);
+  font-size: 0.95rem;
+  margin: 1rem 0 0.5rem 0;
+  font-family: var(--font-family-gothic);
+}
+
+.app-quiz-word {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-on-surface);
+  letter-spacing: 0.02em;
+  padding: 1rem 0 1.5rem 0;
+  word-break: break-word;
+  font-family: var(--font-family-gothic);
+}
+
+.app-quiz-choices {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+@media (min-width: 520px) {
+  .app-quiz-choices {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.app-quiz-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: stretch;
+  margin-top: 0.5rem;
+}
+
+.app-quiz-score-circle {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  margin: 1rem auto;
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 140px;
+  font-family: var(--font-family-gothic);
+}
+.app-quiz-score-circle .app-quiz-score-unit {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.app-quiz-result-text {
+  color: var(--color-on-surface);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.6;
+  font-family: var(--font-family-gothic);
+}

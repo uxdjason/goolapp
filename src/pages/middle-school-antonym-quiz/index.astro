@@ -1,21 +1,31 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'middle-school-antonym-quiz');
-if (!entry) throw new Error('middle-school-antonym-quiz entry not found');
+const entry = await getEntry("apps", "middle-school-antonym-quiz");
+if (!entry) throw new Error("middle-school-antonym-quiz entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
 }
 ---
 
@@ -32,80 +42,86 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    {/*
-      ⚠️ 외부 리소스 안내:
-      원본 워드프레스 앱은 https://goolapp.com/wp-content/json/english_antonym_middle_quiz_data.json
-      파일을 fetch하여 사용했다. CORS 이슈를 피하기 위해 해당 JSON 파일을
-      `public/data/english_antonym_middle_quiz_data.json` 경로로 다운로드하여 배치해야 한다.
-      JSON 형식: [{ quiz: string, selection: string[4], answer: number(1~4) }, ...]
-    */}
-    <div class="quiz-app">
-      {/* 시작 화면 */}
-      <section id="start-screen" class="screen">
-        <div class="intro-card">
-          <h2 class="intro-title">중학교 영단어 반의어 퀴즈</h2>
-          <p class="intro-desc">
-            제시된 영어 단어의 <strong>반의어(Antonym)</strong>를 4개의 보기 중에서 골라보세요.
-            중학교 수준의 필수 영단어로 구성되어 있습니다.
+    <div class="app-quiz-container">
+      <!-- 시작 화면 -->
+      <section id="start-screen" class="app-quiz-screen">
+        <div class="app-quiz-card app-quiz-start-card">
+          <h2 class="app-quiz-title">중학교 영단어 반의어 퀴즈</h2>
+          <p class="app-quiz-subtitle">
+            제시된 영어 단어의 반의어(Antonym)를 4개의 보기 중에서 골라보세요.
           </p>
-          <ul class="intro-list">
-            <li>📝 사지선다형 즉시 채점</li>
-            <li>✅ 정답·오답을 바로 확인</li>
-            <li>📊 종료 후 정답률(%) 표시</li>
+          <ul class="app-quiz-info-list">
+            <li>📚 중학교 필수 영단어 수준</li>
+            <li>🎯 4지선다형 퀴즈</li>
+            <li>🔀 매번 다른 순서로 출제</li>
           </ul>
-          <button type="button" id="start-btn" class="app-btn app-btn-primary app-btn-lg">시작하기</button>
-          <p id="loading-msg" class="loading-msg" hidden>문제를 불러오는 중입니다...</p>
-          <p id="error-msg" class="error-msg" hidden></p>
+          <button id="start-btn" class="app-btn app-btn-primary app-btn-lg"
+            >시작하기</button
+          >
         </div>
       </section>
 
-      {/* 퀴즈 화면 */}
-      <section id="quiz-screen" class="screen" hidden>
-        <div class="quiz-header">
-          <span id="progress-text" class="progress-text">1 / 10</span>
+      <!-- 퀴즈 화면 -->
+      <section id="quiz-screen" class="app-quiz-screen" hidden>
+        <div class="app-quiz-card">
+          <div class="app-quiz-header">
+            <span id="progress-text" class="app-quiz-progress-text">문제 1</span>
+            <span id="score-text" class="app-quiz-score-text">정답 0</span>
+          </div>
           <div class="app-progress-track">
             <div id="progress-fill" class="app-progress-fill"></div>
           </div>
-        </div>
 
-        <div class="question-card">
-          <p class="question-label">다음 단어의 반의어는?</p>
-          <h2 id="question-word" class="question-word">WORD</h2>
-        </div>
+          <p class="app-quiz-prompt">
+            다음 단어의 반의어는 무엇일까요?
+          </p>
+          <div id="quiz-word" class="app-quiz-word">—</div>
 
-        <div id="choices" class="choices"></div>
+          <div id="choices" class="app-quiz-choices"></div>
 
-        <p id="feedback" class="app-feedback" hidden></p>
+          <div id="feedback" class="app-feedback" hidden></div>
 
-        <div class="quiz-actions">
-          <button type="button" id="next-btn" class="app-btn app-btn-primary app-btn-lg" hidden>다음 문제</button>
-          <button type="button" id="quit-btn" class="app-btn app-btn-text">그만하기</button>
+          <div class="app-quiz-actions">
+            <button id="next-btn" class="app-btn app-btn-primary" hidden
+              >다음 문제</button
+            >
+            <button id="quit-btn" class="app-btn app-btn-text">그만하기</button>
+          </div>
         </div>
       </section>
 
-      {/* 결과 화면 */}
-      <section id="result-screen" class="screen" hidden>
-        <div class="result-card">
-          <h2 class="result-title">퀴즈 결과</h2>
-          <div id="score-circle" class="score-circle">
-            <span id="score-percent" class="score-percent">0%</span>
+      <!-- 결과 화면 -->
+      <section id="result-screen" class="app-quiz-screen" hidden>
+        <div class="app-quiz-card app-quiz-result-card">
+          <h2 class="app-quiz-title">결과</h2>
+          <div class="app-quiz-score-circle">
+            <span id="score-value">0</span>
+            <span class="app-quiz-score-unit">점</span>
           </div>
-          <div class="result-stats">
-            <div class="stat">
-              <span class="stat-label">총 풀이</span>
-              <span id="stat-total" class="stat-value">0문항</span>
-            </div>
-            <div class="stat">
-              <span class="stat-label">정답</span>
-              <span id="stat-correct" class="stat-value">0개</span>
-            </div>
-            <div class="stat">
-              <span class="stat-label">오답</span>
-              <span id="stat-wrong" class="stat-value">0개</span>
-            </div>
+          <p id="result-text" class="app-quiz-result-text">—</p>
+          <button id="restart-btn" class="app-btn app-btn-primary app-btn-lg"
+            >처음으로</button
+          >
+        </div>
+      </section>
+
+      <!-- 로딩 화면 -->
+      <section id="loading-screen" class="app-quiz-screen" hidden>
+        <div class="app-quiz-card">
+          <div class="app-loading">
+            <div class="app-spinner"></div>
+            <p>문제를 불러오는 중...</p>
           </div>
-          <p id="result-comment" class="result-comment"></p>
-          <button type="button" id="restart-btn" class="app-btn app-btn-primary app-btn-lg">처음으로</button>
+        </div>
+      </section>
+
+      <!-- 에러 화면 -->
+      <section id="error-screen" class="app-quiz-screen" hidden>
+        <div class="app-error-box">
+          <p id="error-text">문제를 불러오지 못했습니다.</p>
+          <button id="error-retry-btn" class="app-btn app-btn-primary"
+            >다시 시도</button
+          >
         </div>
       </section>
 
@@ -116,8 +132,12 @@ if (related.length === 0) {
           <p class="app-modal-title">그만하시겠습니까?</p>
           <p class="app-modal-body">지금까지의 결과가 표시됩니다.</p>
           <div class="app-modal-actions">
-            <button id="quit-cancel-btn" class="app-btn app-btn-secondary">계속하기</button>
-            <button id="quit-confirm-btn" class="app-btn app-btn-primary">그만하기</button>
+            <button id="quit-cancel-btn" class="app-btn app-btn-secondary"
+              >계속하기</button
+            >
+            <button id="quit-confirm-btn" class="app-btn app-btn-primary"
+              >그만하기</button
+            >
           </div>
         </div>
       </div>
@@ -130,197 +150,47 @@ if (related.length === 0) {
   </Fragment>
 </AppLayout>
 
-<style>
-  .quiz-app {
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto;
-  }
-
-  /* 화면 전환 */
-  .screen {
-    display: block;
-    animation: fadeIn 0.25s ease;
-  }
-  .screen[hidden] {
-    display: none;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* 인트로 카드 */
-  .intro-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: 2rem 1.5rem;
-    text-align: center;
-    box-shadow: var(--shadow-sm);
-  }
-  .intro-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-text);
-    margin: 0 0 0.75rem;
-  }
-  .intro-desc {
-    color: var(--color-text-secondary);
-    line-height: 1.7;
-    margin: 0 0 1.25rem;
-  }
-  .intro-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 1.5rem;
-    text-align: left;
-    display: inline-block;
-  }
-  .intro-list li {
-    padding: 0.4rem 0;
-    color: var(--color-text);
-  }
-  .loading-msg {
-    margin-top: 1rem;
-    color: var(--color-text-secondary);
-  }
-  .loading-msg[hidden] { display: none; }
-  .error-msg {
-    margin-top: 1rem;
-    color: var(--color-danger, #dc2626);
-    font-weight: 600;
-  }
-  .error-msg[hidden] { display: none; }
-
-  /* 퀴즈 헤더 */
-  .quiz-header {
-    margin-bottom: 1.25rem;
-  }
-  .progress-text {
-    display: block;
-    text-align: right;
-    font-size: 0.9rem;
-    color: var(--color-on-surface-variant);
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-  }
-
-  /* 문제 카드 */
-  .question-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: 2rem 1rem;
-    text-align: center;
-    margin-bottom: 1.25rem;
-    box-shadow: var(--shadow-sm);
-  }
-  .question-label {
-    margin: 0 0 0.75rem;
-    color: var(--color-text-secondary);
-    font-size: 0.95rem;
-  }
-  .question-word {
-    margin: 0;
-    font-size: 2.25rem;
-    font-weight: 800;
-    color: var(--color-primary);
-    letter-spacing: 0.04em;
-    word-break: break-word;
-  }
-
-  /* 선택지 */
-  .choices {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-  }
-  @media (min-width: 480px) {
-    .choices {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  /* 선택지 버튼 — app-choice-btn 공통 스타일 사용 */
-
-  /* 액션 영역 (세로 배치) */
-  .quiz-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: stretch;
-  }
-
-  /* 버튼 — app-btn 공통 스타일 사용 */
-
-  /* 결과 화면 */
-  .result-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: 2rem 1.25rem;
-    text-align: center;
-    box-shadow: var(--shadow-sm);
-  }
-  .result-title {
-    margin: 0 0 1.25rem;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--color-text);
-  }
-  .score-circle {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1.5rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  }
-  .score-percent {
-    font-size: 2.25rem;
-    font-weight: 800;
-  }
-  .result-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-    margin-bottom: 1.25rem;
-  }
-  .stat {
-    background: var(--color-bg, #f9fafb);
-    border-radius: var(--radius-md);
-    padding: 0.75rem 0.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  .stat-label {
-    font-size: 0.8rem;
-    color: var(--color-text-secondary);
-  }
-  .stat-value {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--color-text);
-  }
-  .result-comment {
-    color: var(--color-text-secondary);
-    margin: 0 0 1.5rem;
-    line-height: 1.6;
-  }
-</style>
-
 <script>
-  // 로컬 경로 사용 (CORS 회피)
-  // public/data/english_antonym_middle_quiz_data.json 에 파일을 배치해야 함
-  const JSON_URL = '/data/english_antonym_middle_quiz_data.json';
+  const JSON_URL = "/data/english_antonym_middle_quiz_data.json";
+
+  const startScreen = document.getElementById("start-screen") as HTMLElement;
+  const quizScreen = document.getElementById("quiz-screen") as HTMLElement;
+  const resultScreen = document.getElementById("result-screen") as HTMLElement;
+  const loadingScreen = document.getElementById(
+    "loading-screen",
+  ) as HTMLElement;
+  const errorScreen = document.getElementById("error-screen") as HTMLElement;
+  const quitModal = document.getElementById("quit-modal") as HTMLElement;
+
+  const startBtn = document.getElementById("start-btn") as HTMLButtonElement;
+  const nextBtn = document.getElementById("next-btn") as HTMLButtonElement;
+  const quitBtn = document.getElementById("quit-btn") as HTMLButtonElement;
+  const restartBtn = document.getElementById(
+    "restart-btn",
+  ) as HTMLButtonElement;
+  const retryBtn = document.getElementById(
+    "error-retry-btn",
+  ) as HTMLButtonElement;
+  const quitCancelBtn = document.getElementById(
+    "quit-cancel-btn",
+  ) as HTMLButtonElement;
+  const quitConfirmBtn = document.getElementById(
+    "quit-confirm-btn",
+  ) as HTMLButtonElement;
+
+  const quizWordEl = document.getElementById("quiz-word") as HTMLElement;
+  const choicesEl = document.getElementById("choices") as HTMLElement;
+  const feedbackEl = document.getElementById("feedback") as HTMLElement;
+  const progressTextEl = document.getElementById(
+    "progress-text",
+  ) as HTMLElement;
+  const scoreTextEl = document.getElementById("score-text") as HTMLElement;
+  const progressFillEl = document.getElementById(
+    "progress-fill",
+  ) as HTMLElement;
+  const scoreValueEl = document.getElementById("score-value") as HTMLElement;
+  const resultTextEl = document.getElementById("result-text") as HTMLElement;
+  const errorTextEl = document.getElementById("error-text") as HTMLElement;
 
   type QuizItem = { quiz: string; selection: string[]; answer: number };
 
@@ -328,39 +198,15 @@ if (related.length === 0) {
   let questionOrder: number[] = [];
   let currentIndex = 0;
   let correctCount = 0;
-  let answeredCount = 0;
   let answered = false;
 
-  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
-
-  const startScreen = $('start-screen');
-  const quizScreen = $('quiz-screen');
-  const resultScreen = $('result-screen');
-
-  const startBtn = $<HTMLButtonElement>('start-btn');
-  const nextBtn = $<HTMLButtonElement>('next-btn');
-  const quitBtn = $<HTMLButtonElement>('quit-btn');
-  const restartBtn = $<HTMLButtonElement>('restart-btn');
-
-  const loadingMsg = $('loading-msg');
-  const errorMsg = $('error-msg');
-
-  const questionWord = $('question-word');
-  const choicesEl = $('choices');
-  const feedbackEl = $('feedback');
-  const progressText = $('progress-text');
-  const progressFill = $('progress-fill');
-
-  const scorePercentEl = $('score-percent');
-  const statTotal = $('stat-total');
-  const statCorrect = $('stat-correct');
-  const statWrong = $('stat-wrong');
-  const resultComment = $('result-comment');
-
-  function showScreen(name: 'start' | 'quiz' | 'result') {
-    startScreen.hidden = name !== 'start';
-    quizScreen.hidden = name !== 'quiz';
-    resultScreen.hidden = name !== 'result';
+  function showOnly(screen: HTMLElement) {
+    [startScreen, quizScreen, resultScreen, loadingScreen, errorScreen].forEach(
+      (s) => {
+        if (s === screen) s.removeAttribute("hidden");
+        else s.setAttribute("hidden", "");
+      },
+    );
   }
 
   function shuffle<T>(arr: T[]): T[] {
@@ -371,105 +217,97 @@ if (related.length === 0) {
     return arr;
   }
 
-  async function startQuiz() {
-    errorMsg.hidden = true;
-    errorMsg.textContent = '';
-    loadingMsg.hidden = false;
-    startBtn.disabled = true;
-
+  async function loadQuizData() {
+    showOnly(loadingScreen);
     try {
-      if (quizData.length === 0) {
-        const res = await fetch(JSON_URL);
-        if (!res.ok) throw new Error(`데이터를 불러오지 못했습니다. (${res.status})`);
-        const data = await res.json();
-        if (!Array.isArray(data) || data.length === 0) {
-          throw new Error('퀴즈 데이터가 비어 있습니다.');
-        }
-        quizData = data;
-      }
-
-      currentIndex = 0;
-      correctCount = 0;
-      answeredCount = 0;
-      answered = false;
-
-      questionOrder = shuffle(quizData.map((_, i) => i));
-
-      showScreen('quiz');
-      loadQuestion();
-    } catch (e: any) {
-      errorMsg.textContent = e?.message || '오류가 발생했습니다.';
-      errorMsg.hidden = false;
-    } finally {
-      loadingMsg.hidden = true;
-      startBtn.disabled = false;
+      const res = await fetch(JSON_URL);
+      if (!res.ok) throw new Error("네트워크 응답 오류");
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0)
+        throw new Error("데이터 형식 오류");
+      quizData = data as QuizItem[];
+      return true;
+    } catch (e) {
+      console.error(e);
+      errorTextEl.textContent =
+        "문제 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.";
+      showOnly(errorScreen);
+      return false;
     }
+  }
+
+  async function startQuiz() {
+    const ok = await loadQuizData();
+    if (!ok) return;
+
+    questionOrder = shuffle([...Array(quizData.length).keys()]);
+    currentIndex = 0;
+    correctCount = 0;
+    answered = false;
+    showOnly(quizScreen);
+    loadQuestion();
   }
 
   function loadQuestion() {
     answered = false;
-    feedbackEl.hidden = true;
-    feedbackEl.className = 'app-feedback';
-    feedbackEl.textContent = '';
-    nextBtn.hidden = true;
+    feedbackEl.setAttribute("hidden", "");
+    feedbackEl.className = "app-feedback";
+    nextBtn.setAttribute("hidden", "");
 
     const q = quizData[questionOrder[currentIndex]];
-    if (!q) return;
+    quizWordEl.textContent = (q.quiz || "").toUpperCase();
 
-    questionWord.textContent = (q.quiz || '').toUpperCase();
+    progressTextEl.textContent = `문제 ${currentIndex + 1} / ${quizData.length}`;
+    scoreTextEl.textContent = `정답 ${correctCount}`;
+    const pct = (currentIndex / quizData.length) * 100;
+    progressFillEl.style.width = `${pct}%`;
 
-    const total = quizData.length;
-    progressText.textContent = `${currentIndex + 1} / ${total}`;
-    progressFill.style.width = `${((currentIndex) / total) * 100}%`;
-
-    // 선택지 렌더링
-    choicesEl.innerHTML = '';
-    q.selection.forEach((text, idx) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'app-choice-btn';
-      btn.innerHTML = `<span class="app-choice-num">${idx + 1}</span><span class="choice-text"></span>`;
-      (btn.querySelector('.choice-text') as HTMLElement).textContent = text;
-      btn.addEventListener('click', () => checkAnswer(idx + 1, q.answer, q.selection[q.answer - 1], btn));
+    choicesEl.innerHTML = "";
+    q.selection.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "app-choice-btn";
+      btn.type = "button";
+      btn.innerHTML = `<span class="app-choice-num">${i + 1}</span>${opt}`;
+      btn.addEventListener("click", () =>
+        checkAnswer(i + 1, q.answer, q.selection[q.answer - 1], btn),
+      );
       choicesEl.appendChild(btn);
     });
   }
 
-  function checkAnswer(selected: number, correct: number, correctText: string, clickedBtn: HTMLButtonElement) {
+  function checkAnswer(
+    selected: number,
+    correct: number,
+    answerText: string,
+    clickedBtn: HTMLButtonElement,
+  ) {
     if (answered) return;
     answered = true;
-    answeredCount = currentIndex + 1;
 
-    const allBtns = choicesEl.querySelectorAll('button');
-    allBtns.forEach((b) => ((b as HTMLButtonElement).disabled = true));
-
-    // 정답 버튼 하이라이트
-    const correctBtn = allBtns[correct - 1] as HTMLButtonElement | undefined;
+    const allBtns = choicesEl.querySelectorAll("button");
+    allBtns.forEach((b, idx) => {
+      (b as HTMLButtonElement).disabled = true;
+      if (idx + 1 === correct) b.classList.add("correct");
+    });
 
     if (selected === correct) {
       correctCount++;
-      clickedBtn.classList.add('correct');
-      feedbackEl.textContent = '✅ 정답입니다!';
-      feedbackEl.className = 'app-feedback correct';
+      feedbackEl.textContent = "✅ 정답입니다!";
+      feedbackEl.className = "app-feedback correct";
     } else {
-      clickedBtn.classList.add('wrong');
-      if (correctBtn) correctBtn.classList.add('correct');
-      feedbackEl.textContent = `❌ 오답입니다. 정답: ${correctText}`;
-      feedbackEl.className = 'app-feedback wrong';
+      clickedBtn.classList.add("wrong");
+      feedbackEl.textContent = `❌ 정답이 아닙니다. 정답은 "${answerText}" 입니다.`;
+      feedbackEl.className = "app-feedback wrong";
     }
-    feedbackEl.hidden = false;
+    feedbackEl.removeAttribute("hidden");
 
-    // 진행률 업데이트
-    const total = quizData.length;
-    progressFill.style.width = `${((currentIndex + 1) / total) * 100}%`;
+    scoreTextEl.textContent = `정답 ${correctCount}`;
 
-    // 마지막 문제가 아니면 다음 버튼 노출
     if (currentIndex < quizData.length - 1) {
-      nextBtn.hidden = false;
+      nextBtn.removeAttribute("hidden");
     } else {
-      // 마지막 문제: 잠시 후 자동으로 결과 표시 버튼 노출
-      nextBtn.textContent = '결과 보기';
-      nextBtn.hidden = false;
+      nextBtn.textContent = "결과 보기";
+      nextBtn.removeAttribute("hidden");
     }
   }
 
@@ -477,55 +315,58 @@ if (related.length === 0) {
     if (!answered) return;
     currentIndex++;
     if (currentIndex < quizData.length) {
-      nextBtn.textContent = '다음 문제';
+      nextBtn.textContent = "다음 문제";
       loadQuestion();
     } else {
-      showResult();
+      showResult(false);
     }
   }
 
-  const quitModal     = document.getElementById('quit-modal')      as HTMLElement;
-  const quitCancelBtn = document.getElementById('quit-cancel-btn') as HTMLButtonElement;
-  const quitConfirmBtn= document.getElementById('quit-confirm-btn')as HTMLButtonElement;
+  function showResult(fromQuit: boolean) {
+    let attempted = currentIndex;
+    if (fromQuit && answered) attempted = currentIndex + 1;
+    if (!fromQuit) attempted = currentIndex;
 
-  function openQuitModal() { quitModal.removeAttribute('hidden'); }
-  function closeQuitModal() { quitModal.setAttribute('hidden', ''); }
+    if (attempted < 0) attempted = 0;
 
-  function quitQuiz() { openQuitModal(); }
+    const score =
+      attempted > 0 ? Math.round((correctCount / attempted) * 100) : 0;
+    scoreValueEl.textContent = String(score);
+    resultTextEl.innerHTML = `총 <strong>${attempted}</strong> 문제를 풀었으며 <strong>${correctCount}</strong> 문제의 정답을 맞췄습니다.`;
 
-  function showResult() {
-    const total = answeredCount; // 현재까지 답한 문항 수
-    const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-    const wrong = Math.max(0, total - correctCount);
+    progressFillEl.style.width = "100%";
+    showOnly(resultScreen);
+  }
 
-    scorePercentEl.textContent = `${score}%`;
-    statTotal.textContent = `${total}문항`;
-    statCorrect.textContent = `${correctCount}개`;
-    statWrong.textContent = `${wrong}개`;
+  function openQuitModal() {
+    quitModal.removeAttribute("hidden");
+  }
 
-    let comment = '';
-    if (total === 0) comment = '풀이한 문항이 없어요. 다시 도전해보세요!';
-    else if (score === 100) comment = '🎉 완벽해요! 모두 정답입니다.';
-    else if (score >= 80) comment = '👏 훌륭해요! 거의 다 맞혔어요.';
-    else if (score >= 60) comment = '🙂 잘했어요! 조금만 더 연습해봐요.';
-    else if (score >= 40) comment = '💪 더 도전해봐요. 반복 학습이 도움이 됩니다.';
-    else comment = '📚 천천히 다시 풀어봐요. 단어를 익히면 금방 늘어요!';
-    resultComment.textContent = comment;
-
-    showScreen('result');
+  function closeQuitModal() {
+    quitModal.setAttribute("hidden", "");
   }
 
   function restartQuiz() {
-    nextBtn.textContent = '다음 문제';
-    showScreen('start');
+    currentIndex = 0;
+    correctCount = 0;
+    answered = false;
+    nextBtn.textContent = "다음 문제";
+    showOnly(startScreen);
   }
 
-  // 이벤트 바인딩
-  startBtn.addEventListener('click', startQuiz);
-  nextBtn.addEventListener('click', nextQuestion);
-  quitBtn.addEventListener('click', quitQuiz);
-  quitCancelBtn.addEventListener('click', closeQuitModal);
-  quitConfirmBtn.addEventListener('click', () => { closeQuitModal(); showResult(); });
-  restartBtn.addEventListener('click', restartQuiz);
-  quitModal.addEventListener('click', (e) => { if (e.target === quitModal) closeQuitModal(); });
+  startBtn.addEventListener("click", startQuiz);
+  nextBtn.addEventListener("click", nextQuestion);
+  quitBtn.addEventListener("click", openQuitModal);
+  quitCancelBtn.addEventListener("click", closeQuitModal);
+  quitConfirmBtn.addEventListener("click", () => {
+    closeQuitModal();
+    showResult(true);
+  });
+  restartBtn.addEventListener("click", restartQuiz);
+  retryBtn.addEventListener("click", startQuiz);
+
+  // 모달 오버레이 클릭 시 닫기
+  quitModal.addEventListener("click", (e) => {
+    if (e.target === quitModal) closeQuitModal();
+  });
 </script>
