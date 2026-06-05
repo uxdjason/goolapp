@@ -203,9 +203,17 @@ if (related.length === 0) {
     .action-btn {
       flex: 1 1 100%;
     }
+    .results-container :global(.lotto-set) {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .results-container :global(.lotto-balls) {
+      width: 100%;
+      justify-content: space-between;
+    }
     .results-container :global(.lotto-ball) {
-      width: 36px;
-      height: 36px;
+      width: 38px; /* Slightly bigger to look better with space-between */
+      height: 38px;
       font-size: 0.95rem;
     }
   }
