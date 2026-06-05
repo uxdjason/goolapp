@@ -98,39 +98,39 @@ if (related.length === 0) {
     justify-content: center;
     align-items: center;
     gap: 3rem;
-    perspective: 800px;
+    perspective: 1000px;
     width: 100%;
-    min-height: 180px;
+    min-height: 200px;
     padding: 1.5rem 0;
   }
 
   .cube {
     position: relative;
-    width: 100px;
-    height: 100px;
+    width: 140px;
+    height: 140px;
     transform-style: preserve-3d;
     transform: rotateX(0deg) rotateY(0deg);
-    transition: transform 1s cubic-bezier(0.25, 0.8, 0.4, 1);
+    transition: transform 3s ease;
   }
 
   .face {
     position: absolute;
-    width: 100px;
-    height: 100px;
+    width: 140px;
+    height: 140px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    border-radius: 12px;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     background-color: #fff;
   }
 
-  .face-front  { transform: translateZ(50px); }
-  .face-back   { transform: rotateY(180deg) translateZ(50px); }
-  .face-right  { transform: rotateY(90deg) translateZ(50px); }
-  .face-left   { transform: rotateY(-90deg) translateZ(50px); }
-  .face-top    { transform: rotateX(90deg) translateZ(50px); }
-  .face-bottom { transform: rotateX(-90deg) translateZ(50px); }
+  .face-front  { transform: translateZ(70px); }
+  .face-back   { transform: rotateY(180deg) translateZ(70px); }
+  .face-right  { transform: rotateY(90deg) translateZ(70px); }
+  .face-left   { transform: rotateY(-90deg) translateZ(70px); }
+  .face-top    { transform: rotateX(90deg) translateZ(70px); }
+  .face-bottom { transform: rotateX(-90deg) translateZ(70px); }
 
   .roll-button {
     background: var(--color-primary);
@@ -207,18 +207,19 @@ if (related.length === 0) {
 
   @media (max-width: 480px) {
     .dice-stage {
-      gap: 2rem;
+      gap: 1.5rem;
     }
     .cube, .face {
-      width: 80px;
-      height: 80px;
+      width: 120px;
+      height: 120px;
     }
-    .face-front  { transform: translateZ(40px); }
-    .face-back   { transform: rotateY(180deg) translateZ(40px); }
-    .face-right  { transform: rotateY(90deg) translateZ(40px); }
-    .face-left   { transform: rotateY(-90deg) translateZ(40px); }
-    .face-top    { transform: rotateX(90deg) translateZ(40px); }
-    .face-bottom { transform: rotateX(-90deg) translateZ(40px); }
+    .face { border-radius: 14px; }
+    .face-front  { transform: translateZ(60px); }
+    .face-back   { transform: rotateY(180deg) translateZ(60px); }
+    .face-right  { transform: rotateY(90deg) translateZ(60px); }
+    .face-left   { transform: rotateY(-90deg) translateZ(60px); }
+    .face-top    { transform: rotateX(90deg) translateZ(60px); }
+    .face-bottom { transform: rotateX(-90deg) translateZ(60px); }
   }
 </style>
 
@@ -253,23 +254,26 @@ if (related.length === 0) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  function rollCube(cube: HTMLElement): number {
+  function rollCube(cube: HTMLElement, delay: number, duration: number): number {
     const result = randomInt(1, 6);
     const { x, y } = rotations[result];
-    const spins = randomInt(3, 4);
-    const targetX = x + 360 * spins;
-    const targetY = y + 360 * spins;
-
-    cube.style.transition = 'transform 1s cubic-bezier(0.25, 0.8, 0.4, 1)';
-    cube.style.transform = `rotateX(${targetX}deg) rotateY(${targetY}deg)`;
+    const spinsX = randomInt(4, 5);
+    const spinsY = randomInt(4, 5);
+    const targetX = x + 360 * spinsX;
+    const targetY = y + 360 * spinsY;
 
     window.setTimeout(() => {
-      cube.style.transition = 'none';
-      cube.style.transform = `rotateX(${x}deg) rotateY(${y}deg)`;
+      cube.style.transition = `transform ${duration}s ease`;
+      cube.style.transform = `rotateX(${targetX}deg) rotateY(${targetY}deg)`;
+
       window.setTimeout(() => {
-        cube.style.transition = 'transform 1s cubic-bezier(0.25, 0.8, 0.4, 1)';
-      }, 50);
-    }, 1000);
+        cube.style.transition = 'none';
+        cube.style.transform = `rotateX(${x}deg) rotateY(${y}deg)`;
+        window.setTimeout(() => {
+          cube.style.transition = `transform ${duration}s ease`;
+        }, 50);
+      }, duration * 1000);
+    }, delay);
 
     return result;
   }
@@ -290,8 +294,16 @@ if (related.length === 0) {
 
     button.addEventListener('click', () => {
       button.disabled = true;
-      const r1 = rollCube(cube1);
-      const r2 = rollCube(cube2);
+      
+      const delay1 = randomInt(0, 100);
+      const delay2 = randomInt(0, 100);
+      const dur1 = 2.8 + Math.random() * 0.4;
+      const dur2 = 2.8 + Math.random() * 0.4;
+
+      const r1 = rollCube(cube1, delay1, dur1);
+      const r2 = rollCube(cube2, delay2, dur2);
+
+      const maxTime = Math.max(delay1 + dur1 * 1000, delay2 + dur2 * 1000);
 
       window.setTimeout(() => {
         result1El.textContent = String(r1);
@@ -299,7 +311,7 @@ if (related.length === 0) {
         resultTotalEl.textContent = String(r1 + r2);
         resultBox.hidden = false;
         button.disabled = false;
-      }, 1050);
+      }, maxTime + 100);
     });
   }
 
