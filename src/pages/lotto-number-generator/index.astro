@@ -32,11 +32,11 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="lotto-app">
+    <div class="app-calc-layout">
       <div class="action-buttons">
-        <button class="action-btn primary" id="generate-one" type="button">1 세트 받기</button>
-        <button class="action-btn primary" id="generate-five" type="button">5 세트 받기</button>
-        <button class="action-btn secondary" id="clear-all" type="button">모두 지우기</button>
+        <button class="app-btn app-btn-primary" id="generate-one" type="button">1 세트 받기</button>
+        <button class="app-btn app-btn-primary" id="generate-five" type="button">5 세트 받기</button>
+        <button class="app-btn app-btn-secondary" id="clear-all" type="button">모두 지우기</button>
       </div>
 
       <div id="results-container" class="results-container" aria-live="polite"></div>
@@ -56,12 +56,7 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .lotto-app {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-
+  /* lotto-number-generator 특화 스타일 */
   .action-buttons {
     display: flex;
     flex-wrap: wrap;
@@ -69,38 +64,10 @@ if (related.length === 0) {
     justify-content: center;
   }
 
-  .action-btn {
+  .action-buttons > button {
     flex: 1 1 auto;
     min-width: 120px;
-    padding: 0.75rem 1.25rem;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-    border: 2px solid transparent;
-  }
-
-  .action-btn.primary {
-    background-color: var(--color-primary);
-    color: #fff;
-  }
-
-  .action-btn.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    filter: brightness(1.05);
-  }
-
-  .action-btn.secondary {
-    background-color: transparent;
-    color: var(--color-text, #333);
-    border: 2px solid var(--color-border, #d1d5db);
-  }
-
-  .action-btn.secondary:hover {
-    transform: translateY(-2px);
-    background-color: var(--color-bg-muted, #f3f4f6);
+    font-family: var(--font-family-gothic);
   }
 
   .results-container {
@@ -114,10 +81,11 @@ if (related.length === 0) {
     align-items: center;
     justify-content: center;
     padding: 2rem 1rem;
-    border: 2px dashed var(--color-border, #d1d5db);
-    border-radius: 12px;
-    color: var(--color-text-muted, #6b7280);
+    border: 2px dashed var(--color-outline);
+    border-radius: var(--radius-lg);
+    color: var(--color-on-surface-variant);
     text-align: center;
+    font-family: var(--font-family-gothic);
   }
 
   .empty-state[hidden] {
@@ -131,10 +99,10 @@ if (related.length === 0) {
     flex-wrap: wrap;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    background-color: var(--color-surface, #fff);
-    border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
   }
 
   .results-container :global(.lotto-balls) {
@@ -148,7 +116,7 @@ if (related.length === 0) {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    color: #fff;
+    color: var(--color-on-primary);
     font-weight: 700;
     font-size: 1rem;
     display: inline-flex;
@@ -156,6 +124,7 @@ if (related.length === 0) {
     justify-content: center;
     box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    font-family: var(--font-family-gothic);
   }
 
   .results-container :global(.copy-btn) {
@@ -165,14 +134,15 @@ if (related.length === 0) {
     background-color: transparent;
     color: var(--color-primary);
     border: 1.5px solid var(--color-primary);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease;
+    font-family: var(--font-family-gothic);
   }
 
   .results-container :global(.copy-btn:hover) {
     background-color: var(--color-primary);
-    color: #fff;
+    color: var(--color-on-primary);
   }
 
   .toast {
@@ -180,15 +150,16 @@ if (related.length === 0) {
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(17, 24, 39, 0.92);
-    color: #fff;
+    background-color: var(--color-on-surface);
+    color: var(--color-surface);
     padding: 0.75rem 1.25rem;
     border-radius: 999px;
     font-size: 0.95rem;
     z-index: 9999;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-lg);
     opacity: 1;
     transition: opacity 0.3s ease;
+    font-family: var(--font-family-gothic);
   }
 
   .toast[hidden] {
@@ -200,7 +171,7 @@ if (related.length === 0) {
   }
 
   @media (max-width: 480px) {
-    .action-btn {
+    .action-buttons > button {
       flex: 1 1 100%;
     }
     .results-container :global(.lotto-set) {

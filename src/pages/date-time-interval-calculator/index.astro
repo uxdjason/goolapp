@@ -32,94 +32,94 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="calc-wrapper">
+    <div class="app-calc-layout">
 
       <!-- Screen 1: 시작 날짜·시간 입력 -->
-      <div id="screen1" class="screen">
+      <div id="screen1" class="app-screen">
         <h2 class="screen-title">시작 날짜 · 시간</h2>
         <div class="field-group">
           <div class="field-row">
-            <div class="field">
-              <label for="startYear">년</label>
-              <input type="number" id="startYear" min="1" placeholder="예) 2020" />
+            <div class="app-form-group">
+              <label class="app-label" for="startYear">년</label>
+              <input class="app-input" type="number" id="startYear" min="1" placeholder="예) 2020" />
             </div>
-            <div class="field">
-              <label for="startMonth">월</label>
-              <input type="number" id="startMonth" min="1" max="12" placeholder="1~12" />
+            <div class="app-form-group">
+              <label class="app-label" for="startMonth">월</label>
+              <input class="app-input" type="number" id="startMonth" min="1" max="12" placeholder="1~12" />
             </div>
-            <div class="field">
-              <label for="startDay">일</label>
-              <input type="number" id="startDay" min="1" max="31" placeholder="1~31" />
+            <div class="app-form-group">
+              <label class="app-label" for="startDay">일</label>
+              <input class="app-input" type="number" id="startDay" min="1" max="31" placeholder="1~31" />
             </div>
           </div>
           <div class="field-row">
-            <div class="field">
-              <label for="startHour">시</label>
-              <input type="number" id="startHour" min="0" max="23" placeholder="0~23" />
+            <div class="app-form-group">
+              <label class="app-label" for="startHour">시</label>
+              <input class="app-input" type="number" id="startHour" min="0" max="23" placeholder="0~23" />
             </div>
-            <div class="field">
-              <label for="startMin">분</label>
-              <input type="number" id="startMin" min="0" max="59" placeholder="0~59" />
+            <div class="app-form-group">
+              <label class="app-label" for="startMin">분</label>
+              <input class="app-input" type="number" id="startMin" min="0" max="59" placeholder="0~59" />
             </div>
-            <div class="field">
-              <label for="startSec">초</label>
-              <input type="number" id="startSec" min="0" max="59" placeholder="0~59" />
+            <div class="app-form-group">
+              <label class="app-label" for="startSec">초</label>
+              <input class="app-input" type="number" id="startSec" min="0" max="59" placeholder="0~59" />
             </div>
           </div>
         </div>
         <p id="error1" class="error-msg" hidden></p>
         <div class="btn-row">
-          <button id="btnNext" class="app-btn app-btn-primary">다음 →</button>
+          <button id="btnNext" class="app-btn app-btn-primary" style="width: 100%;">다음 →</button>
         </div>
       </div>
 
       <!-- Screen 2: 종료 날짜·시간 입력 -->
-      <div id="screen2" class="screen" hidden>
+      <div id="screen2" class="app-screen" hidden>
         <h2 class="screen-title">종료 날짜 · 시간</h2>
         <div class="field-group">
           <div class="field-row">
-            <div class="field">
-              <label for="endYear">년</label>
-              <input type="number" id="endYear" min="1" placeholder="예) 2024" />
+            <div class="app-form-group">
+              <label class="app-label" for="endYear">년</label>
+              <input class="app-input" type="number" id="endYear" min="1" placeholder="예) 2024" />
             </div>
-            <div class="field">
-              <label for="endMonth">월</label>
-              <input type="number" id="endMonth" min="1" max="12" placeholder="1~12" />
+            <div class="app-form-group">
+              <label class="app-label" for="endMonth">월</label>
+              <input class="app-input" type="number" id="endMonth" min="1" max="12" placeholder="1~12" />
             </div>
-            <div class="field">
-              <label for="endDay">일</label>
-              <input type="number" id="endDay" min="1" max="31" placeholder="1~31" />
+            <div class="app-form-group">
+              <label class="app-label" for="endDay">일</label>
+              <input class="app-input" type="number" id="endDay" min="1" max="31" placeholder="1~31" />
             </div>
           </div>
           <div class="field-row">
-            <div class="field">
-              <label for="endHour">시</label>
-              <input type="number" id="endHour" min="0" max="23" placeholder="0~23" />
+            <div class="app-form-group">
+              <label class="app-label" for="endHour">시</label>
+              <input class="app-input" type="number" id="endHour" min="0" max="23" placeholder="0~23" />
             </div>
-            <div class="field">
-              <label for="endMin">분</label>
-              <input type="number" id="endMin" min="0" max="59" placeholder="0~59" />
+            <div class="app-form-group">
+              <label class="app-label" for="endMin">분</label>
+              <input class="app-input" type="number" id="endMin" min="0" max="59" placeholder="0~59" />
             </div>
-            <div class="field">
-              <label for="endSec">초</label>
-              <input type="number" id="endSec" min="0" max="59" placeholder="0~59" />
+            <div class="app-form-group">
+              <label class="app-label" for="endSec">초</label>
+              <input class="app-input" type="number" id="endSec" min="0" max="59" placeholder="0~59" />
             </div>
           </div>
         </div>
         <p id="error2" class="error-msg" hidden></p>
         <div class="btn-col">
-          <button id="btnCalc" class="app-btn app-btn-primary">계산하기</button>
-          <button id="btnBack" class="app-btn app-btn-text">← 이전으로</button>
+          <button id="btnCalc" class="app-btn app-btn-primary" style="width: 100%;">계산하기</button>
+          <button id="btnBack" class="app-btn app-btn-text" style="width: 100%;">← 이전으로</button>
         </div>
       </div>
 
       <!-- Screen 3: 결과 -->
-      <div id="screen3" class="screen" hidden>
+      <div id="screen3" class="app-screen" hidden>
         <h2 class="screen-title">계산 결과</h2>
         <div id="result" class="result-box"></div>
         <div class="btn-col">
-          <button id="btnCopy" class="app-btn app-btn-secondary">📋 클립보드 복사</button>
-          <button id="btnReset" class="app-btn app-btn-text">처음으로</button>
+          <button id="btnCopy" class="app-btn app-btn-secondary" style="width: 100%;">📋 클립보드 복사</button>
+          <button id="btnReset" class="app-btn app-btn-text" style="width: 100%;">처음으로</button>
         </div>
         <p id="copyMsg" class="copy-msg" hidden>복사되었습니다!</p>
       </div>
@@ -134,25 +134,15 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .calc-wrapper {
-    max-width: 520px;
-    margin: 0 auto;
-    padding: 1rem;
-  }
-
-  .screen {
-    display: block;
-  }
-  .screen[hidden] {
-    display: none;
-  }
-
+<style>
+  /* date-time-interval-calculator 특화 스타일 */
   .screen-title {
     font-size: 1.2rem;
     font-weight: 700;
     color: var(--color-primary);
     margin-bottom: 1.25rem;
     text-align: center;
+    font-family: var(--font-family-gothic);
   }
 
   .field-group {
@@ -168,94 +158,19 @@ if (related.length === 0) {
     gap: 0.75rem;
   }
 
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
+  .app-label {
+    text-align: center;
   }
-
-  .field label {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--color-text-muted, #6b7280);
+  .app-input {
     text-align: center;
   }
 
-  .field input {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0.55rem 0.4rem;
-    border: 1.5px solid var(--color-border, #d1d5db);
-    border-radius: 8px;
-    font-size: 1rem;
-    text-align: center;
-    background: var(--color-surface, #fff);
-    color: var(--color-text, #111827);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    -moz-appearance: textfield;
-  }
-  .field input::-webkit-outer-spin-button,
-  .field input::-webkit-inner-spin-button {
+  .app-input::-webkit-outer-spin-button,
+  .app-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
-  .field input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
-  }
-
-  /* 버튼 공통 */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.25rem;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: background 0.18s, transform 0.15s, box-shadow 0.15s;
-  }
-  .btn:active {
-    transform: scale(0.97);
-  }
-  .btn-primary {
-    background: var(--color-primary);
-    color: #fff;
-    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary) 30%, transparent);
-  }
-  .btn-primary:hover {
-    filter: brightness(1.08);
-    transform: translateY(-1px);
-  }
-  .btn-secondary {
-    background: var(--color-surface, #f3f4f6);
-    color: var(--color-primary);
-    border: 1.5px solid var(--color-primary);
-  }
-  .btn-secondary:hover {
-    background: color-mix(in srgb, var(--color-primary) 8%, transparent);
-    transform: translateY(-1px);
-  }
-  .btn-text {
-    background: none;
-    border: none;
-    color: var(--color-text-muted, #6b7280);
-    font-size: 0.9rem;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    cursor: pointer;
-  }
-  .btn-text:hover {
-    color: var(--color-primary);
-  }
-  .btn-full {
-    width: 100%;
-  }
+  .app-input[type="number"] { -moz-appearance: textfield; }
 
   .btn-row {
     display: flex;
@@ -277,21 +192,21 @@ if (related.length === 0) {
     font-size: 0.88rem;
     margin: 0 0 0.75rem;
     text-align: center;
+    font-family: var(--font-family-gothic);
   }
-  .error-msg[hidden] {
-    display: none;
-  }
+  .error-msg[hidden] { display: none; }
 
   /* 결과 박스 */
   .result-box {
-    background: var(--color-surface, #f9fafb);
-    border: 1.5px solid var(--color-border, #e5e7eb);
-    border-radius: 12px;
+    background: var(--color-surface-container-low);
+    border: 1.5px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
     padding: 1.25rem 1rem;
     margin-bottom: 1rem;
     font-size: 0.95rem;
     line-height: 1.8;
-    color: var(--color-text, #111827);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
   }
 
   /* result-box 내부 동적 요소 (innerHTML) */
@@ -308,7 +223,7 @@ if (related.length === 0) {
     margin-top: 0.5rem;
   }
   :global(.result-table tr) {
-    border-bottom: 1px solid var(--color-border, #e5e7eb);
+    border-bottom: 1px solid var(--color-outline-variant);
   }
   :global(.result-table tr:last-child) {
     border-bottom: none;
@@ -318,14 +233,14 @@ if (related.length === 0) {
     font-size: 0.9rem;
   }
   :global(.result-table td:first-child) {
-    color: var(--color-text-muted, #6b7280);
+    color: var(--color-on-surface-variant);
     font-weight: 600;
     white-space: nowrap;
     width: 30%;
   }
   :global(.result-table td:last-child) {
     font-weight: 500;
-    color: var(--color-text, #111827);
+    color: var(--color-on-surface);
   }
   :global(.result-highlight) {
     color: var(--color-primary);
@@ -338,16 +253,13 @@ if (related.length === 0) {
     color: #16a34a;
     margin-top: 0.25rem;
     text-align: center;
+    font-family: var(--font-family-gothic);
   }
-  .copy-msg[hidden] {
-    display: none;
-  }
+  .copy-msg[hidden] { display: none; }
 
   @media (max-width: 400px) {
-    .field-row {
-      gap: 0.5rem;
-    }
-    .field input {
+    .field-row { gap: 0.5rem; }
+    .app-input {
       font-size: 0.9rem;
       padding: 0.5rem 0.25rem;
     }

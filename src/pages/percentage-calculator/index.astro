@@ -32,9 +32,9 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="calc-app">
+    <div class="app-calc-layout" style="max-width:560px">
       <!-- screen1: 유형 선택 -->
-      <section id="screen1" class="screen" data-active="true">
+      <section id="screen1" data-active="true">
         <h2 class="screen-title">계산 유형을 선택하세요</h2>
         <p class="screen-desc">아래 3가지 유형 중 원하는 계산 방식을 선택해 주세요.</p>
         <div class="type-list">
@@ -53,17 +53,17 @@ if (related.length === 0) {
         </div>
       </section>
 
-      <!-- screen2: 유형1 입력 -->
-      <section id="screen2" class="screen" hidden>
+      <!-- screen2: 유형일 입력 -->
+      <section id="screen2" hidden>
         <h2 class="screen-title">유형 1 · 비율 계산</h2>
         <p class="screen-desc">전체 X 중 부분 Y가 차지하는 비율(%)을 계산합니다.</p>
-        <div class="field">
-          <label for="total1">전체 숫자 (X)</label>
-          <input id="total1" type="number" min="0" step="0.01" placeholder="예: 200" />
+        <div class="app-form-group">
+          <label class="app-label" for="total1">전체 숫자 (X)</label>
+          <input id="total1" class="app-input" type="number" min="0" step="0.01" placeholder="예: 200" />
         </div>
-        <div class="field">
-          <label for="part1">부분 숫자 (Y)</label>
-          <input id="part1" type="number" min="0" step="0.01" placeholder="예: 50" />
+        <div class="app-form-group">
+          <label class="app-label" for="part1">부분 숫자 (Y)</label>
+          <input id="part1" class="app-input" type="number" min="0" step="0.01" placeholder="예: 50" />
         </div>
         <div class="actions">
           <button type="button" class="app-btn app-btn-primary" data-action="calc1">계산하기</button>
@@ -71,8 +71,8 @@ if (related.length === 0) {
         </div>
       </section>
 
-      <!-- screen2-1: 유형1 결과 -->
-      <section id="screen2-1" class="screen" hidden>
+      <!-- screen2-1: 유형일 결과 -->
+      <section id="screen2-1" hidden>
         <h2 class="screen-title">결과</h2>
         <div class="result-box">
           <span class="result-label" id="result-label-1">Y는 X의</span>
@@ -84,17 +84,17 @@ if (related.length === 0) {
         </div>
       </section>
 
-      <!-- screen3: 유형2 입력 -->
-      <section id="screen3" class="screen" hidden>
+      <!-- screen3: 유형이 입력 -->
+      <section id="screen3" hidden>
         <h2 class="screen-title">유형 2 · 부분값 계산</h2>
         <p class="screen-desc">전체 X의 Z%에 해당하는 값을 계산합니다.</p>
-        <div class="field">
-          <label for="total2">전체 숫자 (X)</label>
-          <input id="total2" type="number" min="0" step="0.01" placeholder="예: 1000" />
+        <div class="app-form-group">
+          <label class="app-label" for="total2">전체 숫자 (X)</label>
+          <input id="total2" class="app-input" type="number" min="0" step="0.01" placeholder="예: 1000" />
         </div>
-        <div class="field">
-          <label for="percent2">퍼센트 (Z%)</label>
-          <input id="percent2" type="number" min="0" step="0.01" placeholder="예: 15" />
+        <div class="app-form-group">
+          <label class="app-label" for="percent2">퍼센트 (Z%)</label>
+          <input id="percent2" class="app-input" type="number" min="0" step="0.01" placeholder="예: 15" />
         </div>
         <div class="actions">
           <button type="button" class="app-btn app-btn-primary" data-action="calc2">계산하기</button>
@@ -102,8 +102,8 @@ if (related.length === 0) {
         </div>
       </section>
 
-      <!-- screen3-1: 유형2 결과 -->
-      <section id="screen3-1" class="screen" hidden>
+      <!-- screen3-1: 유형이 결과 -->
+      <section id="screen3-1" hidden>
         <h2 class="screen-title">결과</h2>
         <div class="result-box">
           <span class="result-label" id="result-label-2">X의 Z%는</span>
@@ -115,17 +115,17 @@ if (related.length === 0) {
         </div>
       </section>
 
-      <!-- screen4: 유형3 입력 -->
-      <section id="screen4" class="screen" hidden>
+      <!-- screen4: 유형쌍 입력 -->
+      <section id="screen4" hidden>
         <h2 class="screen-title">유형 3 · 전체값 역산</h2>
         <p class="screen-desc">부분 Y가 전체의 Z%일 때, 전체값을 계산합니다.</p>
-        <div class="field">
-          <label for="part3">부분 숫자 (Y)</label>
-          <input id="part3" type="number" min="0" step="0.01" placeholder="예: 30" />
+        <div class="app-form-group">
+          <label class="app-label" for="part3">부분 숫자 (Y)</label>
+          <input id="part3" class="app-input" type="number" min="0" step="0.01" placeholder="예: 30" />
         </div>
-        <div class="field">
-          <label for="percent3">퍼센트 (Z%)</label>
-          <input id="percent3" type="number" min="0" step="0.01" placeholder="예: 20" />
+        <div class="app-form-group">
+          <label class="app-label" for="percent3">퍼센트 (Z%)</label>
+          <input id="percent3" class="app-input" type="number" min="0" step="0.01" placeholder="예: 20" />
         </div>
         <div class="actions">
           <button type="button" class="app-btn app-btn-primary" data-action="calc3">계산하기</button>
@@ -133,8 +133,8 @@ if (related.length === 0) {
         </div>
       </section>
 
-      <!-- screen4-1: 유형3 결과 -->
-      <section id="screen4-1" class="screen" hidden>
+      <!-- screen4-1: 유형쌍 결과 -->
+      <section id="screen4-1" hidden>
         <h2 class="screen-title">결과</h2>
         <div class="result-box">
           <span class="result-label" id="result-label-3">전체값은</span>
@@ -167,65 +167,63 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .calc-app {
-    width: 100%;
-    max-width: 560px;
-    margin: 0 auto;
-  }
-
-  .screen {
-    display: block;
-    background: var(--color-surface, #fff);
-    border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: 12px;
+  /* percentage-calculator 특화 스타일 */
+  #screen1, #screen2, #screen3, #screen4,
+  #screen2-1, #screen3-1, #screen4-1 {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
     padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
-  .screen[hidden] {
-    display: none;
-  }
+  #screen2[hidden], #screen3[hidden], #screen4[hidden],
+  #screen2-1[hidden], #screen3-1[hidden], #screen4-1[hidden] { display: none; }
 
   .screen-title {
     font-size: 1.25rem;
     font-weight: 700;
-    margin: 0 0 0.5rem 0;
-    color: var(--color-text, #111827);
+    margin: 0;
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
   }
-
   .screen-desc {
-    color: var(--color-text-secondary, #6b7280);
+    color: var(--color-on-surface-variant);
     font-size: 0.95rem;
-    margin: 0 0 1.25rem 0;
+    margin: 0;
+    font-family: var(--font-family-gothic);
   }
 
+  /* 괜아 콴테콘트 보버튼 리스트 */
   .type-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
   }
-
   .type-btn {
     display: flex;
     align-items: center;
     gap: 1rem;
     width: 100%;
     padding: 1rem 1.25rem;
-    background: var(--color-surface, #fff);
-    border: 2px solid var(--color-border, #d1d5db);
-    border-radius: 10px;
+    background: var(--color-surface);
+    border: 2px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
     cursor: pointer;
     text-align: left;
     font-size: 1rem;
-    color: var(--color-text, #111827);
+    color: var(--color-on-surface);
     transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    font-family: var(--font-family-gothic);
+    box-sizing: border-box;
   }
-
   .type-btn:hover {
-    border-color: var(--color-primary, #3b82f6);
+    border-color: var(--color-primary);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   }
-
   .type-num {
     flex-shrink: 0;
     width: 32px;
@@ -233,113 +231,46 @@ if (related.length === 0) {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-primary, #3b82f6);
-    color: #fff;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
     border-radius: 50%;
     font-weight: 700;
     font-size: 0.95rem;
   }
-
   .type-label {
     flex: 1;
     font-weight: 500;
-  }
-
-  .field {
-    margin-bottom: 1rem;
-  }
-
-  .field label {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: var(--color-text, #111827);
-  }
-
-  .field input {
-    width: 100%;
-    padding: 0.75rem 0.9rem;
-    border: 1.5px solid var(--color-border, #d1d5db);
-    border-radius: 8px;
-    font-size: 1rem;
-    background: var(--color-surface, #fff);
-    color: var(--color-text, #111827);
-    box-sizing: border-box;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  .field input:focus {
-    outline: none;
-    border-color: var(--color-primary, #3b82f6);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
   }
 
   .actions {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    margin-top: 1.25rem;
   }
 
-  .btn-primary {
-    width: 100%;
-    padding: 0.85rem 1rem;
-    background: var(--color-primary, #3b82f6);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s ease, transform 0.15s ease;
-  }
-
-  .btn-primary:hover {
-    opacity: 0.92;
-    transform: translateY(-1px);
-  }
-
-  .btn-text {
-    width: 100%;
-    padding: 0.7rem 1rem;
-    background: transparent;
-    color: var(--color-text-secondary, #6b7280);
-    border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: color 0.15s ease;
-  }
-
-  .btn-text:hover {
-    color: var(--color-text, #111827);
-    text-decoration: underline;
-  }
-
+  /* 결과 박스 */
   .result-box {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
     padding: 2rem 1rem;
-    background: var(--color-surface-alt, #f9fafb);
-    border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: 10px;
-    margin-bottom: 0.5rem;
+    background: var(--color-surface-container-low);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
   }
-
   .result-label {
     font-size: 0.95rem;
-    color: var(--color-text-secondary, #6b7280);
+    color: var(--color-on-surface-variant);
+    font-family: var(--font-family-gothic);
   }
-
   .result-value {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--color-primary, #3b82f6);
+    color: var(--color-primary);
     word-break: break-all;
     text-align: center;
+    font-family: var(--font-family-gothic);
   }
 </style>
 

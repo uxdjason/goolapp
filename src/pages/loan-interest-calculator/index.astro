@@ -42,11 +42,12 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="loan-calc">
-      <section class="input-screen" id="inputScreen">
-        <div class="form-group">
-          <label for="principal">대출 원금 (원)</label>
+    <div class="app-calc-layout">
+      <section class="app-screen" id="inputScreen">
+        <div class="app-form-group">
+          <label class="app-label" for="principal">대출 원금 (원)</label>
           <input
+            class="app-input"
             type="number"
             id="principal"
             min="0"
@@ -54,9 +55,10 @@ if (related.length === 0) {
           />
         </div>
 
-        <div class="form-group">
-          <label for="years">대출 기간 (년)</label>
+        <div class="app-form-group">
+          <label class="app-label" for="years">대출 기간 (년)</label>
           <input
+            class="app-input"
             type="number"
             id="years"
             min="0"
@@ -65,9 +67,10 @@ if (related.length === 0) {
           />
         </div>
 
-        <div class="form-group">
-          <label for="rate">대출 금리 (%)</label>
+        <div class="app-form-group">
+          <label class="app-label" for="rate">대출 금리 (%)</label>
           <input
+            class="app-input"
             type="number"
             id="rate"
             min="0"
@@ -76,8 +79,8 @@ if (related.length === 0) {
           />
         </div>
 
-        <div class="form-group">
-          <label class="group-label">상환 방식</label>
+        <div class="app-form-group">
+          <label class="app-label group-label">상환 방식</label>
           <div class="radio-group">
             <label class="radio-item">
               <div class="radio-title-row">
@@ -105,23 +108,21 @@ if (related.length === 0) {
           </div>
         </div>
 
-        <button class="app-btn app-btn-primary" id="calculateBtn">이자 계산하기</button>
+        <button class="app-btn app-btn-primary" id="calculateBtn" style="width: 100%; margin-top: 1rem;">이자 계산하기</button>
       </section>
 
-      <section class="result-screen" id="resultScreen" hidden>
+      <section class="app-screen" id="resultScreen" hidden>
         <div class="input-summary" id="inputSummary"></div>
 
         <div class="result-summary" id="resultText"></div>
 
         <div class="schedule-wrapper">
-          <button class="app-btn app-btn-outline" id="toggleScheduleBtn"
-            >상환 스케줄 보기</button
-          >
+          <button class="app-btn app-btn-secondary" id="toggleScheduleBtn" style="width: 100%;">상환 스케줄 보기</button>
           <div class="schedule-table-wrapper" id="scheduleTableWrapper" hidden>
           </div>
         </div>
 
-        <button class="app-btn app-btn-secondary" id="resetBtn">처음으로</button>
+        <button class="app-btn app-btn-text" id="resetBtn" style="width: 100%; margin-top: 0.5rem;">처음으로</button>
       </section>
 
       <!-- 공통 경고 모달 -->
@@ -145,46 +146,9 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .loan-calc {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 1rem 0;
-  }
-
-  .form-group {
-    margin-bottom: 1.25rem;
-  }
-
-  .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: var(--color-text);
-    font-size: 0.95rem;
-  }
-
+  /* loan-interest-calculator 특화 스타일 */
   .group-label {
     margin-bottom: 0.75rem !important;
-  }
-
-  .form-group input[type="number"] {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    background: var(--color-surface);
-    color: var(--color-text);
-    transition:
-      border-color 0.2s,
-      box-shadow 0.2s;
-    box-sizing: border-box;
-  }
-
-  .form-group input[type="number"]:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
   }
 
   .radio-group {
@@ -198,12 +162,10 @@ if (related.length === 0) {
     flex-direction: column;
     gap: 0.3rem;
     padding: 1rem;
-    border: 2px solid var(--color-border);
-    border-radius: 8px;
+    border: 2px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition:
-      border-color 0.2s,
-      background 0.2s;
+    transition: border-color 0.2s, background 0.2s;
   }
 
   .radio-item:hover {
@@ -212,7 +174,7 @@ if (related.length === 0) {
 
   .radio-item:has(input[type="radio"]:checked) {
     border-color: var(--color-primary);
-    background: var(--color-surface-alt, rgba(0, 0, 0, 0.02));
+    background: var(--color-surface-container-low);
   }
 
   .radio-title-row {
@@ -231,90 +193,38 @@ if (related.length === 0) {
 
   .radio-title-row strong {
     font-size: 1rem;
-    color: var(--color-text);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
   }
 
   .radio-desc {
     font-size: 0.85rem;
-    color: var(--color-text-secondary, #6b7280);
+    color: var(--color-on-surface-variant);
     padding-left: 1.7rem;
+    font-family: var(--font-family-gothic);
   }
 
-  .btn {
-    display: inline-block;
-    width: 100%;
-    padding: 0.875rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition:
-      background 0.2s,
-      transform 0.1s,
-      box-shadow 0.2s;
-    box-sizing: border-box;
-  }
-
-  .btn:active {
-    transform: translateY(1px);
-  }
-
-  .btn-primary {
-    background: var(--color-primary);
-    color: #fff;
-    margin-top: 1rem;
-  }
-
-  .btn-primary:hover {
-    background: var(--color-primary-dark, var(--color-primary));
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
-    transform: translateY(-1px);
-    filter: brightness(1.08);
-  }
-
-  .btn-outline {
-    background: transparent;
-    color: var(--color-primary);
-    border: 2px solid var(--color-primary);
-  }
-
-  .btn-outline:hover {
-    background: var(--color-surface-alt, rgba(0, 0, 0, 0.04));
-  }
-
-  .btn-secondary {
-    background: var(--color-surface-alt, #f3f4f6);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-    margin-top: 0.75rem;
-  }
-
-  .btn-secondary:hover {
-    background: var(--color-border);
-  }
-
-  .input-screen[hidden],
-  .result-screen[hidden],
+  .app-screen[hidden],
   .schedule-table-wrapper[hidden] {
     display: none !important;
   }
 
   .input-summary {
-    background: var(--color-surface-alt, #f9fafb);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
+    background: var(--color-surface-container-low);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
     padding: 1.5rem;
     margin-bottom: 1rem;
   }
 
   .input-summary :global(.summary-section-label) {
     display: block;
-    color: var(--color-text-secondary, #6b7280);
+    color: var(--color-on-surface-variant);
     font-size: 0.95rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-outline-variant);
     margin-bottom: 0;
+    font-family: var(--font-family-gothic);
   }
 
   .input-summary :global(.summary-row) {
@@ -322,7 +232,7 @@ if (related.length === 0) {
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 0;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-outline-variant);
   }
 
   .input-summary :global(.summary-row:last-child) {
@@ -330,20 +240,22 @@ if (related.length === 0) {
   }
 
   .input-summary :global(.summary-label) {
-    color: var(--color-text-secondary, #6b7280);
+    color: var(--color-on-surface-variant);
     font-size: 0.95rem;
+    font-family: var(--font-family-gothic);
   }
 
   .input-summary :global(.summary-value) {
     font-weight: 600;
     font-size: 0.95rem;
-    color: var(--color-text);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
   }
 
   .result-summary {
-    background: var(--color-surface-alt, #f9fafb);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
+    background: var(--color-surface-container-low);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
     padding: 1.5rem;
     margin-bottom: 1.5rem;
   }
@@ -353,7 +265,7 @@ if (related.length === 0) {
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 0;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-outline-variant);
   }
 
   .result-summary :global(.summary-row:last-child) {
@@ -361,14 +273,16 @@ if (related.length === 0) {
   }
 
   .result-summary :global(.summary-label) {
-    color: var(--color-text-secondary, #6b7280);
+    color: var(--color-on-surface-variant);
     font-size: 0.95rem;
+    font-family: var(--font-family-gothic);
   }
 
   .result-summary :global(.summary-value) {
     font-weight: 700;
     font-size: 1.05rem;
-    color: var(--color-text);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
   }
 
   .result-summary :global(.summary-value.highlight) {
@@ -383,8 +297,8 @@ if (related.length === 0) {
   .schedule-table-wrapper {
     margin-top: 1rem;
     overflow-x: auto;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
   }
 
   .schedule-table-wrapper :global(table) {
@@ -392,13 +306,15 @@ if (related.length === 0) {
     border-collapse: collapse;
     font-size: 0.875rem;
     min-width: 560px;
+    font-family: var(--font-family-gothic);
   }
 
   .schedule-table-wrapper :global(th),
   .schedule-table-wrapper :global(td) {
     padding: 0.625rem 0.75rem;
     text-align: right;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-outline-variant);
+    color: var(--color-on-surface);
   }
 
   .schedule-table-wrapper :global(th:first-child),
@@ -407,8 +323,7 @@ if (related.length === 0) {
   }
 
   .schedule-table-wrapper :global(thead th) {
-    background: var(--color-surface-alt, #f3f4f6);
-    color: var(--color-text);
+    background: var(--color-surface-container-low);
     font-weight: 600;
     position: sticky;
     top: 0;
@@ -418,18 +333,15 @@ if (related.length === 0) {
     border-bottom: none;
   }
 
-  .schedule-table-wrapper :global(tbody tr:nth-child(even)) {
-    background: var(--color-surface-alt, rgba(0, 0, 0, 0.02));
-  }
-
   .notice {
     margin-top: 1rem;
     padding: 0.75rem 1rem;
-    background: var(--color-surface-alt, #f9fafb);
+    background: var(--color-surface-container-low);
     border-left: 3px solid var(--color-primary);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: 0.85rem;
-    color: var(--color-text-secondary, #6b7280);
+    color: var(--color-on-surface-variant);
+    font-family: var(--font-family-gothic);
   }
 </style>
 

@@ -32,17 +32,17 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="severance-app">
+    <div class="app-calc-layout">
       <section class="date-section">
         <h2 class="section-title">📅 재직 기간</h2>
         <div class="form-grid">
-          <div class="form-group">
-            <label for="start-date">입사일</label>
-            <input class="calc-input" id="start-date" type="date" />
+          <div class="app-form-group">
+            <label class="app-label" for="start-date">입사일</label>
+            <input class="app-input" id="start-date" type="date" />
           </div>
-          <div class="form-group">
-            <label for="end-date">퇴사일 (마지막 근무일)</label>
-            <input class="calc-input" id="end-date" type="date" />
+          <div class="app-form-group">
+            <label class="app-label" for="end-date">퇴사일 (마지막 근무일)</label>
+            <input class="app-input" id="end-date" type="date" />
           </div>
         </div>
         <p class="hint" id="period-info">입사일과 퇴사일을 입력해 주세요.</p>
@@ -52,21 +52,21 @@ if (related.length === 0) {
         <h2 class="section-title">💰 퇴사 직전 3개월 급여 (세전)</h2>
         <p class="hint">평균 임금 계산을 위해 퇴사일 기준 직전 3개월의 세전 월급을 입력하세요.</p>
         <div class="form-grid">
-          <div class="form-group">
-            <label for="month-1-salary" id="month-1-label">1개월 전 월급 (원)</label>
-            <input class="calc-input" id="month-1-salary" placeholder="예: 2100000" type="number" inputmode="numeric" />
+          <div class="app-form-group">
+            <label class="app-label" for="month-1-salary" id="month-1-label">1개월 전 월급 (원)</label>
+            <input class="app-input" id="month-1-salary" placeholder="예: 2100000" type="number" inputmode="numeric" />
           </div>
-          <div class="form-group">
-            <label for="month-2-salary" id="month-2-label">2개월 전 월급 (원)</label>
-            <input class="calc-input" id="month-2-salary" placeholder="예: 2100000" type="number" inputmode="numeric" />
+          <div class="app-form-group">
+            <label class="app-label" for="month-2-salary" id="month-2-label">2개월 전 월급 (원)</label>
+            <input class="app-input" id="month-2-salary" placeholder="예: 2100000" type="number" inputmode="numeric" />
           </div>
-          <div class="form-group">
-            <label for="month-3-salary" id="month-3-label">3개월 전 월급 (원)</label>
-            <input class="calc-input" id="month-3-salary" placeholder="예: 2100000" type="number" inputmode="numeric" />
+          <div class="app-form-group">
+            <label class="app-label" for="month-3-salary" id="month-3-label">3개월 전 월급 (원)</label>
+            <input class="app-input" id="month-3-salary" placeholder="예: 2100000" type="number" inputmode="numeric" />
           </div>
-          <div class="form-group">
-            <label for="annual-bonus">지난 1년간 총 상여금 (원, 선택)</label>
-            <input class="calc-input" id="annual-bonus" placeholder="0" type="number" inputmode="numeric" value="0" />
+          <div class="app-form-group">
+            <label class="app-label" for="annual-bonus">지난 1년간 총 상여금 (원, 선택)</label>
+            <input class="app-input" id="annual-bonus" placeholder="0" type="number" inputmode="numeric" value="0" />
           </div>
         </div>
       </section>
@@ -99,7 +99,8 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .severance-app {
+  /* part-time-job-severance-pay-calculator 특화 스타일 */
+  .app-calc-layout {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -109,22 +110,21 @@ if (related.length === 0) {
     font-size: 1.1rem;
     font-weight: 700;
     margin: 0 0 0.75rem 0;
-    color: var(--color-text);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
   }
 
   .date-section,
   .salary-section,
   .result-section {
-    background: var(--color-surface, #fff);
-    border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: 12px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
     padding: 1.25rem;
   }
 
   .salary-section[hidden],
-  .result-section[hidden] {
-    display: none;
-  }
+  .result-section[hidden] { display: none; }
 
   .form-grid {
     display: grid;
@@ -133,67 +133,38 @@ if (related.length === 0) {
   }
 
   @media (max-width: 520px) {
-    .form-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-
-  .form-group label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--color-text);
-  }
-
-  .calc-input {
-    width: 100%;
-    padding: 0.65rem 0.75rem;
-    border: 1.5px solid var(--color-border, #d1d5db);
-    border-radius: 8px;
-    font-size: 1rem;
-    background: var(--color-bg, #fff);
-    color: var(--color-text);
-    transition: border-color 0.15s, box-shadow 0.15s;
-    box-sizing: border-box;
-  }
-
-  .calc-input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px var(--color-primary-soft, rgba(59, 130, 246, 0.15));
+    .form-grid { grid-template-columns: 1fr; }
   }
 
   .hint {
     font-size: 0.85rem;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--color-on-surface-variant);
     margin: 0.5rem 0 0 0;
+    font-family: var(--font-family-gothic);
   }
 
   .result-card {
-    background: var(--color-primary-soft, #eff6ff);
-    border: 1.5px solid var(--color-primary, #3b82f6);
-    border-radius: 12px;
+    background: rgba(139, 79, 50, 0.08);
+    border: 1.5px solid var(--color-primary);
+    border-radius: var(--radius-lg);
     padding: 1.25rem;
     text-align: center;
   }
 
   .result-label {
     font-size: 0.9rem;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--color-on-surface-variant);
     font-weight: 600;
     margin-bottom: 0.4rem;
+    font-family: var(--font-family-gothic);
   }
 
   .result-main {
     font-size: 1.85rem;
     font-weight: 800;
-    color: var(--color-primary, #3b82f6);
+    color: var(--color-primary);
     letter-spacing: -0.02em;
+    font-family: var(--font-family-gothic);
   }
 
   .result-details {
@@ -207,27 +178,29 @@ if (related.length === 0) {
     display: flex;
     justify-content: space-between;
     padding: 0.55rem 0.75rem;
-    background: var(--color-surface-alt, #f9fafb);
-    border-radius: 6px;
+    background: var(--color-surface-container-low);
+    border-radius: var(--radius-sm);
     font-size: 0.9rem;
+    font-family: var(--font-family-gothic);
   }
 
   .result-details :global(.detail-row .label) {
-    color: var(--color-text-muted, #6b7280);
+    color: var(--color-on-surface-variant);
   }
 
   .result-details :global(.detail-row .value) {
     font-weight: 700;
-    color: var(--color-text);
+    color: var(--color-on-surface);
   }
 
   .result-details :global(.ineligible-msg) {
     text-align: center;
     padding: 1rem;
-    color: var(--color-text);
+    color: var(--color-on-surface);
     font-weight: 600;
-    background: var(--color-surface-alt, #fef3c7);
-    border-radius: 8px;
+    background: var(--color-surface-container-low);
+    border-radius: var(--radius-md);
+    font-family: var(--font-family-gothic);
   }
 
   .warning-box {
@@ -235,50 +208,46 @@ if (related.length === 0) {
     padding: 0.85rem 1rem;
     background: #fef3c7;
     border-left: 4px solid #f59e0b;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     color: #92400e;
     font-size: 0.9rem;
     line-height: 1.5;
+    font-family: var(--font-family-gothic);
   }
-
-  .warning-box[hidden] {
-    display: none;
-  }
+  .warning-box[hidden] { display: none; }
 
   .actions {
     display: flex;
     justify-content: center;
   }
-
-  .actions[hidden] {
-    display: none;
-  }
+  .actions[hidden] { display: none; }
 
   .btn-reset {
     padding: 0.7rem 1.5rem;
-    background: var(--color-surface-alt, #f3f4f6);
-    color: var(--color-text);
-    border: 1.5px solid var(--color-border, #d1d5db);
-    border-radius: 8px;
+    background: var(--color-surface-container-low);
+    color: var(--color-on-surface);
+    border: 1.5px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
+    font-family: var(--font-family-gothic);
     transition: background 0.15s, border-color 0.15s;
   }
-
   .btn-reset:hover {
-    background: var(--color-border, #e5e7eb);
-    border-color: var(--color-text-muted, #9ca3af);
+    background: var(--color-outline-variant);
+    border-color: var(--color-on-surface-variant);
   }
 
   .disclaimer {
     font-size: 0.8rem;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--color-on-surface-variant);
     line-height: 1.6;
     padding: 0.85rem 1rem;
-    background: var(--color-surface-alt, #f9fafb);
-    border-radius: 8px;
+    background: var(--color-surface-container-low);
+    border-radius: var(--radius-md);
     margin: 0;
+    font-family: var(--font-family-gothic);
   }
 </style>
 
@@ -447,7 +416,7 @@ if (related.length === 0) {
     
     resetActions.hidden = true;
     
-    const appContainer = document.querySelector('.severance-app');
+    const appContainer = document.querySelector('.app-calc-layout');
     if (appContainer) {
       const y = appContainer.getBoundingClientRect().top + window.scrollY - 120;
       window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });

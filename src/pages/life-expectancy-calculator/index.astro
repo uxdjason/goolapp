@@ -245,19 +245,20 @@ if (related.length === 0) {
 
 
 <style>
+  /* life-expectancy-calculator 특화 스타일 */
   #calculator-app {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    padding: 1rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-lg);
-    background-color: var(--color-background-secondary);
+    padding: 1.25rem;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface-container-low);
   }
   .progress-container {
     width: 100%;
-    background-color: var(--color-gray-200);
-    border-radius: var(--border-radius-full);
+    background-color: var(--color-outline-variant);
+    border-radius: var(--radius-full);
     overflow: hidden;
   }
   .progress-bar {
@@ -271,9 +272,7 @@ if (related.length === 0) {
     flex-direction: column;
     gap: 1.5rem;
   }
-  .screen[hidden] {
-    display: none;
-  }
+  .screen[hidden] { display: none; }
   .result-screen {
     align-items: center;
     text-align: center;
@@ -285,19 +284,26 @@ if (related.length === 0) {
   }
   .form-label {
     font-weight: 600;
-    color: var(--color-text-primary);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
   }
+  /* life-expectancy는 app-input 사용을 권장하나 .form-input도 유지 */
   .form-input {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-md);
+    border: 2px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
     font-size: 1rem;
-    background-color: var(--color-background-primary);
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
+    box-sizing: border-box;
+    transition: border-color 0.15s ease;
   }
   .form-input:focus {
-    outline: 2px solid var(--color-primary);
-    border-color: transparent;
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(139, 79, 50, 0.15);
   }
   .options-group {
     display: grid;
@@ -309,29 +315,28 @@ if (related.length === 0) {
     align-items: center;
     justify-content: center;
     padding: 0.75rem 1rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    background-color: var(--color-background-primary);
-    color: var(--color-text-primary);
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
     transition: all 0.2s ease;
     text-align: center;
     font-size: 0.95rem;
     user-select: none;
+    font-family: var(--font-family-gothic);
   }
   .radio-label:has(input:checked) {
     background-color: var(--color-primary);
     border-color: var(--color-primary);
-    color: #ffffff;
+    color: var(--color-on-primary);
     font-weight: 600;
   }
   .radio-label:hover:not(:has(input:checked)) {
-    background-color: var(--color-background-secondary);
+    background-color: var(--color-surface-container-low);
     border-color: var(--color-primary);
   }
-  .radio-label input[type="radio"] {
-    display: none;
-  }
+  .radio-label input[type="radio"] { display: none; }
   .button-group {
     display: flex;
     gap: 1rem;
@@ -342,16 +347,15 @@ if (related.length === 0) {
       flex: 1;
   }
   @media (max-width: 640px) {
-    .button-group {
-      flex-direction: column;
-    }
+    .button-group { flex-direction: column; }
   }
   .bmi-feedback {
     text-align: center;
     font-weight: 600;
     padding: 0.5rem;
-    border-radius: var(--border-radius-md);
+    border-radius: var(--radius-md);
     display: none;
+    font-family: var(--font-family-gothic);
   }
   .bmi-feedback.low { background-color: #e0f2fe; color: #075985; display: block; }
   .bmi-feedback.normal { background-color: #dcfce7; color: #166534; display: block; }
@@ -361,11 +365,13 @@ if (related.length === 0) {
     font-weight: 700;
     color: var(--color-primary);
     margin: 1rem 0;
+    font-family: var(--font-family-gothic);
   }
   .result-detail {
     font-size: 1.125rem;
-    color: var(--color-text-secondary);
+    color: var(--color-on-surface-variant);
     margin-bottom: 1.5rem;
+    font-family: var(--font-family-gothic);
   }
   .error-message {
     color: #dc2626;
@@ -373,14 +379,13 @@ if (related.length === 0) {
     margin-top: 0.75rem;
     padding: 0.75rem;
     background-color: #fef2f2;
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--radius-sm);
     border-left: 4px solid #dc2626;
     text-align: left;
     font-weight: 500;
+    font-family: var(--font-family-gothic);
   }
-  .error-message[hidden] {
-    display: none;
-  }
+  .error-message[hidden] { display: none; }
 </style>
 
 <script>

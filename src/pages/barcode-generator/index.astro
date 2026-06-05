@@ -32,28 +32,28 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="barcode-app">
-      <div class="form-section">
-        <label class="field-label" for="textInput">
+    <div class="app-calc-layout">
+      <div class="app-form-group">
+        <label class="app-label" for="textInput">
           바코드 데이터 <span class="required">*</span>
         </label>
         <input
           id="textInput"
           type="text"
-          class="text-input"
+          class="app-input"
           placeholder="영문·숫자·특수문자 1~30자"
           maxlength="30"
           autocomplete="off"
         />
         <p class="hint">ASCII 출력 가능 문자(영문, 숫자, 공백, 특수문자)만 최대 30자까지 입력할 수 있습니다.</p>
 
-        <label class="field-label" for="labelInput">
+        <label class="app-label" for="labelInput" style="margin-top: 1rem;">
           바코드 레이블 <span class="optional">(선택)</span>
         </label>
         <input
           id="labelInput"
           type="text"
-          class="text-input"
+          class="app-input"
           placeholder="바코드 아래에 표시할 텍스트"
           autocomplete="off"
         />
@@ -89,62 +89,23 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .barcode-app {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .form-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    background: var(--color-surface);
-    padding: 1.5rem;
-    border-radius: var(--radius-md, 12px);
-    border: 1px solid var(--color-border);
-  }
-
-  .field-label {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--color-text);
-    margin-top: 0.5rem;
-  }
-
+  /* barcode-generator 특화 스타일 */
   .required {
-    color: var(--color-danger, #e53935);
+    color: var(--color-danger);
     font-weight: 700;
   }
 
   .optional {
-    color: var(--color-text-muted, #888);
+    color: var(--color-on-surface-variant);
     font-weight: 400;
     font-size: 0.85rem;
   }
 
-  .text-input {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    border: 2px solid var(--color-border, #d1d5db);
-    border-radius: var(--radius-sm, 8px);
-    background: var(--color-background);
-    color: var(--color-text);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    box-sizing: border-box;
-  }
-
-  .text-input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px var(--color-primary-soft, rgba(59, 130, 246, 0.15));
-  }
-
   .hint {
     font-size: 0.8rem;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--color-on-surface-variant);
     margin: 0;
+    font-family: var(--font-family-gothic);
   }
 
   .actions {
@@ -154,51 +115,14 @@ if (related.length === 0) {
     margin-top: 1rem;
   }
 
-  .btn {
-    width: 100%;
-    padding: 0.85rem 1.25rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: var(--radius-sm, 8px);
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
-    border: 2px solid transparent;
-  }
-
-  .btn:hover {
-    transform: translateY(-1px);
-  }
-
-  .btn-primary {
-    background: var(--color-primary);
-    color: var(--color-on-primary, #fff);
-  }
-
-  .btn-primary:hover {
-    box-shadow: 0 4px 12px var(--color-primary-soft, rgba(59, 130, 246, 0.3));
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--color-primary);
-    border-color: var(--color-primary);
-  }
-
-  .btn-secondary:hover {
-    background: var(--color-primary-soft, rgba(59, 130, 246, 0.08));
-  }
-
-  .btn[hidden] {
-    display: none;
-  }
-
   .error-msg {
-    color: var(--color-danger, #e53935);
-    background: var(--color-danger-soft, rgba(229, 57, 53, 0.08));
+    color: var(--color-error);
+    background: var(--color-error-container);
     padding: 0.75rem 1rem;
-    border-radius: var(--radius-sm, 8px);
+    border-radius: var(--radius-sm);
     margin: 0;
     font-size: 0.9rem;
+    font-family: var(--font-family-gothic);
   }
 
   .error-msg[hidden] {
@@ -212,8 +136,8 @@ if (related.length === 0) {
     gap: 1rem;
     background: var(--color-surface);
     padding: 1.5rem;
-    border-radius: var(--radius-md, 12px);
-    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-outline-variant);
   }
 
   .result-section[hidden] {
@@ -223,7 +147,8 @@ if (related.length === 0) {
   .result-title {
     margin: 0;
     font-size: 1.1rem;
-    color: var(--color-text);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
   }
 
   .barcode-container {
@@ -232,8 +157,8 @@ if (related.length === 0) {
     align-items: center;
     background: #ffffff;
     padding: 1rem;
-    border-radius: var(--radius-sm, 8px);
-    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-outline-variant);
     max-width: 100%;
     overflow-x: auto;
   }
@@ -251,10 +176,11 @@ if (related.length === 0) {
     justify-content: center;
     text-align: center;
     padding: 2rem 1rem;
-    color: var(--color-text-muted, #888);
-    border: 2px dashed var(--color-border);
-    border-radius: var(--radius-md, 12px);
+    color: var(--color-on-surface-variant);
+    border: 2px dashed var(--color-outline-variant);
+    border-radius: var(--radius-lg);
     background: var(--color-surface);
+    font-family: var(--font-family-gothic);
   }
 
   .empty-state[hidden] {
@@ -264,7 +190,7 @@ if (related.length === 0) {
   .empty-icon {
     font-size: 2rem;
     letter-spacing: 0.2em;
-    color: var(--color-border);
+    color: var(--color-outline-variant);
     margin-bottom: 0.75rem;
   }
 

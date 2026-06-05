@@ -42,15 +42,15 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="reverse-app">
+    <div class="app-calc-layout">
       <!-- 단일 패널 (입력 및 결과) -->
       <section class="panel" id="mainSection">
-        <label for="inputText" class="field-label"
+        <label for="inputText" class="app-label"
           >텍스트 입력 및 결과 확인</label
         >
         <textarea
           id="inputText"
-          class="text-area"
+          class="app-textarea"
           placeholder="여기에 텍스트를 입력하거나 붙여넣기 하세요."
           rows="8"></textarea>
 
@@ -64,10 +64,10 @@ if (related.length === 0) {
             </button>
           </div>
           <div class="action-row">
-            <button type="button" class="app-btn app-btn-outline" id="copyBtn">
+            <button type="button" class="app-btn app-btn-secondary" id="copyBtn">
               클립보드 저장
             </button>
-            <button type="button" class="app-btn app-btn-outline" id="resetBtn">
+            <button type="button" class="app-btn app-btn-secondary" id="resetBtn">
               지우기
             </button>
           </div>
@@ -91,49 +91,13 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .reverse-app {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-    width: 100%;
-  }
-
+  /* reverse-text-tool 특화 스타일 */
   .panel {
     background: none;
     padding: 0;
     display: flex;
     flex-direction: column;
     gap: 0.875rem;
-  }
-
-  .field-label {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--color-text, #111827);
-  }
-
-  .text-area {
-    width: 100%;
-    min-height: 140px;
-    padding: 0.875rem 1rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: var(--color-text, #111827);
-    background: var(--color-background, #ffffff);
-    border: 2px solid var(--color-border, #d1d5db);
-    border-radius: var(--radius-md, 8px);
-    resize: vertical;
-    font-family: inherit;
-    transition:
-      border-color 0.15s ease,
-      box-shadow 0.15s ease;
-    box-sizing: border-box;
-  }
-
-  .text-area:focus {
-    outline: none;
-    border-color: var(--color-primary, #2563eb);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
   }
 
   .action-group {
@@ -155,8 +119,9 @@ if (related.length === 0) {
   .hint {
     margin: 0;
     font-size: 0.85rem;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--color-on-surface-variant);
     line-height: 1.5;
+    font-family: var(--font-family-gothic);
   }
 
   .toast {
@@ -164,10 +129,10 @@ if (related.length === 0) {
     left: 50%;
     bottom: 24px;
     transform: translateX(-50%);
-    background: var(--color-text, #111827);
-    color: #ffffff;
+    background: var(--color-on-surface);
+    color: var(--color-surface);
     padding: 0.75rem 1.25rem;
-    border-radius: var(--radius-md, 8px);
+    border-radius: var(--radius-md);
     font-size: 0.95rem;
     font-weight: 500;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
@@ -177,6 +142,7 @@ if (related.length === 0) {
     transition:
       opacity 0.2s ease,
       transform 0.2s ease;
+    font-family: var(--font-family-gothic);
   }
 
   .toast.show {

@@ -32,11 +32,11 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="bmi-app">
+    <div class="app-calc-layout" style="max-width:560px">
       <!-- 입력 화면 -->
-      <section id="screen1" class="screen">
-        <div class="form-group">
-          <label class="form-label">성별</label>
+      <section id="screen1">
+        <div class="app-form-group">
+          <label class="app-label">성별</label>
           <div class="radio-group">
             <label class="radio-option">
               <input type="radio" name="gender" value="남성" />
@@ -49,19 +49,19 @@ if (related.length === 0) {
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="age">나이</label>
-          <input id="age" type="number" min="0" step="1" placeholder="예: 30" />
+        <div class="app-form-group">
+          <label class="app-label" for="age">나이</label>
+          <input id="age" class="app-input" type="number" min="0" step="1" placeholder="예: 30" />
         </div>
 
         <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="height">키 (cm)</label>
-            <input id="height" type="number" min="0" step="0.1" placeholder="예: 170" />
+          <div class="app-form-group">
+            <label class="app-label" for="height">키 (cm)</label>
+            <input id="height" class="app-input" type="number" min="0" step="0.1" placeholder="예: 170" />
           </div>
-          <div class="form-group">
-            <label class="form-label" for="weight">몸무게 (kg)</label>
-            <input id="weight" type="number" min="0" step="0.1" placeholder="예: 65" />
+          <div class="app-form-group">
+            <label class="app-label" for="weight">몸무게 (kg)</label>
+            <input id="weight" class="app-input" type="number" min="0" step="0.1" placeholder="예: 65" />
           </div>
         </div>
 
@@ -71,7 +71,7 @@ if (related.length === 0) {
       </section>
 
       <!-- 결과 화면 -->
-      <section id="screen2" class="screen result-screen" hidden>
+      <section id="screen2" class="result-screen" hidden>
         <div class="result-card">
           <div class="input-summary" id="input-summary"></div>
           <p class="result-label">당신의 BMI</p>
@@ -96,60 +96,27 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .bmi-app {
-    max-width: 560px;
-    margin: 0 auto;
-  }
-
-  .screen {
+  /* bmi-calculator 앱 특화 스타일 */
+  #screen1, #screen2 {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
   }
-  .screen[hidden] {
-    display: none;
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    flex: 1;
-  }
+  #screen2[hidden] { display: none; }
 
   .form-row {
     display: flex;
     gap: 1rem;
   }
-
-  .form-label {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--color-text);
+  .form-row .app-form-group {
+    flex: 1;
   }
 
-  input[type="number"] {
-    width: 100%;
-    padding: 0.75rem 0.9rem;
-    border: 2px solid var(--color-border, #d1d5db);
-    border-radius: 8px;
-    font-size: 1rem;
-    background: var(--color-surface, #fff);
-    color: var(--color-text);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    box-sizing: border-box;
-  }
-  input[type="number"]:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
-  }
-
+  /* 간단 라디오 옵션 (포함 선택 토글형) */
   .radio-group {
     display: flex;
     gap: 0.75rem;
   }
-
   .radio-option {
     flex: 1;
     display: flex;
@@ -157,11 +124,12 @@ if (related.length === 0) {
     justify-content: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    border: 2px solid var(--color-border, #d1d5db);
-    border-radius: 8px;
+    border: 2px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    background: var(--color-surface, #fff);
+    background: var(--color-surface);
     font-weight: 500;
+    font-family: var(--font-family-gothic);
     transition: all 0.2s;
   }
   .radio-option:hover {
@@ -174,37 +142,7 @@ if (related.length === 0) {
   .radio-option:has(input:checked) {
     border-color: var(--color-primary);
     background: var(--color-primary);
-    color: #fff;
-  }
-
-  .btn {
-    padding: 0.9rem 1.25rem;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 2px solid transparent;
-    width: 100%;
-  }
-
-  .btn-primary {
-    background: var(--color-primary);
-    color: #fff;
-  }
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  }
-
-  .btn-outline {
-    background: transparent;
-    color: var(--color-primary);
-    border-color: var(--color-primary);
-  }
-  .btn-outline:hover {
-    background: var(--color-primary);
-    color: #fff;
+    color: var(--color-on-primary);
   }
 
   .error-message {
@@ -213,18 +151,18 @@ if (related.length === 0) {
     margin: 0;
     padding: 0.5rem 0.75rem;
     background: rgba(220, 38, 38, 0.08);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-family-gothic);
   }
-  .error-message[hidden] {
-    display: none;
-  }
+  .error-message[hidden] { display: none; }
 
+  /* 결과 카드 (BMI 특화) */
   .result-card {
     text-align: center;
     padding: 2rem 1.25rem;
-    border-radius: 12px;
-    background: var(--color-surface-alt, #f9fafb);
-    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-container-low);
+    border: 1px solid var(--color-outline-variant);
   }
 
   .input-summary {
@@ -232,38 +170,42 @@ if (related.length === 0) {
     justify-content: center;
     gap: 0.75rem;
     font-size: 0.95rem;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--color-on-surface-variant);
     margin-bottom: 1.5rem;
     padding-bottom: 1.25rem;
-    border-bottom: 1px solid var(--color-border, #e5e7eb);
+    border-bottom: 1px solid var(--color-outline-variant);
     flex-wrap: wrap;
+    font-family: var(--font-family-gothic);
   }
   .input-summary span {
-    background: #fff;
+    background: var(--color-surface);
     padding: 0.25rem 0.75rem;
-    border-radius: 999px;
-    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-outline-variant);
     font-weight: 500;
   }
 
   .result-label {
     font-size: 0.95rem;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--color-on-surface-variant);
     margin: 0 0 0.5rem;
+    font-family: var(--font-family-gothic);
   }
 
   .bmi-value {
     font-size: 3rem;
     font-weight: 800;
     margin: 0;
-    color: var(--color-text);
+    color: var(--color-on-surface);
     line-height: 1.1;
+    font-family: var(--font-family-gothic);
   }
 
   .bmi-category {
     font-size: 1.25rem;
     font-weight: 700;
     margin: 0.75rem 0 0;
+    font-family: var(--font-family-gothic);
   }
   .bmi-category.cat-green { color: #16a34a; }
   .bmi-category.cat-orange { color: #ea580c; }
@@ -271,8 +213,8 @@ if (related.length === 0) {
 
   .advice-box {
     padding: 1.25rem;
-    border-radius: 10px;
-    background: var(--color-surface-alt, #f9fafb);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-container-low);
     border-left: 4px solid var(--color-primary);
     display: flex;
     flex-direction: column;
@@ -281,20 +223,15 @@ if (related.length === 0) {
 
   .advice-text {
     margin: 0;
-    color: var(--color-text);
+    color: var(--color-on-surface);
     line-height: 1.6;
+    font-family: var(--font-family-gothic);
   }
-  .advice-text[hidden] {
-    display: none;
-  }
+  .advice-text[hidden] { display: none; }
 
   @media (max-width: 480px) {
-    .form-row {
-      flex-direction: column;
-    }
-    .bmi-value {
-      font-size: 2.5rem;
-    }
+    .form-row { flex-direction: column; }
+    .bmi-value { font-size: 2.5rem; }
   }
 </style>
 

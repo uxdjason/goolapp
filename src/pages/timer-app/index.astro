@@ -46,7 +46,7 @@ if (related.length === 0) {
   updatedAt={entry.data.updatedAt}
 >
   <Fragment slot="app">
-    <div class="calculator-container glass-surface">
+    <div class="app-calc-layout">
       <div class="header">
         <h2 class="label-caps" style="color: var(--color-primary); font-size: var(--font-size-sm); margin-bottom: var(--space-2);">날짜와 시간</h2>
         <h3 style="font-size: var(--font-size-2xl); margin-bottom: var(--space-2); color: var(--color-on-surface);">타이머 및 스톱워치</h3>
@@ -63,7 +63,7 @@ if (related.length === 0) {
       <div id="countdown-view" class="app-view">
         <div class="state-label" id="cd-state-label" style="visibility: hidden;">남은 시간</div>
         
-        <div class="input-section glass-surface-card" id="cd-inputs">
+        <div class="input-section app-form-group" id="cd-inputs">
           <div class="time-inputs">
             <div class="time-input-group">
               <input type="number" id="cd-h" placeholder="0" min="0" max="99">
@@ -101,7 +101,7 @@ if (related.length === 0) {
           <button class="app-btn app-btn-danger" id="sw-stop" style="display:none;">정지</button>
         </div>
 
-        <div class="lap-container glass-surface-card" id="lap-container" style="display:none;">
+        <div class="lap-container app-form-group" id="lap-container" style="display:none;">
           <ul id="lap-list" class="lap-list"></ul>
         </div>
       </div>
@@ -129,15 +129,9 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .calculator-container {
-    padding: var(--space-8);
-    width: 100%;
-    box-sizing: border-box;
-    margin: var(--space-8) auto;
-  }
   .header {
     text-align: center;
-    border-bottom: 1px solid var(--glass-border-soft);
+    border-bottom: 1px solid var(--color-outline-variant);
     padding-bottom: var(--space-5);
     margin-bottom: var(--space-6);
   }
@@ -187,14 +181,8 @@ if (related.length === 0) {
     color: var(--color-on-surface);
   }
 
-  .glass-surface-card {
-    background: var(--color-surface);
-    border: 1px solid var(--glass-border-soft);
-    padding: var(--space-6);
-    border-radius: var(--radius-xl);
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: var(--space-6);
+  .sw-text {
+    color: var(--color-on-surface);
   }
 
   .time-inputs {
@@ -216,9 +204,9 @@ if (related.length === 0) {
     height: 80px;
     font-size: 32px;
     text-align: center;
-    border: 1px solid var(--glass-border-soft);
-    background: var(--glass-bg-input);
-    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-outline-variant);
+    background: var(--color-surface-container-highest);
+    border-radius: var(--radius-md);
     font-weight: var(--font-weight-bold);
     color: var(--color-on-surface);
     transition: var(--transition-fast);
@@ -263,44 +251,6 @@ if (related.length === 0) {
     width: 100%;
   }
 
-  .btn {
-    padding: 0 var(--space-6);
-    height: 56px;
-    border: none;
-    border-radius: var(--radius-full);
-    font-weight: var(--font-weight-bold);
-    font-size: var(--font-size-base);
-    cursor: pointer;
-    transition: var(--transition-fast);
-    flex: 1;
-    max-width: 200px;
-  }
-
-  .btn-primary {
-    background: var(--color-primary);
-    color: var(--color-on-primary);
-  }
-  .btn-primary:hover {
-    filter: brightness(0.9);
-  }
-
-  .btn-secondary {
-    background: var(--glass-bg-input);
-    color: var(--color-on-surface);
-    border: 1px solid var(--glass-border-soft);
-  }
-  .btn-secondary:hover {
-    background: var(--color-surface);
-  }
-
-  .btn-danger {
-    background: #FF5252;
-    color: white;
-  }
-  .btn-danger:hover {
-    background: #FF1744;
-  }
-
   .lap-container {
     margin-top: var(--space-6);
     max-height: 250px;
@@ -319,7 +269,7 @@ if (related.length === 0) {
     justify-content: center;
     align-items: center;
     padding: var(--space-3) 0;
-    border-bottom: 1px solid var(--glass-border-soft);
+    border-bottom: 1px solid var(--color-outline-variant);
     color: var(--color-on-surface);
     font-family: var(--font-family-base);
     font-variant-numeric: tabular-nums;
@@ -338,16 +288,14 @@ if (related.length === 0) {
     background: transparent;
   }
   .lap-container::-webkit-scrollbar-thumb {
-    background: var(--glass-border-soft);
+    background: var(--color-outline-variant);
     border-radius: 4px;
   }
 
   @media (max-width: 768px) {
-    .calculator-container { padding: var(--space-5); }
     .time-display { font-size: 48px; }
     .time-input-group input { width: 60px; height: 60px; font-size: 24px; }
     .colon { font-size: 24px; margin-bottom: 24px; }
-    .btn { height: 48px; }
     .controls { flex-wrap: wrap; }
   }
 </style>

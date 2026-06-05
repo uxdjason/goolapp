@@ -735,3 +735,201 @@
   line-height: 1.6;
   font-family: var(--font-family-gothic);
 }
+
+/* ─────────────────────────────────────────────
+   CALCULATOR LAYOUT (계산기 공통 레이아웃)
+───────────────────────────────────────────── */
+
+/* 계산기 앱의 최대 너비 컨테이너 */
+.app-calc-layout {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0.5rem 0;
+}
+
+/* 화면 전환용 컨테이너 (.app-screen[hidden] → display:none) */
+.app-screen {
+  display: block;
+}
+.app-screen[hidden] {
+  display: none !important;
+}
+
+
+/* ─────────────────────────────────────────────
+   SUMMARY CARD (입력값 요약 / 결과 요약 카드)
+───────────────────────────────────────────── */
+
+/* 입력값 요약 또는 계산 결과 요약 카드 */
+.app-summary-card {
+  background: var(--color-surface-container-low);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.app-summary-section-label {
+  display: block;
+  color: var(--color-on-surface-variant);
+  font-size: 0.95rem;
+  font-family: var(--font-family-gothic);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-outline-variant);
+  margin-bottom: 0;
+}
+
+.app-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-outline-variant);
+  font-family: var(--font-family-gothic);
+}
+
+.app-summary-row:last-child {
+  border-bottom: none;
+}
+
+.app-summary-label {
+  color: var(--color-on-surface-variant);
+  font-size: 0.95rem;
+}
+
+.app-summary-value {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-on-surface);
+}
+
+.app-summary-value.highlight {
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+
+/* ─────────────────────────────────────────────
+   TABLE WRAPPER (스크롤 가능한 테이블 래퍼)
+───────────────────────────────────────────── */
+
+.app-table-wrapper {
+  margin-top: 1rem;
+  overflow-x: auto;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-md);
+}
+
+.app-table-wrapper[hidden] {
+  display: none !important;
+}
+
+.app-table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  min-width: 560px;
+  font-family: var(--font-family-gothic);
+}
+
+.app-table-wrapper th,
+.app-table-wrapper td {
+  padding: 0.625rem 0.75rem;
+  text-align: right;
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.app-table-wrapper th:first-child,
+.app-table-wrapper td:first-child {
+  text-align: center;
+}
+
+.app-table-wrapper thead th {
+  background: var(--color-surface-container);
+  color: var(--color-on-surface);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+
+.app-table-wrapper tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.app-table-wrapper tbody tr:nth-child(even) {
+  background: var(--color-surface-container-low);
+}
+
+
+/* ─────────────────────────────────────────────
+   EMPTY STATE (데이터 없을 때 안내 박스)
+───────────────────────────────────────────── */
+
+.app-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  background: var(--color-surface);
+  border: 1px dashed var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  color: var(--color-on-surface-variant);
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  font-family: var(--font-family-gothic);
+}
+
+.app-empty-state[hidden] {
+  display: none !important;
+}
+
+
+/* ─────────────────────────────────────────────
+   DASHED ADD BUTTON (점선 추가 버튼)
+───────────────────────────────────────────── */
+
+.app-btn-dashed {
+  width: 100%;
+  padding: 0.875rem;
+  border: 2px dashed var(--color-outline);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font-family-gothic);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  box-sizing: border-box;
+}
+
+.app-btn-dashed:hover {
+  border-color: var(--color-primary);
+  background: rgba(139, 79, 50, 0.04);
+}
+
+
+/* ─────────────────────────────────────────────
+   INPUT ROW (인라인 입력 + 단위 레이블 행)
+───────────────────────────────────────────── */
+
+/* 입력 필드 + 단위 텍스트를 나란히 배치 */
+.app-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-input-row .app-input {
+  flex: 1;
+}
+
+.app-input-unit {
+  font-size: 0.9rem;
+  color: var(--color-on-surface-variant);
+  font-family: var(--font-family-gothic);
+  white-space: nowrap;
+  flex-shrink: 0;
+}

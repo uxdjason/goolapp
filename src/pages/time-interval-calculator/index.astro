@@ -32,62 +32,62 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="time-app">
+    <div class="app-calc-layout">
       <!-- 화면 1: 시작 시간 입력 -->
-      <section class="screen" id="screen1">
+      <section class="app-screen" id="screen1">
         <h2 class="screen-title">시작 시간 입력</h2>
         <p class="screen-desc">차이를 계산할 시작 시간을 입력하세요.</p>
 
         <div class="time-inputs">
-          <div class="input-group">
-            <label for="startHour">시 (0~23)</label>
-            <input type="number" id="startHour" min="0" max="23" placeholder="0" />
+          <div class="app-form-group">
+            <label class="app-label" for="startHour">시 (0~23)</label>
+            <input class="app-input" type="number" id="startHour" min="0" max="23" placeholder="0" />
           </div>
-          <div class="input-group">
-            <label for="startMin">분 (0~59)</label>
-            <input type="number" id="startMin" min="0" max="59" placeholder="0" />
+          <div class="app-form-group">
+            <label class="app-label" for="startMin">분 (0~59)</label>
+            <input class="app-input" type="number" id="startMin" min="0" max="59" placeholder="0" />
           </div>
-          <div class="input-group">
-            <label for="startSec">초 (0~59)</label>
-            <input type="number" id="startSec" min="0" max="59" placeholder="0" />
+          <div class="app-form-group">
+            <label class="app-label" for="startSec">초 (0~59)</label>
+            <input class="app-input" type="number" id="startSec" min="0" max="59" placeholder="0" />
           </div>
         </div>
 
         <p class="error-msg" id="error1" hidden></p>
 
-        <button class="app-btn app-btn-primary" id="btnNext1">다음</button>
+        <button class="app-btn app-btn-primary" id="btnNext1" style="width: 100%;">다음</button>
       </section>
 
       <!-- 화면 2: 종료 시간 입력 -->
-      <section class="screen" id="screen2" hidden>
+      <section class="app-screen" id="screen2" hidden>
         <h2 class="screen-title">종료 시간 입력</h2>
         <p class="screen-desc">차이를 계산할 종료 시간을 입력하세요.</p>
 
         <div class="time-inputs">
-          <div class="input-group">
-            <label for="endHour">시 (0~23)</label>
-            <input type="number" id="endHour" min="0" max="23" placeholder="0" />
+          <div class="app-form-group">
+            <label class="app-label" for="endHour">시 (0~23)</label>
+            <input class="app-input" type="number" id="endHour" min="0" max="23" placeholder="0" />
           </div>
-          <div class="input-group">
-            <label for="endMin">분 (0~59)</label>
-            <input type="number" id="endMin" min="0" max="59" placeholder="0" />
+          <div class="app-form-group">
+            <label class="app-label" for="endMin">분 (0~59)</label>
+            <input class="app-input" type="number" id="endMin" min="0" max="59" placeholder="0" />
           </div>
-          <div class="input-group">
-            <label for="endSec">초 (0~59)</label>
-            <input type="number" id="endSec" min="0" max="59" placeholder="0" />
+          <div class="app-form-group">
+            <label class="app-label" for="endSec">초 (0~59)</label>
+            <input class="app-input" type="number" id="endSec" min="0" max="59" placeholder="0" />
           </div>
         </div>
 
         <p class="error-msg" id="error2" hidden></p>
 
         <div class="action-row">
-          <button class="app-btn app-btn-secondary" id="btnBack2">이전</button>
-          <button class="app-btn app-btn-primary" id="btnNext2">계산하기</button>
+          <button class="app-btn app-btn-secondary" id="btnBack2" style="flex: 1;">이전</button>
+          <button class="app-btn app-btn-primary" id="btnNext2" style="flex: 1;">계산하기</button>
         </div>
       </section>
 
       <!-- 화면 3: 결과 -->
-      <section class="screen" id="screen3" hidden>
+      <section class="app-screen" id="screen3" hidden>
         <h2 class="screen-title">계산 결과</h2>
 
         <div class="result-card" id="result">
@@ -125,8 +125,8 @@ if (related.length === 0) {
         <p class="copy-feedback" id="copyFeedback" hidden>클립보드에 복사되었습니다 ✓</p>
 
         <div class="action-row">
-          <button class="app-btn app-btn-secondary" id="btnCopy">클립보드 복사</button>
-          <button class="app-btn app-btn-primary" id="btnReset">처음으로</button>
+          <button class="app-btn app-btn-secondary" id="btnCopy" style="flex: 1;">클립보드 복사</button>
+          <button class="app-btn app-btn-primary" id="btnReset" style="flex: 1;">처음으로</button>
         </div>
       </section>
     </div>
@@ -139,35 +139,20 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .time-app {
-    width: 100%;
-  }
-
-  .screen {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-    padding: 1.5rem;
-    background: var(--color-surface);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-border);
-  }
-
-  .screen[hidden] {
-    display: none;
-  }
-
+  /* time-interval-calculator 특화 스타일 */
   .screen-title {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--color-text);
+    color: var(--color-on-surface);
     margin: 0;
+    font-family: var(--font-family-gothic);
   }
 
   .screen-desc {
     font-size: 0.95rem;
-    color: var(--color-text-secondary);
+    color: var(--color-on-surface-variant);
     margin: 0;
+    font-family: var(--font-family-gothic);
   }
 
   .time-inputs {
@@ -176,85 +161,20 @@ if (related.length === 0) {
     gap: 0.75rem;
   }
 
-  .input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-
-  .input-group label {
-    font-size: 0.85rem;
-    color: var(--color-text-secondary);
-    font-weight: 500;
-  }
-
-  .input-group input {
-    width: 100%;
-    padding: 0.7rem 0.8rem;
-    font-size: 1rem;
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: var(--color-background);
-    color: var(--color-text);
-    transition: border-color 0.15s ease;
-    box-sizing: border-box;
-  }
-
-  .input-group input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-  }
-
   .error-msg {
-    color: var(--color-error, #dc2626);
+    color: #dc2626;
     font-size: 0.9rem;
     margin: 0;
     padding: 0.6rem 0.8rem;
     background: rgba(220, 38, 38, 0.08);
     border-radius: var(--radius-md);
+    font-family: var(--font-family-gothic);
   }
-
-  .error-msg[hidden] {
-    display: none;
-  }
-
-  .btn {
-    padding: 0.85rem 1.25rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: transform 0.1s ease, opacity 0.15s ease;
-    width: 100%;
-  }
-
-  .btn:hover {
-    opacity: 0.92;
-  }
-
-  .btn:active {
-    transform: translateY(1px);
-  }
-
-  .btn-primary {
-    background: var(--color-primary);
-    color: #fff;
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--color-text);
-    border: 2px solid var(--color-border);
-  }
+  .error-msg[hidden] { display: none; }
 
   .action-row {
     display: flex;
     gap: 0.75rem;
-  }
-
-  .action-row .btn {
-    flex: 1;
   }
 
   .result-card {
@@ -262,9 +182,9 @@ if (related.length === 0) {
     flex-direction: column;
     gap: 1rem;
     padding: 1.25rem;
-    background: var(--color-background);
+    background: var(--color-surface);
     border-radius: var(--radius-md);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-outline-variant);
   }
 
   .result-main {
@@ -272,19 +192,21 @@ if (related.length === 0) {
     flex-direction: column;
     gap: 0.4rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-outline-variant);
   }
 
   .result-label {
     font-size: 0.85rem;
-    color: var(--color-text-secondary);
+    color: var(--color-on-surface-variant);
     font-weight: 500;
+    font-family: var(--font-family-gothic);
   }
 
   .result-value {
     font-size: 1.75rem;
     font-weight: 700;
     color: var(--color-primary);
+    font-family: var(--font-family-gothic);
   }
 
   .result-grid {
@@ -298,14 +220,15 @@ if (related.length === 0) {
     flex-direction: column;
     gap: 0.25rem;
     padding: 0.6rem 0.75rem;
-    background: var(--color-surface);
-    border-radius: var(--radius-sm, 6px);
+    background: var(--color-surface-container-low);
+    border-radius: var(--radius-sm);
   }
 
   .result-sub {
     font-size: 1rem;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
   }
 
   .copy-feedback {
@@ -316,11 +239,9 @@ if (related.length === 0) {
     border-radius: var(--radius-md);
     font-size: 0.9rem;
     text-align: center;
+    font-family: var(--font-family-gothic);
   }
-
-  .copy-feedback[hidden] {
-    display: none;
-  }
+  .copy-feedback[hidden] { display: none; }
 
   .overnight-badge {
     font-size: 0.875rem;
@@ -330,22 +251,13 @@ if (related.length === 0) {
     border: 1px solid rgba(124, 58, 237, 0.2);
     border-radius: var(--radius-md);
     padding: 0.55rem 0.9rem;
+    font-family: var(--font-family-gothic);
   }
-
-  .overnight-badge[hidden] {
-    display: none;
-  }
+  .overnight-badge[hidden] { display: none; }
 
   @media (max-width: 480px) {
-    .screen {
-      padding: 1.1rem;
-    }
-    .result-grid {
-      grid-template-columns: 1fr;
-    }
-    .result-value {
-      font-size: 1.5rem;
-    }
+    .result-grid { grid-template-columns: 1fr; }
+    .result-value { font-size: 1.5rem; }
   }
 </style>
 

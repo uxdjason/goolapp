@@ -32,11 +32,12 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="app-wrapper">
-      <div class="input-section">
-        <label for="textInput" class="input-label">텍스트 입력</label>
+    <div class="app-calc-layout">
+      <div class="app-form-group">
+        <label for="textInput" class="app-label">텍스트 입력</label>
         <textarea
           id="textInput"
+          class="app-textarea"
           placeholder="여기에 텍스트를 입력하거나 붙여넣기 하세요."
           rows="10"
         ></textarea>
@@ -60,7 +61,7 @@ if (related.length === 0) {
               <span class="stat-value"><span id="lineCount">0</span><span class="stat-unit">줄</span></span>
             </div>
           </div>
-          <button type="button" class="app-btn app-btn-outline clear-btn" id="clearBtn">
+          <button type="button" class="app-btn app-btn-secondary clear-btn" id="clearBtn">
             지우기
           </button>
         </div>
@@ -75,48 +76,7 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .app-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .input-section,
-  .result-section {
-    background: var(--color-surface);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    box-shadow: var(--shadow-sm);
-  }
-
-  .input-label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: var(--color-text);
-  }
-
-  textarea#textInput {
-    width: 100%;
-    min-height: 200px;
-    padding: 0.875rem;
-    font-size: 1rem;
-    line-height: 1.6;
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: var(--color-background);
-    color: var(--color-text);
-    resize: vertical;
-    font-family: inherit;
-    transition: border-color 0.2s;
-    box-sizing: border-box;
-  }
-
-  textarea#textInput:focus {
-    outline: none;
-    border-color: var(--color-primary);
-  }
-
+  /* count-characters-words 특화 스타일 */
   .stats-container {
     display: flex;
     gap: 0.75rem;
@@ -137,16 +97,17 @@ if (related.length === 0) {
     align-items: center;
     justify-content: center;
     padding: 0.75rem 0.5rem;
-    background: var(--color-background);
+    background: var(--color-surface-container-low);
     border-radius: var(--radius-md);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-outline-variant);
     text-align: center;
   }
 
   .stat-label {
     font-size: 0.8rem;
-    color: var(--color-text-muted);
+    color: var(--color-on-surface-variant);
     margin-bottom: 0.4rem;
+    font-family: var(--font-family-gothic);
   }
 
   .stat-value {
@@ -156,12 +117,13 @@ if (related.length === 0) {
     display: flex;
     align-items: baseline;
     gap: 0.15rem;
+    font-family: var(--font-family-gothic);
   }
 
   .stat-unit {
     font-size: 0.8rem;
     font-weight: 500;
-    color: var(--color-text-muted);
+    color: var(--color-on-surface-variant);
   }
 
   .clear-btn {

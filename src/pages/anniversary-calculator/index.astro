@@ -34,23 +34,23 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="anniversary-app">
+    <div class="app-calc-layout" style="max-width:720px">
       <!-- 입력 화면 -->
-      <section class="screen" id="screen1">
+      <section id="screen1">
         <p class="intro">기준이 되는 날짜를 입력하면, 50일, 100일, 1000일 등 다양한 기념일을 한 번에 계산해드려요.</p>
 
         <div class="input-grid">
-          <div class="input-field">
-            <label for="baseYear">연도</label>
-            <input id="baseYear" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="yyyy" />
+          <div class="app-form-group">
+            <label class="app-label" for="baseYear">연도</label>
+            <input id="baseYear" class="app-input" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="yyyy" />
           </div>
-          <div class="input-field">
-            <label for="baseMonth">월</label>
-            <input id="baseMonth" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="mm" />
+          <div class="app-form-group">
+            <label class="app-label" for="baseMonth">월</label>
+            <input id="baseMonth" class="app-input" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="mm" />
           </div>
-          <div class="input-field">
-            <label for="baseDay">일</label>
-            <input id="baseDay" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="dd" />
+          <div class="app-form-group">
+            <label class="app-label" for="baseDay">일</label>
+            <input id="baseDay" class="app-input" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="dd" />
           </div>
         </div>
 
@@ -64,11 +64,11 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
       </section>
 
       <!-- 결과 화면 -->
-      <section class="screen" id="screen2" hidden>
+      <section id="screen2" hidden>
         <div class="result-header" id="resultHeader"></div>
 
-        <div class="table-wrapper">
-          <table class="result-table" id="resultTable">
+        <div class="app-table-wrapper">
+          <table id="resultTable">
             <thead>
               <tr>
                 <th>기념일</th>
@@ -81,7 +81,7 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
         </div>
 
         <div class="action-buttons">
-          <button class="btn-secondary" id="copyBtn" type="button">📋 클립보드로 복사</button>
+          <button class="app-btn app-btn-secondary" id="copyBtn" type="button">📋 클립보드로 복사</button>
           <button class="app-btn app-btn-primary" id="resetBtn" type="button">처음으로</button>
         </div>
 
@@ -109,60 +109,26 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
 </AppLayout>
 
 <style>
-  .anniversary-app {
-    width: 100%;
-    max-width: 720px;
-    margin: 0 auto;
+  /* anniversary-calculator 특화 스타일 */
+  #screen1, #screen2 {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
-
-  .screen {
-    display: block;
-  }
-  .screen[hidden] {
-    display: none;
-  }
+  #screen2[hidden] { display: none; }
 
   .intro {
     font-size: 0.95rem;
-    color: var(--color-text-secondary, #555);
-    margin-bottom: 1.25rem;
+    color: var(--color-on-surface-variant);
+    margin: 0;
     line-height: 1.6;
+    font-family: var(--font-family-gothic);
   }
 
   .input-grid {
     display: grid;
     grid-template-columns: 1.2fr 1fr 1fr;
     gap: 0.75rem;
-    margin-bottom: 1rem;
-  }
-
-  .input-field {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .input-field label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--color-text, #222);
-    margin-bottom: 0.4rem;
-  }
-
-  .input-field input {
-    padding: 0.7rem 0.75rem;
-    font-size: 1rem;
-    border: 2px solid #d1d5db;
-    border-radius: 8px;
-    background: #fff;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .input-field input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
   }
 
   .error-msg {
@@ -170,107 +136,36 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
     background: #fff0f0;
     border: 1px solid #ffcdd2;
     padding: 0.6rem 0.85rem;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-size: 0.9rem;
-    margin-bottom: 1rem;
     display: block;
+    font-family: var(--font-family-gothic);
   }
-  .error-msg[hidden] {
-    display: none;
-  }
-
-  .btn-primary,
-  .btn-secondary {
-    width: 100%;
-    padding: 0.95rem 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.15s, background 0.15s;
-  }
-
-  .btn-primary {
-    background: var(--color-primary);
-    color: #fff;
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  }
-
-  .btn-secondary {
-    background: #f3f4f6;
-    color: var(--color-text, #222);
-    border: 2px solid #d1d5db;
-  }
-
-  .btn-secondary:hover {
-    transform: translateY(-1px);
-    background: #e5e7eb;
-  }
+  .error-msg[hidden] { display: none; }
 
   .quick-tip {
-    margin-top: 1.25rem;
     padding: 0.85rem 1rem;
-    background: #f9fafb;
+    background: var(--color-surface-container-low);
     border-left: 3px solid var(--color-primary);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     font-size: 0.9rem;
-    color: var(--color-text-secondary, #555);
+    color: var(--color-on-surface-variant);
     line-height: 1.5;
+    font-family: var(--font-family-gothic);
   }
 
   .result-header {
     background: var(--color-primary);
-    color: #fff;
+    color: var(--color-on-primary);
     padding: 1rem 1.25rem;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-size: 1.05rem;
     font-weight: 600;
-    margin-bottom: 1rem;
     text-align: center;
+    font-family: var(--font-family-gothic);
   }
 
-  .table-wrapper {
-    overflow-x: auto;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    margin-bottom: 1.25rem;
-  }
-
-  .result-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.95rem;
-  }
-
-  .result-table thead {
-    background: #f3f4f6;
-  }
-
-  :global(.result-table th),
-  :global(.result-table td) {
-    padding: 0.75rem 1rem;
-    text-align: center;
-    border-bottom: 1px solid #e5e7eb;
-  }
-
-  :global(.result-table th) {
-    font-weight: 600;
-    color: var(--color-text, #222);
-  }
-
-  :global(.result-table tbody tr:last-child td) {
-    border-bottom: none;
-  }
-
-  :global(.result-table tbody tr:hover) {
-    background: #fafafa;
-  }
-
+  /* 테이블 내부 전역 스코프 스타일 */
   :global(.result-table .day-cell) {
     font-weight: 600;
     color: var(--color-primary);
@@ -283,28 +178,19 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
   }
 
   .copy-feedback {
-    margin-top: 0.85rem;
     text-align: center;
     color: #2e7d32;
     background: #e8f5e9;
     padding: 0.6rem;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-size: 0.9rem;
     display: block;
+    font-family: var(--font-family-gothic);
   }
-  .copy-feedback[hidden] {
-    display: none;
-  }
+  .copy-feedback[hidden] { display: none; }
 
   @media (max-width: 480px) {
-    .input-grid {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-    .result-table th,
-    .result-table td {
-      padding: 0.6rem 0.5rem;
-      font-size: 0.88rem;
-    }
+    .input-grid { grid-template-columns: 1fr 1fr 1fr; }
   }
 </style>
 

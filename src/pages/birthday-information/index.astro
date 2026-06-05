@@ -43,15 +43,11 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="app-inner">
-      <section id="input-section">
-        <label for="birth-date" class="input-label"
-          >양력 생일을 선택해주세요</label
-        >
-        <input id="birth-date" type="date" lang="ko-KR" />
-        <button id="submit-btn" class="app-btn app-btn-primary app-btn-lg"
-          >결과 확인</button
-        >
+    <div class="app-calc-layout">
+      <section id="input-section" class="app-form-group">
+        <label for="birth-date" class="app-label">양력 생일을 선택해주세요</label>
+        <input id="birth-date" class="app-input" type="date" lang="ko-KR" />
+        <button id="submit-btn" class="app-btn app-btn-primary app-btn-lg" style="margin-top: 1rem;">결과 확인</button>
       </section>
 
       <section id="result-section" class="hidden">
@@ -117,40 +113,7 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .app-inner {
-    width: 100%;
-  }
-
-  .input-label {
-    display: block;
-    font-weight: 600;
-    color: var(--color-on-surface);
-    margin-bottom: 0.75rem;
-  }
-
-  #birth-date {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    appearance: none;
-    -webkit-appearance: none;
-    padding: 0.875rem 1rem;
-    font-size: 1rem;
-    border: 2px solid var(--color-outline);
-    border-radius: 8px;
-    background: var(--color-surface);
-    color: var(--color-on-surface);
-    margin-bottom: 1rem;
-    box-sizing: border-box;
-  }
-
-  #birth-date:focus {
-    outline: none;
-    border-color: var(--color-primary);
-  }
-
-
-
+  /* birthday-information 특화 스타일 */
   .result-header {
     text-align: center;
     padding-bottom: 1rem;
@@ -193,7 +156,7 @@ if (related.length === 0) {
 
   .icon-lg {
     display: block;
-    font-size: 3.2rem;
+    font-size: 6.4rem;
     margin-bottom: 0.5rem;
   }
 
@@ -380,21 +343,43 @@ if (related.length === 0) {
       try {
         const fmt = new Intl.DateTimeFormat("ko-KR-u-ca-chinese", {
           year: "numeric",
-          month: "long",
+          month: "numeric",
           day: "numeric",
         });
-        let str = fmt.format(date);
+        const str = fmt.format(date);
         
-        // 안드로이드 크롬의 영문 포맷(예: "2013(gui-si) M04 27") 정규화
-        str = str.replace(/\([a-zA-Z-]+\)/g, ""); // 간지 영문 표기 제거
-        str = str.replace(/M0*(\d+)L/g, "윤$1월 "); // 윤달 처리
-        str = str.replace(/M0*(\d+)/g, "$1월 "); // 일반 월 처리
-        if (!str.includes("년")) str = str.replace(/^(\d{4})/, "$1년 ");
-        if (!str.includes("일")) str = str.replace(/(\d{1,2})\s*$/, "$1일");
-        
-        return str.replace(/\s+/g, " ").trim();
+        const yearMatch = str.match(/(\d{4})/);
+        const year = yearMatch ? parseInt(yearMatch[1], 10) : date.getFullYear();
+
+        let isLeap = false;
+        let month = 1;
+        const monthMatchAndroid = str.match(/M0*(\d+)(L?)/i);
+        if (monthMatchAndroid) {
+          month = parseInt(monthMatchAndroid[1], 10);
+          if (monthMatchAndroid[2].toUpperCase() === "L") isLeap = true;
+        } else {
+          const numStr = str.replace(year.toString(), "");
+          const nums = numStr.match(/\d+/g);
+          if (nums && nums.length >= 2) {
+            month = parseInt(nums[0], 10);
+          }
+        }
+
+        let day = 1;
+        const nums = str.replace(year.toString(), "").match(/\d+/g);
+        if (nums && nums.length >= 2) {
+          day = parseInt(nums[nums.length - 1], 10);
+        }
+
+        return {
+          year,
+          text: `${year}년 ${isLeap ? "윤" : ""}${month}월 ${day}일`
+        };
       } catch {
-        return "계산 불가";
+        return {
+          year: date.getFullYear(),
+          text: "계산 불가"
+        };
       }
     }
 
@@ -427,13 +412,10 @@ if (related.length === 0) {
 
       elSummary.textContent = `${year}년 ${month}월 ${day}일`;
       elDay.textContent = getDayOfWeek(date) + "에 태어나셨네요!";
-      elLunar.textContent = getLunarDate(date);
       
-      let lunarYear = year;
-      const lunarMatch = elLunar.textContent.match(/^(\d{4})년/);
-      if (lunarMatch) {
-        lunarYear = parseInt(lunarMatch[1], 10);
-      }
+      const lunarInfo = getLunarDate(date);
+      elLunar.textContent = lunarInfo.text;
+      const lunarYear = lunarInfo.year;
 
       const ddiIndex = (lunarYear + 8) % 12;
       elDdi.textContent = DDI[ddiIndex];
@@ -462,7 +444,7 @@ if (related.length === 0) {
       resultSection.classList.add("hidden");
       inputSection.classList.remove("hidden");
 
-      const appContainer = document.querySelector(".app-inner");
+      const appContainer = document.querySelector(".app-calc-layout");
       if (appContainer) {
         const y = appContainer.getBoundingClientRect().top + window.scrollY - 120;
         window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });

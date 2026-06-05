@@ -36,24 +36,24 @@ const currentDay = new Date().getDate();
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="calculator-wrapper">
+    <div class="app-calc-layout">
       <div class="date-card">
         <div class="date-card-header">
           <span class="date-badge start-badge">시작</span>
           <h2 class="date-card-title">시작 날짜</h2>
         </div>
         <div class="date-inputs">
-          <div class="input-group">
-            <label for="startYear">년</label>
-            <input id="startYear" type="number" min="1" max="9999" value={currentYear} />
+          <div class="app-form-group">
+            <label class="app-label" for="startYear">년</label>
+            <input class="app-input" id="startYear" type="number" min="1" max="9999" value={currentYear} />
           </div>
-          <div class="input-group">
-            <label for="startMonth">월</label>
-            <input id="startMonth" type="number" min="1" max="12" value="1" />
+          <div class="app-form-group">
+            <label class="app-label" for="startMonth">월</label>
+            <input class="app-input" id="startMonth" type="number" min="1" max="12" value="1" />
           </div>
-          <div class="input-group">
-            <label for="startDay">일</label>
-            <input id="startDay" type="number" min="1" max="31" value="1" />
+          <div class="app-form-group">
+            <label class="app-label" for="startDay">일</label>
+            <input class="app-input" id="startDay" type="number" min="1" max="31" value="1" />
           </div>
         </div>
       </div>
@@ -64,17 +64,17 @@ const currentDay = new Date().getDate();
           <h2 class="date-card-title">종료 날짜</h2>
         </div>
         <div class="date-inputs">
-          <div class="input-group">
-            <label for="endYear">년</label>
-            <input id="endYear" type="number" min="1" max="9999" value={currentYear} />
+          <div class="app-form-group">
+            <label class="app-label" for="endYear">년</label>
+            <input class="app-input" id="endYear" type="number" min="1" max="9999" value={currentYear} />
           </div>
-          <div class="input-group">
-            <label for="endMonth">월</label>
-            <input id="endMonth" type="number" min="1" max="12" value={currentMonth} />
+          <div class="app-form-group">
+            <label class="app-label" for="endMonth">월</label>
+            <input class="app-input" id="endMonth" type="number" min="1" max="12" value={currentMonth} />
           </div>
-          <div class="input-group">
-            <label for="endDay">일</label>
-            <input id="endDay" type="number" min="1" max="31" value={currentDay} />
+          <div class="app-form-group">
+            <label class="app-label" for="endDay">일</label>
+            <input class="app-input" id="endDay" type="number" min="1" max="31" value={currentDay} />
           </div>
         </div>
       </div>
@@ -107,7 +107,7 @@ const currentDay = new Date().getDate();
 
         <div class="period-info" id="periodInfo"></div>
 
-        <button id="copyBtn" class="btn-secondary" type="button">결과 복사</button>
+        <button id="copyBtn" class="app-btn app-btn-secondary" type="button">결과 복사</button>
       </div>
     </div>
   </Fragment>
@@ -119,16 +119,11 @@ const currentDay = new Date().getDate();
 </AppLayout>
 
 <style>
-  .calculator-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
+  /* date-interval-calculator 특화 스타일 */
   .date-card {
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg, 12px);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
     padding: 1.25rem;
   }
 
@@ -146,21 +141,17 @@ const currentDay = new Date().getDate();
     font-size: 0.75rem;
     font-weight: 700;
     color: #fff;
+    font-family: var(--font-family-gothic);
   }
-
-  .start-badge {
-    background: var(--color-primary);
-  }
-
-  .end-badge {
-    background: var(--color-secondary, var(--color-primary));
-  }
+  .start-badge { background: var(--color-primary); }
+  .end-badge { background: var(--color-secondary, var(--color-primary)); }
 
   .date-card-title {
     margin: 0;
     font-size: 1rem;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
   }
 
   .date-inputs {
@@ -169,41 +160,12 @@ const currentDay = new Date().getDate();
     gap: 0.75rem;
   }
 
-  .input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-  }
-
-  .input-group label {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--color-text-muted, #6b7280);
-  }
-
-  .input-group input {
-    width: 100%;
-    padding: 0.625rem 0.75rem;
-    font-size: 1rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md, 8px);
-    background: var(--color-bg, #fff);
-    color: var(--color-text);
-    transition: border-color 0.15s, box-shadow 0.15s;
-    -moz-appearance: textfield;
-  }
-
-  .input-group input::-webkit-outer-spin-button,
-  .input-group input::-webkit-inner-spin-button {
+  .app-input::-webkit-outer-spin-button,
+  .app-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
-
-  .input-group input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 59 130 246), 0.15);
-  }
+  .app-input[type="number"] { -moz-appearance: textfield; }
 
   .action-row {
     display: flex;
@@ -212,67 +174,15 @@ const currentDay = new Date().getDate();
     margin-top: 0.5rem;
   }
 
-  .btn-primary {
-    width: 100%;
-    padding: 0.875rem 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #fff;
-    background: var(--color-primary);
-    border: none;
-    border-radius: var(--radius-md, 8px);
-    cursor: pointer;
-    transition: transform 0.1s, opacity 0.15s;
-  }
-
-  .btn-primary:hover {
-    opacity: 0.92;
-  }
-
-  .btn-primary:active {
-    transform: translateY(1px);
-  }
-
-  .btn-secondary {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--color-primary);
-    background: transparent;
-    border: 1.5px solid var(--color-primary);
-    border-radius: var(--radius-md, 8px);
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  .btn-secondary:hover {
-    background: rgba(var(--color-primary-rgb, 59 130 246), 0.08);
-  }
-
-  .btn-text {
-    width: 100%;
-    padding: 0.625rem;
-    font-size: 0.9375rem;
-    color: var(--color-text-muted, #6b7280);
-    background: transparent;
-    border: none;
-    cursor: pointer;
-  }
-
-  .btn-text:hover {
-    color: var(--color-text);
-    text-decoration: underline;
-  }
-
   .error-msg {
     padding: 0.875rem 1rem;
     background: rgba(239, 68, 68, 0.08);
     color: #b91c1c;
     border: 1px solid rgba(239, 68, 68, 0.25);
-    border-radius: var(--radius-md, 8px);
+    border-radius: var(--radius-md);
     font-size: 0.9375rem;
     font-weight: 500;
+    font-family: var(--font-family-gothic);
   }
   .error-msg[hidden] { display: none; }
 
@@ -282,8 +192,8 @@ const currentDay = new Date().getDate();
     gap: 0.875rem;
     padding: 1.25rem;
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg, 12px);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
     margin-top: 0.5rem;
   }
   .result-section[hidden] { display: none; }
@@ -292,49 +202,46 @@ const currentDay = new Date().getDate();
     margin: 0 0 0.25rem 0;
     font-size: 1.0625rem;
     font-weight: 700;
-    color: var(--color-text);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
   }
 
   .result-card {
     padding: 1rem;
-    background: var(--color-bg, #fff);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md, 8px);
+    background: var(--color-surface-container-low);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
     text-align: center;
+    font-family: var(--font-family-gothic);
   }
 
   .primary-result {
     background: linear-gradient(135deg, var(--color-primary), var(--color-secondary, var(--color-primary)));
     border: none;
-    color: #fff;
+    color: var(--color-on-primary);
   }
 
-  .primary-result .result-label {
-    color: rgba(255, 255, 255, 0.85);
-  }
-
-  .primary-result .result-value {
-    color: #fff;
-  }
+  .primary-result .result-label { color: rgba(255, 255, 255, 0.85); }
+  .primary-result .result-value { color: var(--color-on-primary); }
 
   .result-label {
     font-size: 0.8125rem;
     font-weight: 500;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--color-on-surface-variant);
     margin-bottom: 0.5rem;
   }
 
   .result-value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--color-text);
+    color: var(--color-on-surface);
     word-break: keep-all;
   }
 
   .result-value-sm {
     font-size: 1.0625rem;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--color-on-surface);
     word-break: keep-all;
   }
 
@@ -346,23 +253,17 @@ const currentDay = new Date().getDate();
 
   .period-info {
     padding: 0.75rem 1rem;
-    background: var(--color-bg, #fff);
-    border: 1px dashed var(--color-border);
-    border-radius: var(--radius-md, 8px);
+    background: var(--color-surface-container-low);
+    border: 1px dashed var(--color-outline-variant);
+    border-radius: var(--radius-md);
     font-size: 0.875rem;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--color-on-surface-variant);
     text-align: center;
+    font-family: var(--font-family-gothic);
   }
 
   @media (max-width: 380px) {
-    .date-inputs {
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 0.5rem;
-    }
-    .input-group input {
-      padding: 0.5rem 0.5rem;
-      font-size: 0.9375rem;
-    }
+    .date-inputs { grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
   }
 </style>
 
@@ -517,7 +418,7 @@ const currentDay = new Date().getDate();
 
   // 포커스 시 전체 선택 (UX 개선)
   function attachFocusSelect() {
-    document.querySelectorAll<HTMLInputElement>('.input-group input').forEach(inp => {
+    document.querySelectorAll<HTMLInputElement>('.app-input').forEach(inp => {
       inp.addEventListener('focus', () => {
         inp.select();
       });
@@ -529,7 +430,7 @@ const currentDay = new Date().getDate();
   document.getElementById('copyBtn')?.addEventListener('click', copyResult);
 
   // 엔터키로도 계산 가능
-  document.querySelectorAll<HTMLInputElement>('.input-group input').forEach(inp => {
+  document.querySelectorAll<HTMLInputElement>('.app-input').forEach(inp => {
     inp.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();

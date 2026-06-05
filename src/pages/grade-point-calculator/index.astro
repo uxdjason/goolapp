@@ -42,7 +42,7 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="gpa-app">
+    <div class="app-calc-layout">
       <div class="scale-selector">
         <p class="scale-label">만점 기준 선택</p>
         <div class="radio-group">
@@ -120,24 +120,20 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .gpa-app {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
+  /* grade-point-calculator 특화 스타일 */
   .scale-selector {
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
     padding: 16px 20px;
+    font-family: var(--font-family-gothic);
   }
 
   .scale-label {
     margin: 0 0 12px;
     font-size: 0.95rem;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--color-on-surface);
   }
 
   .radio-group {
@@ -152,13 +148,13 @@ if (related.length === 0) {
     justify-content: center;
     gap: 8px;
     padding: 12px;
-    border: 2px solid var(--color-border);
-    border-radius: 10px;
+    border: 2px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
     cursor: pointer;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--color-on-surface);
     transition: all 0.15s ease;
-    background: var(--color-background);
+    background: var(--color-surface);
   }
 
   .radio-option:hover {
@@ -168,7 +164,7 @@ if (related.length === 0) {
   .radio-option:has(input:checked) {
     border-color: var(--color-primary);
     background: var(--color-primary);
-    color: #fff;
+    color: var(--color-on-primary);
   }
 
   .radio-option input {
@@ -184,27 +180,29 @@ if (related.length === 0) {
   .btn-add {
     width: 100%;
     padding: 14px;
-    border: 2px dashed #9ca3af;
-    background: var(--color-surface, #fff);
+    border: 2px dashed var(--color-outline);
+    background: var(--color-surface);
     color: var(--color-primary);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.15s ease;
+    font-family: var(--font-family-gothic);
   }
 
   .btn-add:hover {
     border-color: var(--color-primary);
-    background: rgba(139, 79, 50, 0.04);
+    background: var(--color-surface-container-low);
   }
 
   .results-box {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
+    background: var(--color-surface-container-low);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
     padding: 20px;
     display: block;
+    font-family: var(--font-family-gothic);
   }
 
   .results-box[hidden] {
@@ -215,7 +213,7 @@ if (related.length === 0) {
     margin: 0 0 16px;
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--color-text);
+    color: var(--color-on-surface);
   }
 
   .result-grid {
@@ -228,15 +226,15 @@ if (related.length === 0) {
     align-items: center;
     justify-content: space-between;
     padding: 14px 16px;
-    background: var(--color-background);
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
   }
 
   .result-item.highlight {
     background: var(--color-primary);
     border-color: var(--color-primary);
-    color: #fff;
+    color: var(--color-on-primary);
   }
 
   .result-label {
@@ -249,46 +247,42 @@ if (related.length === 0) {
     font-weight: 700;
   }
 
-  .result-item.highlight .result-value {
-    font-size: 1.4rem;
-  }
-
   .result-unit {
     font-size: 0.9rem;
     font-weight: 500;
-    opacity: 0.85;
+    opacity: 0.8;
   }
 
   .btn-copy {
     width: 100%;
     margin-top: 16px;
-    padding: 12px;
-    background: var(--color-surface-alt, #f1f5f9);
-    border: 1px solid var(--color-border, #d1d5db);
-    border-radius: 10px;
-    color: var(--color-text, #1f2937);
-    font-size: 0.95rem;
+    padding: 14px;
+    border: none;
+    background: var(--color-surface);
+    border: 1px solid var(--color-outline-variant);
+    color: var(--color-on-surface);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.15s ease;
+    font-family: var(--font-family-gothic);
   }
 
   .btn-copy:hover {
-    background: var(--color-border, #e5e7eb);
+    background: var(--color-surface-container-low);
   }
 
   .empty-state {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 28px 20px;
-    background: var(--color-surface);
-    border: 1px dashed var(--color-border);
-    border-radius: 12px;
-    color: var(--color-text-secondary, #6b7280);
     text-align: center;
+    padding: 40px 20px;
+    background: var(--color-surface);
+    border: 1px dashed var(--color-outline);
+    border-radius: var(--radius-lg);
+    color: var(--color-on-surface-variant);
     font-size: 0.95rem;
-    line-height: 1.6;
+    line-height: 1.5;
+    font-family: var(--font-family-gothic);
   }
 
   .empty-state[hidden] {
@@ -302,7 +296,7 @@ if (related.length === 0) {
     align-items: center;
     margin-bottom: 8px;
     padding-bottom: 16px;
-    border-bottom: 1px solid #6b7280;
+    border-bottom: 1px solid var(--color-outline-variant);
   }
 
   :global(.subject-group:last-child) {
@@ -314,13 +308,14 @@ if (related.length === 0) {
   :global(.subject-group input),
   :global(.subject-group select) {
     padding: 12px 14px;
-    border: 1px solid #9ca3af;
-    border-radius: 8px;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
     font-size: 0.95rem;
-    background: var(--color-background, #fff);
-    color: var(--color-text, #1f2937);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
     transition: all 0.15s ease;
     min-width: 0;
+    font-family: var(--font-family-gothic);
   }
 
   :global(.subject-group select) {
@@ -346,16 +341,15 @@ if (related.length === 0) {
   :global(.subject-group select:focus) {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(139, 79, 50, 0.1);
   }
 
   :global(.btn-remove) {
     width: 38px;
     height: 38px;
-    border: 1px solid var(--color-border);
-    background: var(--color-background);
-    color: #dc2626;
-    border-radius: 8px;
+    border: 1px solid var(--color-outline-variant);
+    background: var(--color-surface);
+    color: var(--color-error);
+    border-radius: var(--radius-sm);
     font-size: 1.1rem;
     cursor: pointer;
     flex-shrink: 0;
@@ -366,8 +360,8 @@ if (related.length === 0) {
   }
 
   :global(.btn-remove:hover) {
-    background: #fee2e2;
-    border-color: #dc2626;
+    background: var(--color-surface-container-low);
+    border-color: var(--color-error);
   }
 
   @media (max-width: 640px) {

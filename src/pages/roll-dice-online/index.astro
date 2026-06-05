@@ -38,7 +38,7 @@ if (related.length === 0) {
       로컬 폴더 public/images/dice/ 에 dice01.png ~ dice06.png 로 복사해두어야 합니다.
       (메타: resource_wp → same_resourse_copied_to_our_project_folder: images/dice)
     */}
-    <section class="dice-app">
+    <section class="app-calc-layout">
       <div class="dice-stage">
         <div class="cube" id="cube">
           <div class="face face-front"><img src="/images/dice/dice01.png" alt="주사위 1" /></div>
@@ -68,13 +68,7 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .dice-app {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2rem;
-    padding: 2rem 1rem;
-  }
+  /* roll-dice-online 특화 스타일 */
 
   .dice-stage {
     width: 200px;
@@ -128,16 +122,17 @@ if (related.length === 0) {
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem 1.5rem;
-    background: var(--color-surface-alt, #f3f4f6);
-    border-radius: 999px;
+    background: var(--color-surface-container-low);
+    border-radius: var(--radius-full);
     font-size: 1.05rem;
+    font-family: var(--font-family-gothic);
   }
   .result-area[hidden] {
     display: none;
   }
 
   .result-label {
-    color: var(--color-text-muted, #6b7280);
+    color: var(--color-on-surface-variant);
     font-weight: 500;
   }
 
@@ -153,33 +148,6 @@ if (related.length === 0) {
     display: flex;
     justify-content: center;
     width: 100%;
-  }
-
-  .btn-primary {
-    background: var(--color-primary);
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    padding: 0.95rem 2.5rem;
-    font-size: 1.1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  }
-
-  .btn-primary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
-  }
-
-  .btn-primary:active:not(:disabled) {
-    transform: translateY(0);
-  }
-
-  .btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 
   @media (max-width: 480px) {

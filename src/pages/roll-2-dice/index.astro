@@ -37,7 +37,7 @@ if (related.length === 0) {
       주사위 이미지는 기존 https://goolapp.com/wp-content/app-image/dice/dice01.png ~ dice06.png 를
       프로젝트의 public/images/dice/dice01.png ~ dice06.png 로 복사해두어야 한다.
     */}
-    <div class="dice-app">
+    <div class="app-calc-layout">
       <div class="dice-stage">
         <div class="cube" id="cube1" data-cube>
           <div class="face face-front"></div>
@@ -57,7 +57,7 @@ if (related.length === 0) {
         </div>
       </div>
 
-      <button class="roll-button" id="rollButton" type="button">
+      <button class="app-btn app-btn-primary" id="rollButton" type="button">
         🎲 둘 다 굴려요!
       </button>
 
@@ -85,13 +85,7 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .dice-app {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2rem;
-    padding: 2rem 1rem;
-  }
+  /* roll-2-dice 특화 스타일 */
 
   .dice-stage {
     display: flex;
@@ -122,7 +116,7 @@ if (related.length === 0) {
     background-repeat: no-repeat;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    background-color: #fff;
+    background-color: var(--color-surface);
   }
 
   .face-front  { transform: translateZ(70px); }
@@ -132,44 +126,17 @@ if (related.length === 0) {
   .face-top    { transform: rotateX(90deg) translateZ(70px); }
   .face-bottom { transform: rotateX(-90deg) translateZ(70px); }
 
-  .roll-button {
-    background: var(--color-primary);
-    color: #fff;
-    border: none;
-    padding: 1rem 2rem;
-    font-size: 1.1rem;
-    font-weight: 700;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  .roll-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-  }
-
-  .roll-button:active {
-    transform: translateY(0);
-  }
-
-  .roll-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-
   .result-box {
     width: 100%;
     max-width: 360px;
-    background: var(--color-surface, #f9fafb);
-    border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: 12px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
     padding: 1.25rem 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    font-family: var(--font-family-gothic);
   }
 
   .result-box[hidden] {
@@ -184,18 +151,18 @@ if (related.length === 0) {
   }
 
   .result-label {
-    color: var(--color-text-muted, #6b7280);
+    color: var(--color-on-surface-variant);
     font-size: 0.95rem;
   }
 
   .result-value {
     font-size: 1.15rem;
     font-weight: 700;
-    color: var(--color-text, #111827);
+    color: var(--color-on-surface);
   }
 
   .total-row {
-    border-top: 1px dashed var(--color-border, #e5e7eb);
+    border-top: 1px dashed var(--color-outline-variant);
     margin-top: 0.25rem;
     padding-top: 0.75rem;
   }

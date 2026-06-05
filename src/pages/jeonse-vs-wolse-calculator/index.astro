@@ -32,13 +32,13 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="calc-container">
+    <div class="app-calc-layout">
       <div class="input-section">
         <div class="card jeonse-card">
           <h2 class="card-title">🏠 전세</h2>
-          <div class="field">
-            <label for="jeonse-deposit">전세 보증금 (만원)</label>
-            <input id="jeonse-deposit" type="number" placeholder="예: 30000" value="30000" />
+          <div class="app-form-group">
+            <label class="app-label" for="jeonse-deposit">전세 보증금 (만원)</label>
+            <input class="app-input" id="jeonse-deposit" type="number" placeholder="예: 30000" value="30000" />
           </div>
           <div class="result-box" id="jeonse-result-box">
             <div class="result-label">전세 월 환산 부담액</div>
@@ -49,13 +49,13 @@ if (related.length === 0) {
 
         <div class="card wolse-card">
           <h2 class="card-title">🏡 월세</h2>
-          <div class="field">
-            <label for="wolse-deposit">월세 보증금 (만원)</label>
-            <input id="wolse-deposit" type="number" placeholder="예: 5000" value="5000" />
+          <div class="app-form-group">
+            <label class="app-label" for="wolse-deposit">월세 보증금 (만원)</label>
+            <input class="app-input" id="wolse-deposit" type="number" placeholder="예: 5000" value="5000" />
           </div>
-          <div class="field">
-            <label for="wolse-rent">월 임대료 (만원)</label>
-            <input id="wolse-rent" type="number" placeholder="예: 100" value="100" />
+          <div class="app-form-group">
+            <label class="app-label" for="wolse-rent">월 임대료 (만원)</label>
+            <input class="app-input" id="wolse-rent" type="number" placeholder="예: 100" value="100" />
           </div>
           <div class="result-box" id="wolse-result-box">
             <div class="result-row">
@@ -74,9 +74,9 @@ if (related.length === 0) {
       </div>
 
       <div class="rate-section">
-        <div class="field">
-          <label for="interest-rate">보증금 대출 이자율 / 기회비용 (%)</label>
-          <input id="interest-rate" type="number" step="0.1" value="3.5" />
+        <div class="app-form-group">
+          <label class="app-label" for="interest-rate">보증금 대출 이자율 / 기회비용 (%)</label>
+          <input class="app-input" id="interest-rate" type="number" step="0.1" value="3.5" />
           <p class="hint">전세는 보증금에 대한 이자(또는 그 돈을 다른 곳에 투자했을 때 기대 수익률)를 월 부담으로 환산해 비교합니다.</p>
         </div>
       </div>
@@ -96,12 +96,7 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-  .calc-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
+  /* jeonse-vs-wolse-calculator 특화 스타일 */
   .input-section {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -115,9 +110,9 @@ if (related.length === 0) {
   }
 
   .card {
-    background: var(--color-surface, #fff);
-    border: 2px solid var(--color-border, #e5e7eb);
-    border-radius: 12px;
+    background: var(--color-surface);
+    border: 2px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
     padding: 1.25rem;
     display: flex;
     flex-direction: column;
@@ -134,49 +129,21 @@ if (related.length === 0) {
     margin: 0;
     font-size: 1.15rem;
     font-weight: 700;
-    color: var(--color-text, #111827);
-  }
-
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-
-  .field label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--color-text-secondary, #4b5563);
-  }
-
-  .field input {
-    width: 100%;
-    padding: 0.7rem 0.85rem;
-    font-size: 1rem;
-    border: 2px solid var(--color-border, #d1d5db);
-    border-radius: 8px;
-    background: var(--color-bg, #fff);
-    color: var(--color-text, #111827);
-    transition: border-color 0.15s, box-shadow 0.15s;
-    box-sizing: border-box;
-  }
-
-  .field input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
   }
 
   .hint {
     margin: 0.35rem 0 0;
     font-size: 0.8rem;
-    color: var(--color-text-tertiary, #6b7280);
+    color: var(--color-on-surface-variant);
     line-height: 1.5;
+    font-family: var(--font-family-gothic);
   }
 
   .result-box {
-    background: var(--color-bg-soft, #f9fafb);
-    border-radius: 8px;
+    background: var(--color-surface-container-low);
+    border-radius: var(--radius-sm);
     padding: 0.9rem 1rem;
     display: flex;
     flex-direction: column;
@@ -185,8 +152,9 @@ if (related.length === 0) {
 
   .result-label {
     font-size: 0.85rem;
-    color: var(--color-text-secondary, #4b5563);
+    color: var(--color-on-surface-variant);
     font-weight: 600;
+    font-family: var(--font-family-gothic);
   }
 
   .result-value {
@@ -194,42 +162,45 @@ if (related.length === 0) {
     font-weight: 800;
     color: var(--color-primary);
     letter-spacing: -0.02em;
+    font-family: var(--font-family-gothic);
   }
 
   .result-sub {
     font-size: 0.75rem;
-    color: var(--color-text-tertiary, #6b7280);
+    color: var(--color-on-surface-variant);
+    font-family: var(--font-family-gothic);
   }
 
   .result-row {
     display: flex;
     justify-content: space-between;
     font-size: 0.9rem;
-    color: var(--color-text-secondary, #4b5563);
+    color: var(--color-on-surface-variant);
+    font-family: var(--font-family-gothic);
   }
 
   .result-row span:last-child {
     font-weight: 600;
-    color: var(--color-text, #111827);
+    color: var(--color-on-surface);
   }
 
   .result-divider {
     height: 1px;
-    background: var(--color-border, #e5e7eb);
+    background: var(--color-outline-variant);
     margin: 0.3rem 0;
   }
 
   .rate-section {
-    background: var(--color-surface, #fff);
-    border: 2px solid var(--color-border, #e5e7eb);
-    border-radius: 12px;
+    background: var(--color-surface);
+    border: 2px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
     padding: 1.25rem;
   }
 
   .summary {
-    background: linear-gradient(135deg, var(--color-primary-soft, #eff6ff), var(--color-bg-soft, #f9fafb));
+    background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 10%, transparent), var(--color-surface-container-low));
     border: 2px solid var(--color-primary);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     padding: 1.5rem;
     text-align: center;
     display: flex;
@@ -245,14 +216,16 @@ if (related.length === 0) {
   .summary-text {
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--color-text, #111827);
+    color: var(--color-on-surface);
     line-height: 1.5;
+    font-family: var(--font-family-gothic);
   }
 
   .summary-detail {
     font-size: 0.95rem;
-    color: var(--color-text-secondary, #4b5563);
+    color: var(--color-on-surface-variant);
     line-height: 1.6;
+    font-family: var(--font-family-gothic);
   }
 
   .summary-detail:empty {
