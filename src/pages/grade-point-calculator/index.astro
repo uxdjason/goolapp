@@ -314,6 +314,16 @@ if (related.length === 0) {
     min-width: 0;
   }
 
+  :global(.subject-group select) {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 36px;
+  }
+
   :global(.subject-name) {
     flex: 2;
   }
@@ -498,10 +508,10 @@ if (related.length === 0) {
     });
 
     const creditInput = document.createElement("input");
-    creditInput.type = "number";
+    creditInput.type = "text";
+    creditInput.inputMode = "numeric";
+    creditInput.pattern = "[0-9]*";
     creditInput.className = "subject-credit";
-    creditInput.min = "0";
-    creditInput.step = "1";
     creditInput.placeholder = "학점";
 
     const gradeSelect = document.createElement("select");
@@ -509,6 +519,9 @@ if (related.length === 0) {
     const placeholderOpt = document.createElement("option");
     placeholderOpt.value = "";
     placeholderOpt.textContent = "성적 선택";
+    placeholderOpt.disabled = true;
+    placeholderOpt.selected = true;
+    placeholderOpt.hidden = true;
     gradeSelect.appendChild(placeholderOpt);
     gradeOptions.forEach((g) => {
       const opt = document.createElement("option");
@@ -521,6 +534,15 @@ if (related.length === 0) {
     card.appendChild(creditInput);
     card.appendChild(gradeSelect);
     card.appendChild(removeBtn);
+
+    creditInput.addEventListener("input", () => {
+      let val = creditInput.value.replace(/[^0-9]/g, '');
+      if (val.length > 1) {
+        val = val.substring(0, 1);
+        showAlert('학점은 한 자리 숫자만 입력할 수 있습니다.');
+      }
+      creditInput.value = val;
+    });
 
     [nameInput, creditInput, gradeSelect].forEach((el) => {
       el.addEventListener("input", calculate);
