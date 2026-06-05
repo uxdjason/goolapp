@@ -42,15 +42,15 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
         <div class="input-grid">
           <div class="input-field">
             <label for="baseYear">연도</label>
-            <input id="baseYear" type="number" min="0" max="9999" placeholder="yyyy" />
+            <input id="baseYear" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="yyyy" />
           </div>
           <div class="input-field">
             <label for="baseMonth">월</label>
-            <input id="baseMonth" type="number" min="1" max="12" placeholder="mm" />
+            <input id="baseMonth" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="mm" />
           </div>
           <div class="input-field">
             <label for="baseDay">일</label>
-            <input id="baseDay" type="number" min="1" max="31" placeholder="dd" />
+            <input id="baseDay" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="dd" />
           </div>
         </div>
 
@@ -424,6 +424,14 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
       screen2.hidden = true;
       screen1.hidden = false;
       copyFeedback.hidden = true;
+      
+      const appContainer = document.querySelector('.anniversary-app');
+      if (appContainer) {
+        const y = appContainer.getBoundingClientRect().top + window.scrollY - 120;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
 
     async function copyResult() {
@@ -463,6 +471,9 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
     copyBtn.addEventListener('click', copyResult);
 
     [yearEl, monthEl, dayEl].forEach((el) => {
+      el.addEventListener('input', () => {
+        el.value = el.value.replace(/[^0-9]/g, '');
+      });
       el.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') calculate();
       });
