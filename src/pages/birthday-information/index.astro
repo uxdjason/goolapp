@@ -66,7 +66,7 @@ if (related.length === 0) {
             <div id="result-lunar-date" class="result-value">-</div>
           </div>
           <div class="result-item">
-            <div class="result-label"><span class="icon-lg">🐎</span> 띠</div>
+            <div class="result-label"><span class="icon-lg" id="icon-ddi">🐎</span> 띠</div>
             <div id="result-ddi" class="result-value">-</div>
           </div>
           <div class="result-item">
@@ -311,6 +311,7 @@ if (related.length === 0) {
       "개",
       "돼지",
     ];
+    const DDI_ICONS = ["🐭", "🐮", "🐯", "🐰", "🐲", "🐍", "🐴", "🐑", "🐵", "🐔", "🐶", "🐷"];
 
     const HOROSCOPES = [
       { name: "염소자리", start: "01-01" },
@@ -382,7 +383,16 @@ if (related.length === 0) {
           month: "long",
           day: "numeric",
         });
-        return fmt.format(date);
+        let str = fmt.format(date);
+        
+        // 안드로이드 크롬의 영문 포맷(예: "2013(gui-si) M04 27") 정규화
+        str = str.replace(/\([a-zA-Z-]+\)/g, ""); // 간지 영문 표기 제거
+        str = str.replace(/M0*(\d+)L/g, "윤$1월 "); // 윤달 처리
+        str = str.replace(/M0*(\d+)/g, "$1월 "); // 일반 월 처리
+        if (!str.includes("년")) str = str.replace(/^(\d{4})/, "$1년 ");
+        if (!str.includes("일")) str = str.replace(/(\d{1,2})\s*$/, "$1일");
+        
+        return str.replace(/\s+/g, " ").trim();
       } catch {
         return "계산 불가";
       }
@@ -418,7 +428,12 @@ if (related.length === 0) {
       elSummary.textContent = `${year}년 ${month}월 ${day}일`;
       elDay.textContent = getDayOfWeek(date) + "에 태어나셨네요!";
       elLunar.textContent = getLunarDate(date);
-      elDdi.textContent = getDdi(year);
+      const ddiIndex = (year + 8) % 12;
+      elDdi.textContent = DDI[ddiIndex];
+      const iconDdiEl = document.getElementById("icon-ddi");
+      if (iconDdiEl) {
+        iconDdiEl.textContent = DDI_ICONS[ddiIndex];
+      }
       elGanja.textContent = getGanja(year);
 
       const horo = getHoroscope(month, day);
