@@ -251,27 +251,27 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
     background: #f3f4f6;
   }
 
-  .result-table th,
-  .result-table td {
+  :global(.result-table th),
+  :global(.result-table td) {
     padding: 0.75rem 1rem;
     text-align: center;
     border-bottom: 1px solid #e5e7eb;
   }
 
-  .result-table th {
+  :global(.result-table th) {
     font-weight: 600;
     color: var(--color-text, #222);
   }
 
-  .result-table tbody tr:last-child td {
+  :global(.result-table tbody tr:last-child td) {
     border-bottom: none;
   }
 
-  .result-table tbody tr:hover {
+  :global(.result-table tbody tr:hover) {
     background: #fafafa;
   }
 
-  .result-table .day-cell {
+  :global(.result-table .day-cell) {
     font-weight: 600;
     color: var(--color-primary);
   }
@@ -418,7 +418,6 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
       screen1.hidden = true;
       screen2.hidden = false;
       copyFeedback.hidden = true;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function reset() {
