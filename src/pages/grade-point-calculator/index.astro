@@ -150,7 +150,7 @@ if (related.length === 0) {
   }
 
   .radio-option input {
-    accent-color: var(--color-primary);
+    display: none;
   }
 
   .subject-list {
@@ -162,8 +162,8 @@ if (related.length === 0) {
   .btn-add {
     width: 100%;
     padding: 14px;
-    border: 2px dashed var(--color-border);
-    background: transparent;
+    border: 2px dashed #9ca3af;
+    background: var(--color-surface, #fff);
     color: var(--color-primary);
     border-radius: 10px;
     font-size: 1rem;
@@ -174,7 +174,7 @@ if (related.length === 0) {
 
   .btn-add:hover {
     border-color: var(--color-primary);
-    background: var(--color-surface);
+    background: rgba(139, 79, 50, 0.04);
   }
 
   .results-box {
@@ -241,18 +241,18 @@ if (related.length === 0) {
     width: 100%;
     margin-top: 16px;
     padding: 12px;
-    background: var(--color-text);
-    color: #fff;
-    border: none;
+    background: var(--color-surface-alt, #f1f5f9);
+    border: 1px solid var(--color-border, #d1d5db);
     border-radius: 10px;
+    color: var(--color-text, #1f2937);
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: opacity 0.15s ease;
+    transition: all 0.15s ease;
   }
 
   .btn-copy:hover {
-    opacity: 0.85;
+    background: var(--color-border, #e5e7eb);
   }
 
   .empty-state {
@@ -275,62 +275,41 @@ if (related.length === 0) {
 
   /* 동적으로 생성되는 과목 카드 (전역 스코프 필요) */
   :global(.subject-group) {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 10px;
-    padding: 14px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
-  }
-
-  :global(.subject-group .row-1) {
     display: flex;
-    gap: 8px;
+    gap: 12px;
     align-items: center;
+    background: var(--color-surface, #fff);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--color-border, #d1d5db);
   }
 
-  :global(.subject-group .row-2) {
-    display: flex;
-    gap: 8px;
-    grid-column: 1 / -1;
+  :global(.subject-group input),
+  :global(.subject-group select) {
+    padding: 12px 14px;
+    border: 1px solid #9ca3af;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: var(--color-background, #fff);
+    color: var(--color-text, #1f2937);
+    transition: all 0.15s ease;
+    min-width: 0;
   }
 
   :global(.subject-name) {
-    flex: 1;
-    padding: 10px 12px;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    font-size: 0.95rem;
-    background: var(--color-background);
-    color: var(--color-text);
+    flex: 2;
   }
 
-  :global(.subject-credit) {
-    width: 90px;
-    padding: 10px 12px;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    font-size: 0.95rem;
-    background: var(--color-background);
-    color: var(--color-text);
-  }
-
+  :global(.subject-credit),
   :global(.subject-grade) {
     flex: 1;
-    padding: 10px 12px;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    font-size: 0.95rem;
-    background: var(--color-background);
-    color: var(--color-text);
   }
 
-  :global(.subject-name:focus),
-  :global(.subject-credit:focus),
-  :global(.subject-grade:focus) {
+  :global(.subject-group input:focus),
+  :global(.subject-group select:focus) {
     outline: none;
     border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(139, 79, 50, 0.1);
   }
 
   :global(.btn-remove) {
@@ -354,9 +333,23 @@ if (related.length === 0) {
     border-color: #dc2626;
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 640px) {
     .radio-group {
       flex-direction: column;
+    }
+
+    :global(.subject-group) {
+      flex-wrap: wrap;
+    }
+
+    :global(.subject-name) {
+      width: calc(100% - 50px);
+      flex: none;
+    }
+
+    :global(.subject-credit),
+    :global(.subject-grade) {
+      flex: 1;
     }
   }
 </style>
@@ -414,9 +407,6 @@ if (related.length === 0) {
     const card = document.createElement('div');
     card.className = 'subject-group';
 
-    const row1 = document.createElement('div');
-    row1.className = 'row-1';
-
     const nameInput = document.createElement('input');
     nameInput.type = 'text';
     nameInput.className = 'subject-name';
@@ -431,12 +421,6 @@ if (related.length === 0) {
       card.remove();
       calculate();
     });
-
-    row1.appendChild(nameInput);
-    row1.appendChild(removeBtn);
-
-    const row2 = document.createElement('div');
-    row2.className = 'row-2';
 
     const creditInput = document.createElement('input');
     creditInput.type = 'number';
@@ -458,11 +442,10 @@ if (related.length === 0) {
       gradeSelect.appendChild(opt);
     });
 
-    row2.appendChild(creditInput);
-    row2.appendChild(gradeSelect);
-
-    card.appendChild(row1);
-    card.appendChild(row2);
+    card.appendChild(nameInput);
+    card.appendChild(creditInput);
+    card.appendChild(gradeSelect);
+    card.appendChild(removeBtn);
 
     [nameInput, creditInput, gradeSelect].forEach(el => {
       el.addEventListener('input', calculate);
