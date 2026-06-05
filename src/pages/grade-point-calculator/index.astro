@@ -1,21 +1,31 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'grade-point-calculator');
-if (!entry) throw new Error('grade-point-calculator entry not found');
+const entry = await getEntry("apps", "grade-point-calculator");
+if (!entry) throw new Error("grade-point-calculator entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
 }
 ---
 
@@ -49,28 +59,38 @@ if (related.length === 0) {
 
       <div id="subjectList" class="subject-list"></div>
 
-      <button id="addSubjectBtn" class="btn-add" type="button">+ 과목 추가</button>
+      <button id="addSubjectBtn" class="btn-add" type="button"
+        >+ 과목 추가</button
+      >
 
       <div id="resultsBox" class="results-box" hidden>
         <h3 class="results-title">계산 결과</h3>
         <div class="result-grid">
           <div class="result-item">
             <span class="result-label">총 이수 과목</span>
-            <span class="result-value"><span id="totalSubjects">0</span>과목</span>
+            <span class="result-value"
+              ><span id="totalSubjects">0</span>과목</span
+            >
           </div>
           <div class="result-item">
             <span class="result-label">총 이수 학점</span>
-            <span class="result-value"><span id="totalCredits">0</span>학점</span>
+            <span class="result-value"
+              ><span id="totalCredits">0</span>학점</span
+            >
           </div>
           <div class="result-item highlight">
             <span class="result-label">GPA 평점</span>
             <span class="result-value">
               <span id="gpaValue">0.00</span>
-              <span class="result-unit"> / <span id="maxScaleLabel">4.5</span></span>
+              <span class="result-unit">
+                / <span id="maxScaleLabel">4.5</span></span
+              >
             </span>
           </div>
         </div>
-        <button id="copyBtn" class="btn-copy" type="button">📋 클립보드로 복사</button>
+        <button id="copyBtn" class="btn-copy" type="button"
+          >📋 클립보드로 복사</button
+        >
       </div>
 
       <div id="emptyState" class="empty-state">
@@ -84,7 +104,9 @@ if (related.length === 0) {
           <p class="app-modal-title" id="app-alert-title">알림</p>
           <p class="app-modal-body" id="app-alert-message"></p>
           <div class="app-modal-actions">
-            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary"
+              >확인</button
+            >
           </div>
         </div>
       </div>
@@ -278,10 +300,6 @@ if (related.length === 0) {
     display: flex;
     gap: 12px;
     align-items: center;
-    background: var(--color-surface, #fff);
-    padding: 16px;
-    border-radius: 12px;
-    border: 1px solid var(--color-border, #d1d5db);
   }
 
   :global(.subject-group input),
@@ -345,98 +363,155 @@ if (related.length === 0) {
     :global(.subject-name) {
       width: calc(100% - 50px);
       flex: none;
+      order: 1;
     }
 
-    :global(.subject-credit),
+    :global(.btn-remove) {
+      order: 2;
+    }
+
+    :global(.subject-credit) {
+      width: calc(50% - 6px);
+      flex: none;
+      order: 3;
+    }
+
     :global(.subject-grade) {
-      flex: 1;
+      width: calc(50% - 6px);
+      flex: none;
+      order: 4;
     }
   }
 </style>
 
 <script>
   const gradeMap45: Record<string, number> = {
-    'A+': 4.5, 'A0': 4.0, 'A-': 3.7,
-    'B+': 3.5, 'B0': 3.0, 'B-': 2.7,
-    'C+': 2.5, 'C0': 2.0, 'C-': 1.7,
-    'D+': 1.5, 'D0': 1.0, 'D-': 0.7,
-    'F': 0
+    "A+": 4.5,
+    A0: 4.0,
+    "A-": 3.7,
+    "B+": 3.5,
+    B0: 3.0,
+    "B-": 2.7,
+    "C+": 2.5,
+    C0: 2.0,
+    "C-": 1.7,
+    "D+": 1.5,
+    D0: 1.0,
+    "D-": 0.7,
+    F: 0,
   };
   const gradeMap43: Record<string, number> = {
-    'A+': 4.3, 'A0': 4.0, 'A-': 3.7,
-    'B+': 3.3, 'B0': 3.0, 'B-': 2.7,
-    'C+': 2.3, 'C0': 2.0, 'C-': 1.7,
-    'D+': 1.3, 'D0': 1.0, 'D-': 0.7,
-    'F': 0
+    "A+": 4.3,
+    A0: 4.0,
+    "A-": 3.7,
+    "B+": 3.3,
+    B0: 3.0,
+    "B-": 2.7,
+    "C+": 2.3,
+    C0: 2.0,
+    "C-": 1.7,
+    "D+": 1.3,
+    D0: 1.0,
+    "D-": 0.7,
+    F: 0,
   };
-  const passGrades = ['S', 'U', 'P'];
-  const gradeOptions = ['A+','A0','A-','B+','B0','B-','C+','C0','C-','D+','D0','D-','F','S','U','P'];
+  const passGrades = ["S", "U", "P"];
+  const gradeOptions = [
+    "A+",
+    "A0",
+    "A-",
+    "B+",
+    "B0",
+    "B-",
+    "C+",
+    "C0",
+    "C-",
+    "D+",
+    "D0",
+    "D-",
+    "F",
+    "S",
+    "U",
+    "P",
+  ];
 
-  const appAlertModal = document.getElementById('app-alert-modal') as HTMLElement;
-  const appAlertMessage = document.getElementById('app-alert-message') as HTMLElement;
-  const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn') as HTMLButtonElement;
+  const appAlertModal = document.getElementById(
+    "app-alert-modal",
+  ) as HTMLElement;
+  const appAlertMessage = document.getElementById(
+    "app-alert-message",
+  ) as HTMLElement;
+  const appAlertConfirmBtn = document.getElementById(
+    "app-alert-confirm-btn",
+  ) as HTMLButtonElement;
 
   function showAlert(msg: string) {
     appAlertMessage.textContent = msg;
-    appAlertModal.removeAttribute('hidden');
+    appAlertModal.removeAttribute("hidden");
   }
 
   function hideAlert() {
-    appAlertModal.setAttribute('hidden', '');
+    appAlertModal.setAttribute("hidden", "");
   }
 
-  appAlertConfirmBtn?.addEventListener('click', hideAlert);
-  appAlertModal?.addEventListener('click', (e) => {
+  appAlertConfirmBtn?.addEventListener("click", hideAlert);
+  appAlertModal?.addEventListener("click", (e) => {
     if (e.target === appAlertModal) hideAlert();
   });
 
-  const subjectList = document.getElementById('subjectList') as HTMLDivElement;
-  const addBtn = document.getElementById('addSubjectBtn') as HTMLButtonElement;
-  const resultsBox = document.getElementById('resultsBox') as HTMLDivElement;
-  const emptyState = document.getElementById('emptyState') as HTMLDivElement;
-  const totalSubjectsEl = document.getElementById('totalSubjects') as HTMLSpanElement;
-  const totalCreditsEl = document.getElementById('totalCredits') as HTMLSpanElement;
-  const gpaValueEl = document.getElementById('gpaValue') as HTMLSpanElement;
-  const maxScaleLabelEl = document.getElementById('maxScaleLabel') as HTMLSpanElement;
-  const copyBtn = document.getElementById('copyBtn') as HTMLButtonElement;
+  const subjectList = document.getElementById("subjectList") as HTMLDivElement;
+  const addBtn = document.getElementById("addSubjectBtn") as HTMLButtonElement;
+  const resultsBox = document.getElementById("resultsBox") as HTMLDivElement;
+  const emptyState = document.getElementById("emptyState") as HTMLDivElement;
+  const totalSubjectsEl = document.getElementById(
+    "totalSubjects",
+  ) as HTMLSpanElement;
+  const totalCreditsEl = document.getElementById(
+    "totalCredits",
+  ) as HTMLSpanElement;
+  const gpaValueEl = document.getElementById("gpaValue") as HTMLSpanElement;
+  const maxScaleLabelEl = document.getElementById(
+    "maxScaleLabel",
+  ) as HTMLSpanElement;
+  const copyBtn = document.getElementById("copyBtn") as HTMLButtonElement;
 
   let subjectCounter = 0;
 
   function addSubject() {
     subjectCounter++;
-    const card = document.createElement('div');
-    card.className = 'subject-group';
+    const card = document.createElement("div");
+    card.className = "subject-group";
 
-    const nameInput = document.createElement('input');
-    nameInput.type = 'text';
-    nameInput.className = 'subject-name';
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.className = "subject-name";
     nameInput.placeholder = `과목명 ${subjectCounter} (선택)`;
 
-    const removeBtn = document.createElement('button');
-    removeBtn.type = 'button';
-    removeBtn.className = 'btn-remove';
-    removeBtn.textContent = '×';
-    removeBtn.setAttribute('aria-label', '과목 삭제');
-    removeBtn.addEventListener('click', () => {
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "btn-remove";
+    removeBtn.textContent = "×";
+    removeBtn.setAttribute("aria-label", "과목 삭제");
+    removeBtn.addEventListener("click", () => {
       card.remove();
       calculate();
     });
 
-    const creditInput = document.createElement('input');
-    creditInput.type = 'number';
-    creditInput.className = 'subject-credit';
-    creditInput.min = '0';
-    creditInput.step = '1';
-    creditInput.placeholder = '학점';
+    const creditInput = document.createElement("input");
+    creditInput.type = "number";
+    creditInput.className = "subject-credit";
+    creditInput.min = "0";
+    creditInput.step = "1";
+    creditInput.placeholder = "학점";
 
-    const gradeSelect = document.createElement('select');
-    gradeSelect.className = 'subject-grade';
-    const placeholderOpt = document.createElement('option');
-    placeholderOpt.value = '';
-    placeholderOpt.textContent = '성적 선택';
+    const gradeSelect = document.createElement("select");
+    gradeSelect.className = "subject-grade";
+    const placeholderOpt = document.createElement("option");
+    placeholderOpt.value = "";
+    placeholderOpt.textContent = "성적 선택";
     gradeSelect.appendChild(placeholderOpt);
-    gradeOptions.forEach(g => {
-      const opt = document.createElement('option');
+    gradeOptions.forEach((g) => {
+      const opt = document.createElement("option");
       opt.value = g;
       opt.textContent = g;
       gradeSelect.appendChild(opt);
@@ -447,33 +522,39 @@ if (related.length === 0) {
     card.appendChild(gradeSelect);
     card.appendChild(removeBtn);
 
-    [nameInput, creditInput, gradeSelect].forEach(el => {
-      el.addEventListener('input', calculate);
-      el.addEventListener('change', calculate);
+    [nameInput, creditInput, gradeSelect].forEach((el) => {
+      el.addEventListener("input", calculate);
+      el.addEventListener("change", calculate);
     });
 
     subjectList.appendChild(card);
     calculate();
   }
 
-  function getSelectedScale(): '4.5' | '4.3' {
-    const checked = document.querySelector('input[name="maxScore"]:checked') as HTMLInputElement;
-    return (checked?.value as '4.5' | '4.3') || '4.5';
+  function getSelectedScale(): "4.5" | "4.3" {
+    const checked = document.querySelector(
+      'input[name="maxScore"]:checked',
+    ) as HTMLInputElement;
+    return (checked?.value as "4.5" | "4.3") || "4.5";
   }
 
   function calculate() {
     const scale = getSelectedScale();
-    const map = scale === '4.5' ? gradeMap45 : gradeMap43;
+    const map = scale === "4.5" ? gradeMap45 : gradeMap43;
 
     let totalCount = 0;
     let totalCreditsForGpa = 0;
     let weighted = 0;
     let earnedCredits = 0;
 
-    const groups = document.querySelectorAll('.subject-group');
-    groups.forEach(group => {
-      const creditInput = group.querySelector('.subject-credit') as HTMLInputElement;
-      const gradeSelect = group.querySelector('.subject-grade') as HTMLSelectElement;
+    const groups = document.querySelectorAll(".subject-group");
+    groups.forEach((group) => {
+      const creditInput = group.querySelector(
+        ".subject-credit",
+      ) as HTMLInputElement;
+      const gradeSelect = group.querySelector(
+        ".subject-grade",
+      ) as HTMLSelectElement;
       const credit = parseFloat(creditInput.value);
       const grade = gradeSelect.value;
 
@@ -482,7 +563,7 @@ if (related.length === 0) {
         if (grade in map) {
           totalCreditsForGpa += credit;
           weighted += credit * map[grade];
-          if (grade !== 'F') {
+          if (grade !== "F") {
             earnedCredits += credit;
           }
         } else if (passGrades.includes(grade)) {
@@ -491,7 +572,10 @@ if (related.length === 0) {
       }
     });
 
-    const gpa = totalCreditsForGpa > 0 ? (weighted / totalCreditsForGpa).toFixed(2) : '0.00';
+    const gpa =
+      totalCreditsForGpa > 0
+        ? (weighted / totalCreditsForGpa).toFixed(2)
+        : "0.00";
 
     totalSubjectsEl.textContent = String(totalCount);
     totalCreditsEl.textContent = String(earnedCredits);
@@ -507,20 +591,20 @@ if (related.length === 0) {
     }
   }
 
-  addBtn.addEventListener('click', addSubject);
+  addBtn.addEventListener("click", addSubject);
 
-  document.querySelectorAll('input[name="maxScore"]').forEach(radio => {
-    radio.addEventListener('change', calculate);
+  document.querySelectorAll('input[name="maxScore"]').forEach((radio) => {
+    radio.addEventListener("change", calculate);
   });
 
-  copyBtn.addEventListener('click', async () => {
+  copyBtn.addEventListener("click", async () => {
     const scale = getSelectedScale();
     const text = `[GPA 계산 결과]\n총 이수 과목: ${totalSubjectsEl.textContent}과목\n총 이수 학점: ${totalCreditsEl.textContent}학점\nGPA 평점: ${gpaValueEl.textContent} / ${scale}`;
     try {
       await navigator.clipboard.writeText(text);
-      showAlert('결과가 클립보드에 복사되었습니다.');
+      showAlert("결과가 클립보드에 복사되었습니다.");
     } catch {
-      showAlert('복사에 실패했습니다. 브라우저 환경을 확인해 주세요.');
+      showAlert("복사에 실패했습니다. 브라우저 환경을 확인해 주세요.");
     }
   });
 
