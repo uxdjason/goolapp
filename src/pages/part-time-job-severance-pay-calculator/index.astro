@@ -81,7 +81,7 @@ if (related.length === 0) {
         <div class="warning-box" id="warning-box" hidden></div>
       </section>
 
-      <div class="actions">
+      <div class="actions" id="reset-actions" hidden>
         <button id="reset-btn" class="btn-reset" type="button">초기화</button>
       </div>
 
@@ -250,6 +250,10 @@ if (related.length === 0) {
     justify-content: center;
   }
 
+  .actions[hidden] {
+    display: none;
+  }
+
   .btn-reset {
     padding: 0.7rem 1.5rem;
     background: var(--color-surface-alt, #f3f4f6);
@@ -305,6 +309,7 @@ if (related.length === 0) {
   const calcDetailsEl = document.getElementById('calc-details') as HTMLElement;
   const warningBoxEl = document.getElementById('warning-box') as HTMLElement;
   const resetBtn = document.getElementById('reset-btn') as HTMLButtonElement;
+  const resetActions = document.getElementById('reset-actions') as HTMLElement;
 
   // ===== Utils =====
   const fmt = (n: number) => Math.floor(n).toLocaleString('ko-KR');
@@ -341,6 +346,12 @@ if (related.length === 0) {
   function calculate() {
     const startVal = startDateEl.value;
     const endVal = endDateEl.value;
+
+    if (startVal || endVal) {
+      resetActions.hidden = false;
+    } else {
+      resetActions.hidden = true;
+    }
 
     if (!startVal || !endVal) {
       periodInfoEl.textContent = '입사일과 퇴사일을 입력해 주세요.';
@@ -433,6 +444,16 @@ if (related.length === 0) {
     salarySection.hidden = true;
     resultSection.hidden = true;
     warningBoxEl.hidden = true;
+    
+    resetActions.hidden = true;
+    
+    const appContainer = document.querySelector('.severance-app');
+    if (appContainer) {
+      const y = appContainer.getBoundingClientRect().top + window.scrollY - 120;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   // ===== 이벤트 바인딩 =====
