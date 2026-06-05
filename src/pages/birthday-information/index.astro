@@ -49,7 +49,7 @@ if (related.length === 0) {
           >양력 생일을 선택해주세요</label
         >
         <input id="birth-date" type="date" lang="ko-KR" />
-        <button id="submit-btn" class="app-btn app-btn-primary" disabled
+        <button id="submit-btn" class="app-btn app-btn-primary app-btn-lg"
           >결과 확인</button
         >
       </section>
@@ -62,19 +62,19 @@ if (related.length === 0) {
 
         <div class="result-grid">
           <div class="result-item">
-            <div class="result-label">🌙 음력</div>
+            <div class="result-label"><span class="icon-lg">🌙</span> 음력</div>
             <div id="result-lunar-date" class="result-value">-</div>
           </div>
           <div class="result-item">
-            <div class="result-label">🐎 띠</div>
+            <div class="result-label"><span class="icon-lg">🐎</span> 띠</div>
             <div id="result-ddi" class="result-value">-</div>
           </div>
           <div class="result-item">
-            <div class="result-label">📜 간지</div>
+            <div class="result-label"><span class="icon-lg">📜</span> 간지</div>
             <div id="result-ganja" class="result-value">-</div>
           </div>
           <div class="result-item">
-            <div class="result-label">✨ 별자리</div>
+            <div class="result-label"><span class="icon-lg">✨</span> 별자리</div>
             <div id="result-horoscope" class="result-value">-</div>
           </div>
         </div>
@@ -85,10 +85,10 @@ if (related.length === 0) {
         </div>
 
         <div class="button-group">
-          <button id="copy-btn" class="app-btn app-btn-secondary"
+          <button id="copy-btn" class="app-btn app-btn-primary app-btn-lg"
             >📋 결과 복사하기</button
           >
-          <button id="reset-btn" class="app-btn app-btn-outline"
+          <button id="reset-btn" class="app-btn app-btn-primary app-btn-lg"
             >🔄 다른 날짜 확인하기</button
           >
         </div>
@@ -145,43 +145,7 @@ if (related.length === 0) {
     border-color: var(--color-primary);
   }
 
-  .btn {
-    width: 100%;
-    padding: 0.875rem 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
 
-  .btn-primary {
-    background: var(--color-primary);
-    color: #fff;
-  }
-
-  .btn-primary:hover:not(:disabled) {
-    opacity: 0.9;
-  }
-
-  .btn-primary:disabled {
-    background: var(--color-outline);
-    color: var(--color-on-surface-variant);
-    cursor: not-allowed;
-  }
-
-  .btn-secondary {
-    background: var(--color-primary);
-    color: #fff;
-    margin-bottom: 0.5rem;
-  }
-
-  .btn-outline {
-    background: transparent;
-    color: var(--color-primary);
-    border: 2px solid var(--color-primary);
-  }
 
   .result-header {
     text-align: center;
@@ -221,6 +185,12 @@ if (related.length === 0) {
     font-size: 0.85rem;
     color: var(--color-on-surface-variant);
     margin-bottom: 0.5rem;
+  }
+
+  .icon-lg {
+    display: block;
+    font-size: 1.6rem;
+    margin-bottom: 0.35rem;
   }
 
   .result-value {
@@ -431,12 +401,11 @@ if (related.length === 0) {
       return result;
     }
 
-    dateInput.addEventListener("change", () => {
-      submitBtn.disabled = !dateInput.value;
-    });
-
     submitBtn.addEventListener("click", () => {
-      if (!dateInput.value) return;
+      if (!dateInput.value) {
+        showAlert("양력 생일을 선택해주세요.");
+        return;
+      }
       const date = new Date(dateInput.value);
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
@@ -464,7 +433,6 @@ if (related.length === 0) {
 
     resetBtn.addEventListener("click", () => {
       dateInput.value = "";
-      submitBtn.disabled = true;
       resultSection.classList.add("hidden");
       inputSection.classList.remove("hidden");
     });
