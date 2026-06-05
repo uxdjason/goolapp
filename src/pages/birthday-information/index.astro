@@ -428,13 +428,20 @@ if (related.length === 0) {
       elSummary.textContent = `${year}년 ${month}월 ${day}일`;
       elDay.textContent = getDayOfWeek(date) + "에 태어나셨네요!";
       elLunar.textContent = getLunarDate(date);
-      const ddiIndex = (year + 8) % 12;
+      
+      let lunarYear = year;
+      const lunarMatch = elLunar.textContent.match(/^(\d{4})년/);
+      if (lunarMatch) {
+        lunarYear = parseInt(lunarMatch[1], 10);
+      }
+
+      const ddiIndex = (lunarYear + 8) % 12;
       elDdi.textContent = DDI[ddiIndex];
       const iconDdiEl = document.getElementById("icon-ddi");
       if (iconDdiEl) {
         iconDdiEl.textContent = DDI_ICONS[ddiIndex];
       }
-      elGanja.textContent = getGanja(year);
+      elGanja.textContent = getGanja(lunarYear);
 
       const horo = getHoroscope(month, day);
       elHoro.textContent = horo;
