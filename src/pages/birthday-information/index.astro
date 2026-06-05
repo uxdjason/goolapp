@@ -435,6 +435,14 @@ if (related.length === 0) {
       dateInput.value = "";
       resultSection.classList.add("hidden");
       inputSection.classList.remove("hidden");
+
+      const appContainer = document.querySelector(".app-inner");
+      if (appContainer) {
+        const y = appContainer.getBoundingClientRect().top + window.scrollY - 120;
+        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     });
 
     copyBtn.addEventListener("click", async () => {
