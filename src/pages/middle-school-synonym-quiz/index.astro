@@ -5,10 +5,10 @@ import RelatedApps from "../../components/RelatedApps.astro";
 
 const entry = await getEntry(
   "apps",
-  "middle-school-english-synonyms-quiz",
+  "middle-school-synonym-quiz",
 );
 if (!entry)
-  throw new Error("middle-school-english-synonyms-quiz entry not found");
+  throw new Error("middle-school-synonym-quiz entry not found");
 const { Content } = await render(entry);
 
 const allApps = await getCollection("apps");

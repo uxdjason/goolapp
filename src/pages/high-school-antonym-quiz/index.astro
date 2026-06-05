@@ -5,10 +5,10 @@ import RelatedApps from "../../components/RelatedApps.astro";
 
 const entry = await getEntry(
   "apps",
-  "english-antonym-quiz-high-school-level",
+  "high-school-antonym-quiz",
 );
 if (!entry)
-  throw new Error("english-antonym-quiz-high-school-level entry not found");
+  throw new Error("high-school-antonym-quiz entry not found");
 const { Content } = await render(entry);
 
 const allApps = await getCollection("apps");

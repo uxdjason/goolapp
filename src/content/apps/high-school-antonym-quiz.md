@@ -1,6 +1,6 @@
 ---
 title: 영단어 반의어 맞추기 – 고등학교 수준
-slug: english-antonym-quiz-high-school-level
+slug: high-school-antonym-quiz
 description: 고등학교 수준의 영단어 반의어 맞추기 퀴즈로 어휘력을 키워보세요. 사지선다형 문제에서 즉시 정답을 확인하며 자연스럽게 영어
   실력을 높일 수 있습니다.
 shortDescription: 고등학교 수준의 영단어 반의어 맞추기 퀴즈로 어휘력을 키워보세요.
@@ -17,11 +17,11 @@ seo:
   title: 영단어 반의어 맞추기 퀴즈 – 고등학교 수준 무료 학습
   description: 고등학교 수준의 영단어 반의어 맞추기 퀴즈로 어휘력을 키워보세요. 사지선다형 문제에서 즉시 정답을 확인하며 자연스럽게 영어
     실력을 높일 수 있습니다.
-  canonicalPath: /english-antonym-quiz-high-school-level/
+  canonicalPath: /high-school-antonym-quiz/
   ogTitle: 고등학교 영단어 반의어 맞추기 – 재미있는 무료 퀴즈 앱
   ogDescription: 고등학교 수준의 영단어 반의어 퀴즈로 어휘 학습을 재미있게 해보세요. 사지선다형 문제로 구성되어 있으며, 각 문제마다
     즉시 정오답 피드백과 최종 점수를 확인할 수 있습니다. 자투리 시간에 가볍게 즐기면서 영어 실력을 늘려보세요.
-  ogImage: /og/GoolAPP-english-antonym-quiz-high-school-level.webp
+  ogImage: /og/GoolAPP-high-school-antonym-quiz.webp
   twitterCard: summary_large_image
   searchTitle: 영단어 반의어 맞추기 퀴즈 – 고등학교 수준 무료 학습
   searchDescription: 고등학교 수준의 영단어 반의어 맞추기 퀴즈로 어휘력을 키워보세요. 사지선다형 문제에서 즉시 정답을 확인하며 자연스럽게
