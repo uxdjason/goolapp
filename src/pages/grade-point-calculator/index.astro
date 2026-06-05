@@ -300,6 +300,8 @@ if (related.length === 0) {
     display: flex;
     gap: 12px;
     align-items: center;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #eee;
   }
 
   :global(.subject-group input),
@@ -536,10 +538,10 @@ if (related.length === 0) {
     card.appendChild(removeBtn);
 
     creditInput.addEventListener("input", () => {
-      let val = creditInput.value.replace(/[^0-9]/g, '');
+      let val = creditInput.value.replace(/[^0-9]/g, "");
       if (val.length > 1) {
         val = val.substring(0, 1);
-        showAlert('학점은 한 자리 숫자만 입력할 수 있습니다.');
+        showAlert("학점은 한 자리 숫자만 입력할 수 있습니다.");
       }
       creditInput.value = val;
     });
