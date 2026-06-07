@@ -1,21 +1,31 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'bmi-calculator');
-if (!entry) throw new Error('bmi-calculator entry not found');
+const entry = await getEntry("apps", "bmi-calculator");
+if (!entry) throw new Error("bmi-calculator entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
 }
 ---
 
@@ -51,27 +61,51 @@ if (related.length === 0) {
 
         <div class="app-form-group">
           <label class="app-label" for="age">나이</label>
-          <input id="age" class="app-input" type="number" min="0" step="1" placeholder="예: 30" />
+          <input
+            id="age"
+            class="app-input"
+            type="number"
+            min="0"
+            step="1"
+            placeholder="예: 30"
+          />
         </div>
 
         <div class="form-row">
           <div class="app-form-group">
             <label class="app-label" for="height">키 (cm)</label>
-            <input id="height" class="app-input" type="number" min="0" step="0.1" placeholder="예: 170" />
+            <input
+              id="height"
+              class="app-input"
+              type="number"
+              min="0"
+              step="0.1"
+              placeholder="예: 170"
+            />
           </div>
           <div class="app-form-group">
             <label class="app-label" for="weight">몸무게 (kg)</label>
-            <input id="weight" class="app-input" type="number" min="0" step="0.1" placeholder="예: 65" />
+            <input
+              id="weight"
+              class="app-input"
+              type="number"
+              min="0"
+              step="0.1"
+              placeholder="예: 65"
+            />
           </div>
         </div>
 
         <p id="error-message" class="error-message" hidden></p>
 
-        <button id="calc-btn" class="app-btn app-btn-primary" type="button">비만도 계산하기</button>
+        <button id="calc-btn" class="app-btn app-btn-primary" type="button"
+          >비만도 계산하기</button
+        >
       </section>
 
       <!-- 결과 화면 -->
       <section id="screen2" class="result-screen" hidden>
+        <div class="app-spacer-sm"></div>
         <div class="result-card">
           <div class="input-summary" id="input-summary"></div>
           <p class="result-label">당신의 BMI</p>
@@ -84,7 +118,9 @@ if (related.length === 0) {
           <p id="advice2" class="advice-text" hidden></p>
         </div>
 
-        <button id="reset-btn" class="app-btn app-btn-outline" type="button">다시 계산하기</button>
+        <button id="reset-btn" class="app-btn app-btn-outline" type="button"
+          >다시 계산하기</button
+        >
       </section>
     </div>
   </Fragment>
@@ -97,12 +133,15 @@ if (related.length === 0) {
 
 <style>
   /* bmi-calculator 앱 특화 스타일 */
-  #screen1, #screen2 {
+  #screen1,
+  #screen2 {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
   }
-  #screen2[hidden] { display: none; }
+  #screen2[hidden] {
+    display: none;
+  }
 
   .form-row {
     display: flex;
@@ -154,7 +193,9 @@ if (related.length === 0) {
     border-radius: var(--radius-sm);
     font-family: var(--font-family-gothic);
   }
-  .error-message[hidden] { display: none; }
+  .error-message[hidden] {
+    display: none;
+  }
 
   /* 결과 카드 (BMI 특화) */
   .result-card {
@@ -207,9 +248,15 @@ if (related.length === 0) {
     margin: 0.75rem 0 0;
     font-family: var(--font-family-gothic);
   }
-  .bmi-category.cat-green { color: #16a34a; }
-  .bmi-category.cat-orange { color: #ea580c; }
-  .bmi-category.cat-red { color: #dc2626; }
+  .bmi-category.cat-green {
+    color: #16a34a;
+  }
+  .bmi-category.cat-orange {
+    color: #ea580c;
+  }
+  .bmi-category.cat-red {
+    color: #dc2626;
+  }
 
   .advice-box {
     padding: 1.25rem;
@@ -227,24 +274,30 @@ if (related.length === 0) {
     line-height: 1.6;
     font-family: var(--font-family-gothic);
   }
-  .advice-text[hidden] { display: none; }
+  .advice-text[hidden] {
+    display: none;
+  }
 
   @media (max-width: 480px) {
-    .form-row { flex-direction: column; }
-    .bmi-value { font-size: 2.5rem; }
+    .form-row {
+      flex-direction: column;
+    }
+    .bmi-value {
+      font-size: 2.5rem;
+    }
   }
 </style>
 
 <script>
-  const screen1 = document.getElementById('screen1') as HTMLElement;
-  const screen2 = document.getElementById('screen2') as HTMLElement;
-  const calcBtn = document.getElementById('calc-btn');
-  const resetBtn = document.getElementById('reset-btn');
-  const errorEl = document.getElementById('error-message') as HTMLElement;
-  const bmiValueEl = document.getElementById('bmi-value') as HTMLElement;
-  const bmiCategoryEl = document.getElementById('bmi-category') as HTMLElement;
-  const advice1El = document.getElementById('advice1') as HTMLElement;
-  const advice2El = document.getElementById('advice2') as HTMLElement;
+  const screen1 = document.getElementById("screen1") as HTMLElement;
+  const screen2 = document.getElementById("screen2") as HTMLElement;
+  const calcBtn = document.getElementById("calc-btn");
+  const resetBtn = document.getElementById("reset-btn");
+  const errorEl = document.getElementById("error-message") as HTMLElement;
+  const bmiValueEl = document.getElementById("bmi-value") as HTMLElement;
+  const bmiCategoryEl = document.getElementById("bmi-category") as HTMLElement;
+  const advice1El = document.getElementById("advice1") as HTMLElement;
+  const advice2El = document.getElementById("advice2") as HTMLElement;
 
   function showError(msg: string) {
     errorEl.textContent = msg;
@@ -257,29 +310,40 @@ if (related.length === 0) {
   function calculateBMI() {
     hideError();
 
-    const genderInput = document.querySelector<HTMLInputElement>('input[name="gender"]:checked');
-    const ageVal = parseInt((document.getElementById('age') as HTMLInputElement).value, 10);
-    const heightVal = parseFloat((document.getElementById('height') as HTMLInputElement).value);
-    const weightVal = parseFloat((document.getElementById('weight') as HTMLInputElement).value);
+    const genderInput = document.querySelector<HTMLInputElement>(
+      'input[name="gender"]:checked',
+    );
+    const ageVal = parseInt(
+      (document.getElementById("age") as HTMLInputElement).value,
+      10,
+    );
+    const heightVal = parseFloat(
+      (document.getElementById("height") as HTMLInputElement).value,
+    );
+    const weightVal = parseFloat(
+      (document.getElementById("weight") as HTMLInputElement).value,
+    );
 
     if (!genderInput) {
-      showError('성별을 선택해주세요.');
+      showError("성별을 선택해주세요.");
       return;
     }
     if (isNaN(ageVal) || ageVal <= 0) {
-      showError('나이를 올바르게 입력해주세요.');
+      showError("나이를 올바르게 입력해주세요.");
       return;
     }
     if (isNaN(heightVal) || heightVal <= 0) {
-      showError('키를 올바르게 입력해주세요.');
+      showError("키를 올바르게 입력해주세요.");
       return;
     }
     if (isNaN(weightVal) || weightVal <= 0) {
-      showError('몸무게를 올바르게 입력해주세요.');
+      showError("몸무게를 올바르게 입력해주세요.");
       return;
     }
 
-    const inputSummaryEl = document.getElementById('input-summary') as HTMLElement;
+    const inputSummaryEl = document.getElementById(
+      "input-summary",
+    ) as HTMLElement;
     if (inputSummaryEl) {
       inputSummaryEl.innerHTML = `
         <span>${genderInput.value}</span>
@@ -292,41 +356,46 @@ if (related.length === 0) {
     const heightM = heightVal / 100;
     const bmi = Math.round((weightVal / (heightM * heightM)) * 10) / 10;
 
-    let category = '';
-    let colorClass = '';
-    let advice1 = '';
+    let category = "";
+    let colorClass = "";
+    let advice1 = "";
     let isNormal = false;
 
     if (bmi < 18.5) {
-      category = '저체중';
-      colorClass = 'cat-red';
-      advice1 = '저체중에 해당합니다. 충분한 영양 섭취와 규칙적인 식사 습관이 필요합니다.';
+      category = "저체중";
+      colorClass = "cat-red";
+      advice1 =
+        "저체중에 해당합니다. 충분한 영양 섭취와 규칙적인 식사 습관이 필요합니다.";
     } else if (bmi <= 22.9) {
-      category = '정상 체중';
-      colorClass = 'cat-green';
-      advice1 = '정상 체중 범위에 속합니다. 현재의 건강한 생활 습관을 유지하세요!';
+      category = "정상 체중";
+      colorClass = "cat-green";
+      advice1 =
+        "정상 체중 범위에 속합니다. 현재의 건강한 생활 습관을 유지하세요!";
       isNormal = true;
     } else if (bmi <= 24.9) {
-      category = '비만 전단계 (과체중)';
-      colorClass = 'cat-orange';
-      advice1 = '과체중 단계입니다. 식단 조절과 규칙적인 운동으로 정상 체중을 유지하세요.';
+      category = "비만 전단계 (과체중)";
+      colorClass = "cat-orange";
+      advice1 =
+        "과체중 단계입니다. 식단 조절과 규칙적인 운동으로 정상 체중을 유지하세요.";
     } else if (bmi <= 29.9) {
-      category = '1단계 비만';
-      colorClass = 'cat-red';
-      advice1 = '1단계 비만에 해당합니다. 꾸준한 운동과 식이요법이 권장됩니다.';
+      category = "1단계 비만";
+      colorClass = "cat-red";
+      advice1 = "1단계 비만에 해당합니다. 꾸준한 운동과 식이요법이 권장됩니다.";
     } else if (bmi <= 34.9) {
-      category = '2단계 비만';
-      colorClass = 'cat-red';
-      advice1 = '2단계 비만입니다. 건강에 영향을 줄 수 있으니 전문가와 상담을 권장합니다.';
+      category = "2단계 비만";
+      colorClass = "cat-red";
+      advice1 =
+        "2단계 비만입니다. 건강에 영향을 줄 수 있으니 전문가와 상담을 권장합니다.";
     } else {
-      category = '3단계 비만';
-      colorClass = 'cat-red';
-      advice1 = '3단계 비만(고도비만)에 해당합니다. 반드시 전문 의료기관의 도움을 받으세요.';
+      category = "3단계 비만";
+      colorClass = "cat-red";
+      advice1 =
+        "3단계 비만(고도비만)에 해당합니다. 반드시 전문 의료기관의 도움을 받으세요.";
     }
 
     bmiValueEl.textContent = bmi.toFixed(1);
     bmiCategoryEl.textContent = category;
-    bmiCategoryEl.classList.remove('cat-green', 'cat-orange', 'cat-red');
+    bmiCategoryEl.classList.remove("cat-green", "cat-orange", "cat-red");
     bmiCategoryEl.classList.add(colorClass);
 
     advice1El.textContent = advice1;
@@ -338,26 +407,39 @@ if (related.length === 0) {
       advice2El.hidden = false;
     } else {
       advice2El.hidden = true;
-      advice2El.textContent = '';
+      advice2El.textContent = "";
     }
 
     screen1.hidden = true;
     screen2.hidden = false;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const targetEl = document.getElementById("screen2");
+    if (targetEl) {
+      const y = targetEl.getBoundingClientRect().top + window.scrollY - 20;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    }
   }
 
   function resetApp() {
     hideError();
     screen2.hidden = true;
     screen1.hidden = false;
+
+    const appContainer = document.querySelector(".app-calc-layout");
+    if (appContainer) {
+      const y = appContainer.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }
 
-  calcBtn?.addEventListener('click', calculateBMI);
-  resetBtn?.addEventListener('click', resetApp);
+  calcBtn?.addEventListener("click", calculateBMI);
+  resetBtn?.addEventListener("click", resetApp);
 
   // 입력 시 포커스 깔끔하게
-  ['age', 'height', 'weight'].forEach(id => {
+  ["age", "height", "weight"].forEach((id) => {
     const el = document.getElementById(id) as HTMLInputElement | null;
-    el?.addEventListener('focus', () => hideError());
+    el?.addEventListener("focus", () => hideError());
   });
 </script>

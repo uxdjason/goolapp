@@ -1,24 +1,37 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'anniversary-calculator');
-if (!entry) throw new Error('anniversary-calculator entry not found');
+const entry = await getEntry("apps", "anniversary-calculator");
+if (!entry) throw new Error("anniversary-calculator entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
 }
 
-const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1500, 2000, 3000, 4000, 5000, 6000, 7000, 7777, 8000, 9000, 10000];
+const daysList = [
+  50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1500, 2000, 3000,
+  4000, 5000, 6000, 7000, 7777, 8000, 9000, 10000,
+];
 ---
 
 <AppLayout
@@ -37,29 +50,56 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
     <div class="app-calc-layout" style="max-width:720px">
       <!-- 입력 화면 -->
       <section id="screen1">
-        <p class="intro">기준이 되는 날짜를 입력하면, 50일, 100일, 1000일 등 다양한 기념일을 한 번에 계산해드려요.</p>
+        <p class="intro">
+          기준이 되는 날짜를 입력하면, 50일, 100일, 1000일 등 다양한 기념일을 한
+          번에 계산해드려요.
+        </p>
 
         <div class="input-grid">
           <div class="app-form-group">
             <label class="app-label" for="baseYear">연도</label>
-            <input id="baseYear" class="app-input" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="yyyy" />
+            <input
+              id="baseYear"
+              class="app-input"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              placeholder="2026"
+            />
           </div>
           <div class="app-form-group">
             <label class="app-label" for="baseMonth">월</label>
-            <input id="baseMonth" class="app-input" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="mm" />
+            <input
+              id="baseMonth"
+              class="app-input"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              placeholder="1-12"
+            />
           </div>
           <div class="app-form-group">
             <label class="app-label" for="baseDay">일</label>
-            <input id="baseDay" class="app-input" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="dd" />
+            <input
+              id="baseDay"
+              class="app-input"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              placeholder="1-31"
+            />
           </div>
         </div>
 
         <p class="error-msg" id="errorMsg" hidden></p>
 
-        <button class="app-btn app-btn-primary" id="calcBtn" type="button">기념일 계산</button>
+        <button class="app-btn app-btn-primary" id="calcBtn" type="button"
+          >기념일 계산</button
+        >
 
         <div class="quick-tip">
-          💡 연인의 첫 만남, 결혼, 출산, 입사일 등 의미 있는 날짜를 입력해보세요.
+          💡 연인의 첫 만남, 결혼, 출산, 입사일 등 의미 있는 날짜를
+          입력해보세요.
         </div>
       </section>
 
@@ -81,8 +121,12 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
         </div>
 
         <div class="action-buttons">
-          <button class="app-btn app-btn-secondary" id="copyBtn" type="button">📋 클립보드로 복사</button>
-          <button class="app-btn app-btn-primary" id="resetBtn" type="button">처음으로</button>
+          <button class="app-btn app-btn-secondary" id="copyBtn" type="button"
+            >📋 클립보드로 복사</button
+          >
+          <button class="app-btn app-btn-primary" id="resetBtn" type="button"
+            >처음으로</button
+          >
         </div>
 
         <p class="copy-feedback" id="copyFeedback" hidden>✅ 복사되었습니다!</p>
@@ -95,7 +139,9 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
           <p class="app-modal-title" id="app-alert-title">알림</p>
           <p class="app-modal-body" id="app-alert-message"></p>
           <div class="app-modal-actions">
-            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary"
+              >확인</button
+            >
           </div>
         </div>
       </div>
@@ -110,12 +156,15 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
 
 <style>
   /* anniversary-calculator 특화 스타일 */
-  #screen1, #screen2 {
+  #screen1,
+  #screen2 {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
-  #screen2[hidden] { display: none; }
+  #screen2[hidden] {
+    display: none;
+  }
 
   .intro {
     font-size: 0.95rem;
@@ -141,7 +190,9 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
     display: block;
     font-family: var(--font-family-gothic);
   }
-  .error-msg[hidden] { display: none; }
+  .error-msg[hidden] {
+    display: none;
+  }
 
   .quick-tip {
     padding: 0.85rem 1rem;
@@ -196,47 +247,53 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
     display: block;
     font-family: var(--font-family-gothic);
   }
-  .copy-feedback[hidden] { display: none; }
+  .copy-feedback[hidden] {
+    display: none;
+  }
 
   @media (max-width: 480px) {
-    .input-grid { grid-template-columns: 1fr 1fr 1fr; }
+    .input-grid {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
   }
 </style>
 
 <script is:inline define:vars={{ daysList }}>
   (function () {
-    const screen1 = document.getElementById('screen1');
-    const screen2 = document.getElementById('screen2');
-    const yearEl = document.getElementById('baseYear');
-    const monthEl = document.getElementById('baseMonth');
-    const dayEl = document.getElementById('baseDay');
-    const errorMsg = document.getElementById('errorMsg');
-    const calcBtn = document.getElementById('calcBtn');
-    const copyBtn = document.getElementById('copyBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const resultHeader = document.getElementById('resultHeader');
-    const resultBody = document.getElementById('resultBody');
-    const copyFeedback = document.getElementById('copyFeedback');
+    const screen1 = document.getElementById("screen1");
+    const screen2 = document.getElementById("screen2");
+    const yearEl = document.getElementById("baseYear");
+    const monthEl = document.getElementById("baseMonth");
+    const dayEl = document.getElementById("baseDay");
+    const errorMsg = document.getElementById("errorMsg");
+    const calcBtn = document.getElementById("calcBtn");
+    const copyBtn = document.getElementById("copyBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const resultHeader = document.getElementById("resultHeader");
+    const resultBody = document.getElementById("resultBody");
+    const copyFeedback = document.getElementById("copyFeedback");
 
-    const appAlertModal = document.getElementById('app-alert-modal');
-    const appAlertMessage = document.getElementById('app-alert-message');
-    const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn');
+    const appAlertModal = document.getElementById("app-alert-modal");
+    const appAlertMessage = document.getElementById("app-alert-message");
+    const appAlertConfirmBtn = document.getElementById("app-alert-confirm-btn");
 
     function showAlert(msg) {
       appAlertMessage.textContent = msg;
-      appAlertModal.removeAttribute('hidden');
+      appAlertModal.removeAttribute("hidden");
     }
 
     function hideAlert() {
-      appAlertModal.setAttribute('hidden', '');
+      appAlertModal.setAttribute("hidden", "");
     }
 
-    if (appAlertConfirmBtn) appAlertConfirmBtn.addEventListener('click', hideAlert);
-    if (appAlertModal) appAlertModal.addEventListener('click', (e) => {
-      if (e.target === appAlertModal) hideAlert();
-    });
+    if (appAlertConfirmBtn)
+      appAlertConfirmBtn.addEventListener("click", hideAlert);
+    if (appAlertModal)
+      appAlertModal.addEventListener("click", (e) => {
+        if (e.target === appAlertModal) hideAlert();
+      });
 
-    const weekdayNames = ['일', '월', '화', '수', '목', '금', '토'];
+    const weekdayNames = ["일", "월", "화", "수", "목", "금", "토"];
 
     function showError(msg) {
       errorMsg.textContent = msg;
@@ -244,19 +301,19 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
     }
 
     function clearError() {
-      errorMsg.textContent = '';
+      errorMsg.textContent = "";
       errorMsg.hidden = true;
     }
 
     function formatDate(d) {
       const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
       return `${y}-${m}-${dd}`;
     }
 
     function formatDay(n) {
-      return n.toLocaleString('ko-KR') + '일';
+      return n.toLocaleString("ko-KR") + "일";
     }
 
     function calculate() {
@@ -267,12 +324,12 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
       const d = parseInt(dayEl.value, 10);
 
       if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) {
-        showError('연/월/일을 모두 숫자로 입력해주세요.');
+        showError("연/월/일을 모두 숫자로 입력해주세요.");
         return;
       }
 
       if (y < 0 || y > 9999 || m < 1 || m > 12 || d < 1 || d > 31) {
-        showError('올바른 범위의 날짜를 입력해주세요.');
+        showError("올바른 범위의 날짜를 입력해주세요.");
         return;
       }
 
@@ -282,27 +339,27 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
         baseDate.getMonth() !== m - 1 ||
         baseDate.getDate() !== d
       ) {
-        showError('존재하지 않는 날짜입니다. 다시 확인해주세요.');
+        showError("존재하지 않는 날짜입니다. 다시 확인해주세요.");
         return;
       }
 
       resultHeader.textContent = `📅 기준일: ${formatDate(baseDate)} (${weekdayNames[baseDate.getDay()]}요일)`;
 
-      resultBody.innerHTML = '';
+      resultBody.innerHTML = "";
       daysList.forEach((n) => {
         const target = new Date(baseDate.getTime());
         target.setDate(target.getDate() + n);
 
-        const tr = document.createElement('tr');
-        const tdDay = document.createElement('td');
-        tdDay.className = 'day-cell';
+        const tr = document.createElement("tr");
+        const tdDay = document.createElement("td");
+        tdDay.className = "day-cell";
         tdDay.textContent = formatDay(n);
 
-        const tdDate = document.createElement('td');
+        const tdDate = document.createElement("td");
         tdDate.textContent = formatDate(target);
 
-        const tdWeek = document.createElement('td');
-        tdWeek.textContent = weekdayNames[target.getDay()] + '요일';
+        const tdWeek = document.createElement("td");
+        tdWeek.textContent = weekdayNames[target.getDay()] + "요일";
 
         tr.appendChild(tdDay);
         tr.appendChild(tdDate);
@@ -319,37 +376,38 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
       screen2.hidden = true;
       screen1.hidden = false;
       copyFeedback.hidden = true;
-      
-      const appContainer = document.querySelector('.anniversary-app');
+
+      const appContainer = document.querySelector(".anniversary-app");
       if (appContainer) {
-        const y = appContainer.getBoundingClientRect().top + window.scrollY - 120;
-        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+        const y =
+          appContainer.getBoundingClientRect().top + window.scrollY - 120;
+        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
       } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
     }
 
     async function copyResult() {
-      let text = resultHeader.textContent + '\n\n';
-      const rows = resultBody.querySelectorAll('tr');
+      let text = resultHeader.textContent + "\n\n";
+      const rows = resultBody.querySelectorAll("tr");
       rows.forEach((row) => {
-        const cells = row.querySelectorAll('td');
+        const cells = row.querySelectorAll("td");
         const parts = [];
         cells.forEach((c) => parts.push(c.textContent.trim()));
-        text += parts.join(' | ') + '\n';
+        text += parts.join(" | ") + "\n";
       });
 
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           await navigator.clipboard.writeText(text);
         } else {
-          const ta = document.createElement('textarea');
+          const ta = document.createElement("textarea");
           ta.value = text;
-          ta.style.position = 'fixed';
-          ta.style.opacity = '0';
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
           document.body.appendChild(ta);
           ta.select();
-          document.execCommand('copy');
+          document.execCommand("copy");
           document.body.removeChild(ta);
         }
         copyFeedback.hidden = false;
@@ -357,20 +415,20 @@ const daysList = [50, 100, 123, 200, 300, 500, 700, 777, 800, 900, 1000, 1234, 1
           copyFeedback.hidden = true;
         }, 2000);
       } catch (e) {
-        showAlert('복사에 실패했습니다. 브라우저 설정을 확인해주세요.');
+        showAlert("복사에 실패했습니다. 브라우저 설정을 확인해주세요.");
       }
     }
 
-    calcBtn.addEventListener('click', calculate);
-    resetBtn.addEventListener('click', reset);
-    copyBtn.addEventListener('click', copyResult);
+    calcBtn.addEventListener("click", calculate);
+    resetBtn.addEventListener("click", reset);
+    copyBtn.addEventListener("click", copyResult);
 
     [yearEl, monthEl, dayEl].forEach((el) => {
-      el.addEventListener('input', () => {
-        el.value = el.value.replace(/[^0-9]/g, '');
+      el.addEventListener("input", () => {
+        el.value = el.value.replace(/[^0-9]/g, "");
       });
-      el.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') calculate();
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") calculate();
       });
     });
   })();
