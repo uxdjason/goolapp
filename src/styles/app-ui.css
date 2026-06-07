@@ -58,6 +58,7 @@
   color: var(--color-on-primary);
   border-color: var(--color-primary);
 }
+
 .app-btn-primary:hover:not(:disabled) {
   filter: brightness(1.1);
   box-shadow: 0 6px 18px rgba(139, 79, 50, 0.28);
@@ -70,6 +71,7 @@
   color: var(--color-on-surface);
   border-color: var(--color-outline-variant);
 }
+
 .app-btn-secondary:hover:not(:disabled) {
   background: var(--color-surface-container-high);
   border-color: var(--color-outline);
@@ -81,6 +83,7 @@
   color: var(--color-primary);
   border-color: var(--color-primary);
 }
+
 .app-btn-outline:hover:not(:disabled) {
   background: rgba(139, 79, 50, 0.06);
   box-shadow: 0 2px 8px rgba(139, 79, 50, 0.12);
@@ -92,6 +95,7 @@
   color: #fff;
   border-color: #dc2626;
 }
+
 .app-btn-danger:hover:not(:disabled) {
   background: #b91c1c;
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
@@ -107,6 +111,7 @@
   width: auto;
   padding: 0.5rem 0.75rem;
 }
+
 .app-btn-text:hover:not(:disabled) {
   color: var(--color-on-surface);
   background: var(--color-surface-container-low);
@@ -118,6 +123,7 @@
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
 }
+
 .app-btn-lg {
   padding: 1rem 1.75rem;
   font-size: 1.05rem;
@@ -397,7 +403,9 @@
 }
 
 @keyframes app-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 
@@ -458,8 +466,15 @@
 }
 
 @keyframes app-modal-in {
-  from { opacity: 0; transform: scale(0.94) translateY(8px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .app-modal-icon {
@@ -587,7 +602,7 @@
 .app-tab-btn.active {
   background: var(--color-primary);
   color: var(--color-on-primary);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* ─────────────────────────────────────────────
@@ -605,6 +620,7 @@
   width: 100%;
   animation: fadeIn var(--transition-base);
 }
+
 .app-quiz-screen[hidden] {
   display: none;
 }
@@ -642,6 +658,7 @@
   text-align: left;
   display: inline-block;
 }
+
 .app-quiz-info-list li {
   padding: 0.4rem 0;
   color: var(--color-on-surface);
@@ -662,6 +679,7 @@
 .app-quiz-progress-text {
   font-weight: 600;
 }
+
 .app-quiz-score-text {
   font-weight: 600;
   color: var(--color-primary);
@@ -693,6 +711,7 @@
   gap: 0.75rem;
   margin-bottom: 1rem;
 }
+
 @media (min-width: 520px) {
   .app-quiz-choices {
     grid-template-columns: 1fr 1fr;
@@ -723,6 +742,7 @@
   line-height: 140px;
   font-family: var(--font-family-gothic);
 }
+
 .app-quiz-score-circle .app-quiz-score-unit {
   font-size: 1rem;
   font-weight: 600;
@@ -751,6 +771,7 @@
 .app-screen {
   display: block;
 }
+
 .app-screen[hidden] {
   display: none !important;
 }
@@ -932,4 +953,105 @@
   font-family: var(--font-family-gothic);
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────
+   SPACER DIVs
+───────────────────────────────────────────── */
+
+/* 0.5rem 높이 스페이서 */
+.app-spacer-xs {
+  display: block;
+  height: 0.5rem;
+  font-size: 0;
+}
+
+/* 1rem 높이 스페이서 */
+.app-spacer-sm {
+  display: block;
+  height: 1rem;
+  font-size: 0;
+  /* 화면에서 높이만 확보 */
+}
+
+/* 1.5rem 높이 스페이서 */
+.app-spacer-md {
+  display: block;
+  height: 1.5rem;
+  font-size: 0;
+}
+
+/* 2rem 높이 스페이서 */
+.app-spacer-lg {
+  display: block;
+  height: 2rem;
+  font-size: 0;
+}
+
+/* 2.5rem 높이 스페이서 */
+.app-spacer-xl {
+  display: block;
+  height: 2.5rem;
+  font-size: 0;
+}
+
+/* 3rem 높이 스페이서 */
+.app-spacer-xxl {
+  display: block;
+  height: 3rem;
+  font-size: 0;
+}
+
+/* 4rem 높이 스페이서 */
+.app-spacer-xxxl {
+  display: block;
+  height: 4rem;
+  font-size: 0;
+}
+
+/* 특정 rem 크기 스페이서 (인라인 스타일 없이 고정 높이) */
+.app-spacer-36 {
+  display: block;
+  height: 36px;
+  font-size: 0;
+}
+
+/* 모바일/PC별 높이 대응 스페이서 */
+.app-spacer-mobile-24-pc-36 {
+  display: block;
+  height: 24px;
+  /* 모바일 */
+}
+
+@media (min-width: 1024px) {
+  .app-spacer-mobile-24-pc-36 {
+    height: 36px;
+    /* PC */
+  }
+}
+
+.app-spacer-mobile-36-pc-48 {
+  display: block;
+  height: 36px;
+  /* 모바일 */
+}
+
+@media (min-width: 1024px) {
+  .app-spacer-mobile-36-pc-48 {
+    height: 48px;
+    /* PC */
+  }
+}
+
+.app-spacer-mobile-48-pc-60 {
+  display: block;
+  height: 48px;
+  /* 모바일 */
+}
+
+@media (min-width: 1024px) {
+  .app-spacer-mobile-48-pc-60 {
+    height: 60px;
+    /* PC */
+  }
 }

@@ -346,6 +346,13 @@ if (related.length === 0) {
     btnReset?.addEventListener('click', () => {
       clearError();
       goTo(1);
+      const appContainer = document.querySelector('.app-calc-layout');
+      if (appContainer) {
+        const y = appContainer.getBoundingClientRect().top + window.scrollY - 120;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     });
 
     // Enter 키로 계산
