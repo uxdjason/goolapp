@@ -450,9 +450,9 @@ if (related.length === 0) {
     err.hidden = true;
     goTo(2);
     
-    const appContainer = document.querySelector(".app-calc-layout");
-    if (appContainer) {
-      const y = appContainer.getBoundingClientRect().top + window.scrollY - 120;
+    const targetEl = document.getElementById("screen2");
+    if (targetEl) {
+      const y = targetEl.getBoundingClientRect().top + window.scrollY - 20;
       window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
     }
   });
@@ -491,16 +491,13 @@ if (related.length === 0) {
     }
   });
   $("btn-reset").addEventListener("click", () => {
-    ["y1", "mo1", "d1", "y2", "mo2", "d2"].forEach((id) => {
-      $i(id).value = "";
-    });
     goTo(1);
-    const appContainer = document.querySelector('.app-calc-layout');
+    const appContainer = document.querySelector(".app-calc-layout");
     if (appContainer) {
-      const y = appContainer.getBoundingClientRect().top + window.scrollY - 120;
-      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      const y = appContainer.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
     } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   });
 

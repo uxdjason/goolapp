@@ -42,87 +42,85 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div style="max-width:560px">
-      <!-- 입력 화면 -->
-      <section id="screen-input">
-        <h2 class="section-title">생년월일 입력</h2>
-        <p class="section-desc">
-          태어난 연/월/일을 입력하면 한국 나이와 만 나이를 계산해 드립니다.
-        </p>
+    <!-- 입력 화면 -->
+    <section id="screen-input">
+      <h2 class="section-title">생년월일 입력</h2>
+      <p class="section-desc">
+        태어난 연/월/일을 입력하면 한국 나이와 만 나이를 계산해 드립니다.
+      </p>
 
-        <div class="date-inputs">
-          <div class="app-form-group">
-            <label class="app-label" for="year">년</label>
-            <input
-              id="year"
-              class="app-input"
-              type="number"
-              min="1"
-              step="1"
-              placeholder="예: 1990"
-              inputmode="numeric"
-            />
-          </div>
-          <div class="app-form-group">
-            <label class="app-label" for="month">월</label>
-            <input
-              id="month"
-              class="app-input"
-              type="number"
-              min="1"
-              max="12"
-              step="1"
-              placeholder="1-12"
-              inputmode="numeric"
-            />
-          </div>
-          <div class="app-form-group">
-            <label class="app-label" for="day">일</label>
-            <input
-              id="day"
-              class="app-input"
-              type="number"
-              min="1"
-              max="31"
-              step="1"
-              placeholder="1-31"
-              inputmode="numeric"
-            />
-          </div>
+      <div class="date-inputs">
+        <div class="app-form-group">
+          <label class="app-label" for="year">년</label>
+          <input
+            id="year"
+            class="app-input"
+            type="number"
+            min="1"
+            step="1"
+            placeholder="예: 1990"
+            inputmode="numeric"
+          />
         </div>
-
-        <p id="err-msg" class="err-msg" hidden></p>
-
-        <button id="btn-calc" class="app-btn app-btn-primary" type="button"
-          >나이 계산</button
-        >
-      </section>
-
-      <!-- 결과 화면 -->
-      <section id="screen-result" hidden>
-        <h2 class="section-title">나이 계산 결과</h2>
-
-        <div class="result-grid">
-          <div class="result-card highlight">
-            <span class="result-label">만 나이</span>
-            <span class="result-value"><span id="manAge">0</span>세</span>
-          </div>
-          <div class="result-card">
-            <span class="result-label">한국 나이</span>
-            <span class="result-value"><span id="koreaAge">0</span>세</span>
-          </div>
+        <div class="app-form-group">
+          <label class="app-label" for="month">월</label>
+          <input
+            id="month"
+            class="app-input"
+            type="number"
+            min="1"
+            max="12"
+            step="1"
+            placeholder="1-12"
+            inputmode="numeric"
+          />
         </div>
-
-        <div class="lifespan-box">
-          <span class="lifespan-label">지금까지 살아온 기간</span>
-          <span id="lifespan" class="lifespan-value">- 년 - 개월 - 일</span>
+        <div class="app-form-group">
+          <label class="app-label" for="day">일</label>
+          <input
+            id="day"
+            class="app-input"
+            type="number"
+            min="1"
+            max="31"
+            step="1"
+            placeholder="1-31"
+            inputmode="numeric"
+          />
         </div>
+      </div>
 
-        <button id="btn-reset" class="app-btn app-btn-primary" type="button"
-          >다시 하기</button
-        >
-      </section>
-    </div>
+      <p id="err-msg" class="err-msg" hidden></p>
+
+      <button id="btn-calc" class="app-btn app-btn-primary" type="button"
+        >나이 계산</button
+      >
+    </section>
+
+    <!-- 결과 화면 -->
+    <section id="screen-result" hidden>
+      <h2 class="section-title">나이 계산 결과</h2>
+
+      <div class="result-grid">
+        <div class="result-card highlight">
+          <span class="result-label">만 나이</span>
+          <span class="result-value"><span id="manAge">0</span>세</span>
+        </div>
+        <div class="result-card">
+          <span class="result-label">한국 나이</span>
+          <span class="result-value"><span id="koreaAge">0</span>세</span>
+        </div>
+      </div>
+
+      <div class="lifespan-box">
+        <span class="lifespan-label">지금까지 살아온 기간</span>
+        <span id="lifespan" class="lifespan-value">- 년 - 개월 - 일</span>
+      </div>
+
+      <button id="btn-reset" class="app-btn app-btn-primary" type="button"
+        >다시 하기</button
+      >
+    </section>
   </Fragment>
 
   <Fragment slot="longform">
