@@ -449,6 +449,12 @@ if (related.length === 0) {
     }
     err.hidden = true;
     goTo(2);
+    
+    const appContainer = document.querySelector(".app-calc-layout");
+    if (appContainer) {
+      const y = appContainer.getBoundingClientRect().top + window.scrollY - 120;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    }
   });
 
   // ===== Step 2 → 계산 =====
@@ -464,8 +470,26 @@ if (related.length === 0) {
     compare(b1, b2);
   });
 
-  $("btn-back1").addEventListener("click", () => goTo(1));
-  $("btn-back2").addEventListener("click", () => goTo(2));
+  $("btn-back1").addEventListener("click", () => {
+    goTo(1);
+    const appContainer = document.querySelector(".app-calc-layout");
+    if (appContainer) {
+      const y = appContainer.getBoundingClientRect().top + window.scrollY - 120;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  });
+  $("btn-back2").addEventListener("click", () => {
+    goTo(2);
+    const appContainer = document.querySelector(".app-calc-layout");
+    if (appContainer) {
+      const y = appContainer.getBoundingClientRect().top + window.scrollY - 120;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  });
   $("btn-reset").addEventListener("click", () => {
     ["y1", "mo1", "d1", "y2", "mo2", "d2"].forEach((id) => {
       $i(id).value = "";
