@@ -42,381 +42,382 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <!-- 입력 화면 -->
-    <section id="screen-input">
-      <h2 class="section-title">생년월일 입력</h2>
-      <p class="section-desc">
-        태어난 연/월/일을 입력하면 한국 나이와 만 나이를 계산해 드립니다.
-      </p>
+    <div class="app-calc-layout" style="max-width:560px">
+      <!-- 입력 화면 -->
+      <section id="screen-input">
+        <h2 class="section-title">생년월일 입력</h2>
+        <p class="section-desc">
+          태어난 연/월/일을 입력하면 한국 나이와 만 나이를 계산해 드립니다.
+        </p>
 
-      <div class="date-inputs">
-        <div class="app-form-group">
-          <label class="app-label" for="year">년</label>
-          <input
-            id="year"
-            class="app-input"
-            type="number"
-            min="1"
-            step="1"
-            placeholder="예: 1990"
-            inputmode="numeric"
-          />
+        <div class="date-inputs">
+          <div class="app-form-group">
+            <label class="app-label" for="year">년</label>
+            <input
+              id="year"
+              class="app-input"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="예: 1990"
+              inputmode="numeric"
+            />
+          </div>
+          <div class="app-form-group">
+            <label class="app-label" for="month">월</label>
+            <input
+              id="month"
+              class="app-input"
+              type="number"
+              min="1"
+              max="12"
+              step="1"
+              placeholder="1-12"
+              inputmode="numeric"
+            />
+          </div>
+          <div class="app-form-group">
+            <label class="app-label" for="day">일</label>
+            <input
+              id="day"
+              class="app-input"
+              type="number"
+              min="1"
+              max="31"
+              step="1"
+              placeholder="1-31"
+              inputmode="numeric"
+            />
+          </div>
         </div>
-        <div class="app-form-group">
-          <label class="app-label" for="month">월</label>
-          <input
-            id="month"
-            class="app-input"
-            type="number"
-            min="1"
-            max="12"
-            step="1"
-            placeholder="1-12"
-            inputmode="numeric"
-          />
+
+        <p id="err-msg" class="err-msg" hidden></p>
+
+        <button id="btn-calc" class="app-btn app-btn-primary" type="button"
+          >나이 계산</button
+        >
+      </section>
+
+      <!-- 결과 화면 -->
+      <section id="screen-result" hidden>
+        <h2 class="section-title">나이 계산 결과</h2>
+
+        <div class="result-grid">
+          <div class="result-card highlight">
+            <span class="result-label">만 나이</span>
+            <span class="result-value"><span id="manAge">0</span>세</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">한국 나이</span>
+            <span class="result-value"><span id="koreaAge">0</span>세</span>
+          </div>
         </div>
-        <div class="app-form-group">
-          <label class="app-label" for="day">일</label>
-          <input
-            id="day"
-            class="app-input"
-            type="number"
-            min="1"
-            max="31"
-            step="1"
-            placeholder="1-31"
-            inputmode="numeric"
-          />
+
+        <div class="lifespan-box">
+          <span class="lifespan-label">지금까지 살아온 기간</span>
+          <span id="lifespan" class="lifespan-value">- 년 - 개월 - 일</span>
         </div>
-      </div>
 
-      <p id="err-msg" class="err-msg" hidden></p>
+        <button id="btn-reset" class="app-btn app-btn-primary" type="button"
+          >다시 하기</button
+        >
+      </section>
+    </div>
 
-      <button id="btn-calc" class="app-btn app-btn-primary" type="button"
-        >나이 계산</button
-      >
-    </section>
-
-    <!-- 결과 화면 -->
-    <section id="screen-result" hidden>
-      <h2 class="section-title">나이 계산 결과</h2>
-
-      <div class="result-grid">
-        <div class="result-card highlight">
-          <span class="result-label">만 나이</span>
-          <span class="result-value"><span id="manAge">0</span>세</span>
-        </div>
-        <div class="result-card">
-          <span class="result-label">한국 나이</span>
-          <span class="result-value"><span id="koreaAge">0</span>세</span>
-        </div>
-      </div>
-
-      <div class="lifespan-box">
-        <span class="lifespan-label">지금까지 살아온 기간</span>
-        <span id="lifespan" class="lifespan-value">- 년 - 개월 - 일</span>
-      </div>
-
-      <button id="btn-reset" class="app-btn app-btn-primary" type="button"
-        >다시 하기</button
-      >
-    </section>
+    <Fragment slot="longform">
+      <Content />
+      <RelatedApps apps={related} />
+    </Fragment>
   </Fragment>
 
-  <Fragment slot="longform">
-    <Content />
-    <RelatedApps apps={related} />
-  </Fragment>
-</AppLayout>
+  <style>
+    /* age-calculator 특화 스타일 */
+    #screen-input,
+    #screen-result {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    #screen-result[hidden] {
+      display: none;
+    }
 
-<style>
-  /* age-calculator 특화 스타일 */
-  #screen-input,
-  #screen-result {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    background: var(--color-surface);
-    border: 1px solid var(--color-outline-variant);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  }
-  #screen-result[hidden] {
-    display: none;
-  }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-on-surface);
+      margin: 0 0 0.5rem 0;
+      font-family: var(--font-family-gothic);
+    }
 
-  .section-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-on-surface);
-    margin: 0 0 0.5rem 0;
-    font-family: var(--font-family-gothic);
-  }
+    .section-desc {
+      color: var(--color-on-surface-variant);
+      font-size: 0.95rem;
+      margin: 0;
+      font-family: var(--font-family-gothic);
+    }
 
-  .section-desc {
-    color: var(--color-on-surface-variant);
-    font-size: 0.95rem;
-    margin: 0;
-    font-family: var(--font-family-gothic);
-  }
-
-  .date-inputs {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr;
-    gap: 0.75rem;
-  }
-
-  /* 숫자 입력 화살표 제거 (모바일 UX) */
-  .app-input::-webkit-outer-spin-button,
-  .app-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  .app-input[type="number"] {
-    -moz-appearance: textfield;
-  }
-
-  .err-msg {
-    display: block;
-    background: #fef2f2;
-    color: #b91c1c;
-    border: 1px solid #fecaca;
-    border-radius: var(--radius-md);
-    padding: 0.6rem 0.8rem;
-    font-size: 0.9rem;
-    margin: 0;
-    font-family: var(--font-family-gothic);
-  }
-  .err-msg[hidden] {
-    display: none;
-  }
-
-  .result-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-  }
-
-  .result-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    padding: 1.25rem 0.75rem;
-    border: 2px solid var(--color-outline-variant);
-    border-radius: var(--radius-md);
-    background: var(--color-surface-container-low);
-    font-family: var(--font-family-gothic);
-  }
-
-  .result-card.highlight {
-    border-color: var(--color-primary);
-    background: rgba(139, 79, 50, 0.06);
-  }
-
-  .result-label {
-    font-size: 0.9rem;
-    color: var(--color-on-surface-variant);
-    font-weight: 600;
-  }
-
-  .result-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--color-on-surface);
-  }
-
-  .lifespan-box {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    padding: 1rem;
-    border-radius: var(--radius-md);
-    background: var(--color-surface-container-low);
-    border: 1px dashed var(--color-outline-variant);
-    margin-bottom: 0.75rem;
-    text-align: center;
-  }
-
-  .lifespan-label {
-    font-size: 0.9rem;
-    color: var(--color-on-surface-variant);
-    font-weight: 600;
-    font-family: var(--font-family-gothic);
-  }
-
-  .lifespan-value {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--color-on-surface);
-    font-family: var(--font-family-gothic);
-  }
-
-  @media (max-width: 480px) {
     .date-inputs {
-      grid-template-columns: 1fr 1fr 1fr;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 0.75rem;
     }
+
+    /* 숫자 입력 화살표 제거 (모바일 UX) */
+    .app-input::-webkit-outer-spin-button,
+    .app-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .app-input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    .err-msg {
+      display: block;
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+      border-radius: var(--radius-md);
+      padding: 0.6rem 0.8rem;
+      font-size: 0.9rem;
+      margin: 0;
+      font-family: var(--font-family-gothic);
+    }
+    .err-msg[hidden] {
+      display: none;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .result-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 1.25rem 0.75rem;
+      border: 2px solid var(--color-outline-variant);
+      border-radius: var(--radius-md);
+      background: var(--color-surface-container-low);
+      font-family: var(--font-family-gothic);
+    }
+
+    .result-card.highlight {
+      border-color: var(--color-primary);
+      background: rgba(139, 79, 50, 0.06);
+    }
+
+    .result-label {
+      font-size: 0.9rem;
+      color: var(--color-on-surface-variant);
+      font-weight: 600;
+    }
+
     .result-value {
-      font-size: 1.35rem;
-    }
-  }
-</style>
-
-<script>
-  function $(id: string) {
-    return document.getElementById(id) as HTMLElement | null;
-  }
-
-  function showError(msg: string) {
-    const el = $("err-msg") as HTMLParagraphElement | null;
-    if (!el) return;
-    el.textContent = msg;
-    el.hidden = false;
-  }
-
-  function clearError() {
-    const el = $("err-msg") as HTMLParagraphElement | null;
-    if (!el) return;
-    el.textContent = "";
-    el.hidden = true;
-  }
-
-  function goTo(screen: 1 | 2) {
-    const s1 = $("screen-input");
-    const s2 = $("screen-result");
-    if (!s1 || !s2) return;
-    if (screen === 1) {
-      s1.hidden = false;
-      s2.hidden = true;
-    } else {
-      s1.hidden = true;
-      s2.hidden = false;
-    }
-  }
-
-  function isValidDate(y: number, m: number, d: number): boolean {
-    const dt = new Date(y, m - 1, d);
-    return (
-      dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d
-    );
-  }
-
-  function calculateAge() {
-    clearError();
-
-    const yEl = $("year") as HTMLInputElement | null;
-    const mEl = $("month") as HTMLInputElement | null;
-    const dEl = $("day") as HTMLInputElement | null;
-    if (!yEl || !mEl || !dEl) return;
-
-    const y = parseInt(yEl.value, 10);
-    const m = parseInt(mEl.value, 10);
-    const d = parseInt(dEl.value, 10);
-
-    if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) {
-      showError("연, 월, 일을 모두 숫자로 입력해 주세요.");
-      return;
-    }
-    if (y < 1) {
-      showError("태어난 해를 올바르게 입력해 주세요.");
-      return;
-    }
-    if (m < 1 || m > 12) {
-      showError("월은 1~12 사이로 입력해 주세요.");
-      return;
-    }
-    if (d < 1 || d > 31) {
-      showError("일은 1~31 사이로 입력해 주세요.");
-      return;
-    }
-    if (!isValidDate(y, m, d)) {
-      showError("존재하지 않는 날짜입니다. 다시 확인해 주세요.");
-      return;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--color-on-surface);
     }
 
-    const today = new Date();
-    const birth = new Date(y, m - 1, d);
-
-    if (birth.getTime() > today.getTime()) {
-      showError("미래 날짜는 입력할 수 없습니다.");
-      return;
+    .lifespan-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      background: var(--color-surface-container-low);
+      border: 1px dashed var(--color-outline-variant);
+      margin-bottom: 0.75rem;
+      text-align: center;
     }
 
-    // 한국 나이
-    const koreaAge = today.getFullYear() - y + 1;
-
-    // 만 나이
-    let manAge = today.getFullYear() - y;
-    const beforeBirthday =
-      today.getMonth() < m - 1 ||
-      (today.getMonth() === m - 1 && today.getDate() < d);
-    if (beforeBirthday) manAge -= 1;
-
-    // 생존 기간 (정확도 개선: 윤년/월별 일수 반영)
-    let yrs = today.getFullYear() - birth.getFullYear();
-    let mons = today.getMonth() - birth.getMonth();
-    let days = today.getDate() - birth.getDate();
-
-    if (days < 0) {
-      mons -= 1;
-      // 이전 달의 마지막 날
-      const prevMonthLastDay = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        0,
-      ).getDate();
-      days += prevMonthLastDay;
-    }
-    if (mons < 0) {
-      yrs -= 1;
-      mons += 12;
+    .lifespan-label {
+      font-size: 0.9rem;
+      color: var(--color-on-surface-variant);
+      font-weight: 600;
+      font-family: var(--font-family-gothic);
     }
 
-    const koreaAgeEl = $("koreaAge");
-    const manAgeEl = $("manAge");
-    const lifespanEl = $("lifespan");
+    .lifespan-value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--color-on-surface);
+      font-family: var(--font-family-gothic);
+    }
 
-    if (koreaAgeEl) koreaAgeEl.textContent = String(koreaAge);
-    if (manAgeEl) manAgeEl.textContent = String(Math.max(0, manAge));
-    if (lifespanEl) lifespanEl.textContent = `${yrs}년 ${mons}개월 ${days}일`;
-
-    goTo(2);
-  }
-
-  function init() {
-    const btnCalc = $("btn-calc");
-    const btnReset = $("btn-reset");
-    btnCalc?.addEventListener("click", calculateAge);
-    btnReset?.addEventListener("click", () => {
-      clearError();
-      goTo(1);
-      const appContainer = document.querySelector(".app-calc-layout");
-      if (appContainer) {
-        const y =
-          appContainer.getBoundingClientRect().top + window.scrollY - 120;
-        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
-      } else {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+    @media (max-width: 480px) {
+      .date-inputs {
+        grid-template-columns: 1fr 1fr 1fr;
       }
-    });
+      .result-value {
+        font-size: 1.35rem;
+      }
+    }
+  </style>
 
-    // Enter 키로 계산
-    ["year", "month", "day"].forEach((id) => {
-      const el = $(id) as HTMLInputElement | null;
-      el?.addEventListener("keydown", (e) => {
-        if ((e as KeyboardEvent).key === "Enter") {
-          e.preventDefault();
-          calculateAge();
+  <script>
+    function $(id: string) {
+      return document.getElementById(id) as HTMLElement | null;
+    }
+
+    function showError(msg: string) {
+      const el = $("err-msg") as HTMLParagraphElement | null;
+      if (!el) return;
+      el.textContent = msg;
+      el.hidden = false;
+    }
+
+    function clearError() {
+      const el = $("err-msg") as HTMLParagraphElement | null;
+      if (!el) return;
+      el.textContent = "";
+      el.hidden = true;
+    }
+
+    function goTo(screen: 1 | 2) {
+      const s1 = $("screen-input");
+      const s2 = $("screen-result");
+      if (!s1 || !s2) return;
+      if (screen === 1) {
+        s1.hidden = false;
+        s2.hidden = true;
+      } else {
+        s1.hidden = true;
+        s2.hidden = false;
+      }
+    }
+
+    function isValidDate(y: number, m: number, d: number): boolean {
+      const dt = new Date(y, m - 1, d);
+      return (
+        dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d
+      );
+    }
+
+    function calculateAge() {
+      clearError();
+
+      const yEl = $("year") as HTMLInputElement | null;
+      const mEl = $("month") as HTMLInputElement | null;
+      const dEl = $("day") as HTMLInputElement | null;
+      if (!yEl || !mEl || !dEl) return;
+
+      const y = parseInt(yEl.value, 10);
+      const m = parseInt(mEl.value, 10);
+      const d = parseInt(dEl.value, 10);
+
+      if (
+        !Number.isInteger(y) ||
+        !Number.isInteger(m) ||
+        !Number.isInteger(d)
+      ) {
+        showError("연, 월, 일을 모두 숫자로 입력해 주세요.");
+        return;
+      }
+      if (y < 1) {
+        showError("태어난 해를 올바르게 입력해 주세요.");
+        return;
+      }
+      if (m < 1 || m > 12) {
+        showError("월은 1~12 사이로 입력해 주세요.");
+        return;
+      }
+      if (d < 1 || d > 31) {
+        showError("일은 1~31 사이로 입력해 주세요.");
+        return;
+      }
+      if (!isValidDate(y, m, d)) {
+        showError("존재하지 않는 날짜입니다. 다시 확인해 주세요.");
+        return;
+      }
+
+      const today = new Date();
+      const birth = new Date(y, m - 1, d);
+
+      if (birth.getTime() > today.getTime()) {
+        showError("미래 날짜는 입력할 수 없습니다.");
+        return;
+      }
+
+      // 한국 나이
+      const koreaAge = today.getFullYear() - y + 1;
+
+      // 만 나이
+      let manAge = today.getFullYear() - y;
+      const beforeBirthday =
+        today.getMonth() < m - 1 ||
+        (today.getMonth() === m - 1 && today.getDate() < d);
+      if (beforeBirthday) manAge -= 1;
+
+      // 생존 기간 (정확도 개선: 윤년/월별 일수 반영)
+      let yrs = today.getFullYear() - birth.getFullYear();
+      let mons = today.getMonth() - birth.getMonth();
+      let days = today.getDate() - birth.getDate();
+
+      if (days < 0) {
+        mons -= 1;
+        // 이전 달의 마지막 날
+        const prevMonthLastDay = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          0,
+        ).getDate();
+        days += prevMonthLastDay;
+      }
+      if (mons < 0) {
+        yrs -= 1;
+        mons += 12;
+      }
+
+      const koreaAgeEl = $("koreaAge");
+      const manAgeEl = $("manAge");
+      const lifespanEl = $("lifespan");
+
+      if (koreaAgeEl) koreaAgeEl.textContent = String(koreaAge);
+      if (manAgeEl) manAgeEl.textContent = String(Math.max(0, manAge));
+      if (lifespanEl) lifespanEl.textContent = `${yrs}년 ${mons}개월 ${days}일`;
+
+      goTo(2);
+    }
+
+    function init() {
+      const btnCalc = $("btn-calc");
+      const btnReset = $("btn-reset");
+      btnCalc?.addEventListener("click", calculateAge);
+      btnReset?.addEventListener("click", () => {
+        clearError();
+        goTo(1);
+        const appContainer = document.querySelector(".app-calc-layout");
+        if (appContainer) {
+          const y =
+            appContainer.getBoundingClientRect().top + window.scrollY - 120;
+          window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+        } else {
+          window.scrollTo({ top: 0, behavior: "smooth" });
         }
       });
-    });
-  }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-</script>
+      // Enter 키로 계산
+      ["year", "month", "day"].forEach((id) => {
+        const el = $(id) as HTMLInputElement | null;
+        el?.addEventListener("keydown", (e) => {
+          if ((e as KeyboardEvent).key === "Enter") {
+            e.preventDefault();
+            calculateAge();
+          }
+        });
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  </script>
+</AppLayout>
