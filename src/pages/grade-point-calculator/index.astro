@@ -121,6 +121,14 @@ if (related.length === 0) {
 
 <style>
   /* grade-point-calculator 특화 스타일 */
+
+  /* 최상위 레이아웃 컨테이너에 gap 적용 */
+  .app-calc-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
   .scale-selector {
     background: var(--color-surface);
     border: 1px solid var(--color-outline-variant);
@@ -201,7 +209,9 @@ if (related.length === 0) {
     border: 1px solid var(--color-outline-variant);
     border-radius: var(--radius-lg);
     padding: 20px;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     font-family: var(--font-family-gothic);
   }
 
@@ -294,7 +304,6 @@ if (related.length === 0) {
     display: flex;
     gap: 12px;
     align-items: center;
-    margin-bottom: 8px;
     padding-bottom: 16px;
     border-bottom: 1px solid var(--color-outline-variant);
   }
