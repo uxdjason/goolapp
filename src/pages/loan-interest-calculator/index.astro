@@ -552,6 +552,14 @@ if (related.length === 0) {
     ) as HTMLElement;
     tableWrapper.hidden = true;
     tableWrapper.innerHTML = "";
+
+    const appContainer = document.querySelector(".app-calc-layout");
+    if (appContainer) {
+      const y = appContainer.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }
 
   document.getElementById("calculateBtn")?.addEventListener("click", calculate);

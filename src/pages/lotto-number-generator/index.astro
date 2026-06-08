@@ -1,21 +1,31 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'lotto-number-generator');
-if (!entry) throw new Error('lotto-number-generator entry not found');
+const entry = await getEntry("apps", "lotto-number-generator");
+if (!entry) throw new Error("lotto-number-generator entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
 }
 ---
 
@@ -34,18 +44,28 @@ if (related.length === 0) {
   <Fragment slot="app">
     <div class="app-calc-layout">
       <div class="action-buttons">
-        <button class="app-btn app-btn-primary" id="generate-one" type="button">1 세트 받기</button>
-        <button class="app-btn app-btn-primary" id="generate-five" type="button">5 세트 받기</button>
-        <button class="app-btn app-btn-secondary" id="clear-all" type="button">모두 지우기</button>
+        <button class="app-btn app-btn-primary" id="generate-one" type="button"
+          >1 세트 받기</button
+        >
+        <button class="app-btn app-btn-primary" id="generate-five" type="button"
+          >5 세트 받기</button
+        >
+        <button class="app-btn app-btn-secondary" id="clear-all" type="button"
+          >모두 지우기</button
+        >
       </div>
+      <div class="app-spacer-sm"></div>
 
-      <div id="results-container" class="results-container" aria-live="polite"></div>
+      <div id="results-container" class="results-container" aria-live="polite">
+      </div>
 
       <div id="empty-state" class="empty-state" hidden>
         <p>아직 생성된 번호가 없어요. 위 버튼을 눌러 번호를 받아보세요!</p>
       </div>
 
-      <div id="toast" class="toast" role="status" aria-live="polite" hidden>번호가 복사되었습니다.</div>
+      <div id="toast" class="toast" role="status" aria-live="polite" hidden>
+        번호가 복사되었습니다.
+      </div>
     </div>
   </Fragment>
 
@@ -98,11 +118,6 @@ if (related.length === 0) {
     align-items: center;
     flex-wrap: wrap;
     gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-outline-variant);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
   }
 
   .results-container :global(.lotto-balls) {
@@ -122,7 +137,9 @@ if (related.length === 0) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
+    box-shadow:
+      inset 0 -3px 0 rgba(0, 0, 0, 0.15),
+      0 2px 4px rgba(0, 0, 0, 0.08);
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
     font-family: var(--font-family-gothic);
   }
@@ -136,7 +153,9 @@ if (related.length === 0) {
     border: 1.5px solid var(--color-primary);
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
     font-family: var(--font-family-gothic);
   }
 
@@ -192,17 +211,25 @@ if (related.length === 0) {
 
 <script>
   (function () {
-    const STORAGE_KEY = 'lottoSetsHTML';
-    const LEGACY_KEY = 'lottoSetsHTML_wp';
+    const STORAGE_KEY = "lottoSetsHTML";
+    const LEGACY_KEY = "lottoSetsHTML_wp";
 
-    const genOneBtn = document.getElementById('generate-one');
-    const genFiveBtn = document.getElementById('generate-five');
-    const clearBtn = document.getElementById('clear-all');
-    const resultsContainer = document.getElementById('results-container');
-    const emptyState = document.getElementById('empty-state');
-    const toast = document.getElementById('toast');
+    const genOneBtn = document.getElementById("generate-one");
+    const genFiveBtn = document.getElementById("generate-five");
+    const clearBtn = document.getElementById("clear-all");
+    const resultsContainer = document.getElementById("results-container");
+    const emptyState = document.getElementById("empty-state");
+    const toast = document.getElementById("toast");
 
-    if (!genOneBtn || !genFiveBtn || !clearBtn || !resultsContainer || !emptyState || !toast) return;
+    if (
+      !genOneBtn ||
+      !genFiveBtn ||
+      !clearBtn ||
+      !resultsContainer ||
+      !emptyState ||
+      !toast
+    )
+      return;
 
     function generateLottoNumbers(): number[] {
       const numbers = new Set<number>();
@@ -213,33 +240,33 @@ if (related.length === 0) {
     }
 
     function getBallColor(n: number): string {
-      if (n <= 10) return '#fbc400';
-      if (n <= 20) return '#69c8f2';
-      if (n <= 30) return '#ff7272';
-      if (n <= 40) return '#aaaaaa';
-      return '#b0d840';
+      if (n <= 10) return "#fbc400";
+      if (n <= 20) return "#69c8f2";
+      if (n <= 30) return "#ff7272";
+      if (n <= 40) return "#aaaaaa";
+      return "#b0d840";
     }
 
     function createLottoSetElement(numbers: number[]) {
-      const setDiv = document.createElement('div');
-      setDiv.className = 'lotto-set';
+      const setDiv = document.createElement("div");
+      setDiv.className = "lotto-set";
 
-      const ballsWrap = document.createElement('div');
-      ballsWrap.className = 'lotto-balls';
+      const ballsWrap = document.createElement("div");
+      ballsWrap.className = "lotto-balls";
 
       numbers.forEach((num) => {
-        const ball = document.createElement('span');
-        ball.className = 'lotto-ball';
+        const ball = document.createElement("span");
+        ball.className = "lotto-ball";
         ball.style.backgroundColor = getBallColor(num);
         ball.textContent = String(num);
         ballsWrap.appendChild(ball);
       });
 
-      const copyBtn = document.createElement('button');
-      copyBtn.className = 'copy-btn';
-      copyBtn.type = 'button';
-      copyBtn.textContent = '복사';
-      copyBtn.setAttribute('data-numbers', numbers.join(', '));
+      const copyBtn = document.createElement("button");
+      copyBtn.className = "copy-btn";
+      copyBtn.type = "button";
+      copyBtn.textContent = "복사";
+      copyBtn.setAttribute("data-numbers", numbers.join(", "));
 
       setDiv.appendChild(ballsWrap);
       setDiv.appendChild(copyBtn);
@@ -250,9 +277,9 @@ if (related.length === 0) {
       if (!resultsContainer || !emptyState) return;
       const hasResults = resultsContainer.children.length > 0;
       if (hasResults) {
-        emptyState.setAttribute('hidden', '');
+        emptyState.setAttribute("hidden", "");
       } else {
-        emptyState.removeAttribute('hidden');
+        emptyState.removeAttribute("hidden");
       }
     }
 
@@ -288,7 +315,7 @@ if (related.length === 0) {
 
     function generateSets(count: number) {
       if (!resultsContainer || !emptyState) return;
-      resultsContainer.innerHTML = '';
+      resultsContainer.innerHTML = "";
       for (let i = 0; i < count; i++) {
         const nums = generateLottoNumbers();
         resultsContainer.appendChild(createLottoSetElement(nums));
@@ -301,14 +328,14 @@ if (related.length === 0) {
     function showToast(message: string) {
       if (!toast) return;
       toast.textContent = message;
-      toast.classList.remove('fade-out');
-      toast.removeAttribute('hidden');
+      toast.classList.remove("fade-out");
+      toast.removeAttribute("hidden");
       if (toastTimer) clearTimeout(toastTimer);
       toastTimer = window.setTimeout(() => {
-        toast.classList.add('fade-out');
+        toast.classList.add("fade-out");
         setTimeout(() => {
-          toast.setAttribute('hidden', '');
-          toast.classList.remove('fade-out');
+          toast.setAttribute("hidden", "");
+          toast.classList.remove("fade-out");
         }, 300);
       }, 1500);
     }
@@ -322,21 +349,21 @@ if (related.length === 0) {
       }
     }
 
-    genOneBtn.addEventListener('click', () => generateSets(1));
-    genFiveBtn.addEventListener('click', () => generateSets(5));
-    clearBtn.addEventListener('click', () => {
-      resultsContainer.innerHTML = '';
+    genOneBtn.addEventListener("click", () => generateSets(1));
+    genFiveBtn.addEventListener("click", () => generateSets(5));
+    clearBtn.addEventListener("click", () => {
+      resultsContainer.innerHTML = "";
       saveToStorage();
       updateEmptyState();
     });
 
-    resultsContainer.addEventListener('click', async (e) => {
+    resultsContainer.addEventListener("click", async (e) => {
       const target = e.target;
       if (!(target instanceof HTMLElement)) return;
-      if (target.classList.contains('copy-btn')) {
-        const nums = target.getAttribute('data-numbers') || '';
+      if (target.classList.contains("copy-btn")) {
+        const nums = target.getAttribute("data-numbers") || "";
         const ok = await copyText(nums);
-        showToast(ok ? '번호가 복사되었습니다.' : '복사에 실패했습니다.');
+        showToast(ok ? "번호가 복사되었습니다." : "복사에 실패했습니다.");
       }
     });
 

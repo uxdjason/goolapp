@@ -427,10 +427,6 @@ if (related.length === 0) {
 
     document.getElementById('start-btn')?.addEventListener('click', () => showScreen(2));
     document.getElementById('restart-btn')?.addEventListener('click', () => {
-        app.querySelectorAll('input').forEach(input => {
-          if (input.type === 'radio') input.checked = false;
-          else input.value = '';
-        });
         showScreen(1);
     });
 
@@ -445,7 +441,7 @@ if (related.length === 0) {
       });
     });
      
-    function showScreen(screenNumber: number) {
+    function showScreen(screenNumber: number, preventScroll = false) {
       screens.forEach(s => (s as HTMLElement).hidden = true);
       const screenToShow = document.getElementById(`screen${screenNumber}`);
       if (screenToShow) {
@@ -455,7 +451,7 @@ if (related.length === 0) {
       updateProgressBar(screenNumber);
       
       // 스크롤 상단 이동 (모바일 사용성 개선, 헤더 여백 고려)
-      if (app) {
+      if (!preventScroll && app) {
         const offset = 80; // 고정 헤더 높이를 고려한 여백
         const top = app.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: 'smooth' });
@@ -609,6 +605,6 @@ if (related.length === 0) {
     }
     
     // Initialize
-    showScreen(1);
+    showScreen(1, true);
   });
 </script>
