@@ -1,21 +1,31 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'roll-2-dice');
-if (!entry) throw new Error('roll-2-dice entry not found');
+const entry = await getEntry("apps", "roll-2-dice");
+if (!entry) throw new Error("roll-2-dice entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
 }
 ---
 
@@ -32,11 +42,13 @@ if (related.length === 0) {
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    {/*
+    {
+      /*
       외부 리소스 안내:
       주사위 이미지는 기존 https://goolapp.com/wp-content/app-image/dice/dice01.png ~ dice06.png 를
       프로젝트의 public/images/dice/dice01.png ~ dice06.png 로 복사해두어야 한다.
-    */}
+    */
+    }
     <div class="app-calc-layout">
       <div class="dice-stage">
         <div class="cube" id="cube1" data-cube>
@@ -56,11 +68,12 @@ if (related.length === 0) {
           <div class="face face-bottom"></div>
         </div>
       </div>
-
+      <div class="app-spacer-sm"></div>
       <button class="app-btn app-btn-primary" id="rollButton" type="button">
         🎲 둘 다 굴려요!
       </button>
 
+      <div class="app-spacer-sm"></div>
       <div class="result-box" id="resultBox" hidden>
         <div class="result-row">
           <span class="result-label">주사위 1</span>
@@ -119,12 +132,24 @@ if (related.length === 0) {
     background-color: var(--color-surface);
   }
 
-  .face-front  { transform: translateZ(70px); }
-  .face-back   { transform: rotateY(180deg) translateZ(70px); }
-  .face-right  { transform: rotateY(90deg) translateZ(70px); }
-  .face-left   { transform: rotateY(-90deg) translateZ(70px); }
-  .face-top    { transform: rotateX(90deg) translateZ(70px); }
-  .face-bottom { transform: rotateX(-90deg) translateZ(70px); }
+  .face-front {
+    transform: translateZ(70px);
+  }
+  .face-back {
+    transform: rotateY(180deg) translateZ(70px);
+  }
+  .face-right {
+    transform: rotateY(90deg) translateZ(70px);
+  }
+  .face-left {
+    transform: rotateY(-90deg) translateZ(70px);
+  }
+  .face-top {
+    transform: rotateX(90deg) translateZ(70px);
+  }
+  .face-bottom {
+    transform: rotateX(-90deg) translateZ(70px);
+  }
 
   .result-box {
     width: 100%;
@@ -176,29 +201,44 @@ if (related.length === 0) {
     .dice-stage {
       gap: 1.5rem;
     }
-    .cube, .face {
+    .cube,
+    .face {
       width: 120px;
       height: 120px;
     }
-    .face { border-radius: 14px; }
-    .face-front  { transform: translateZ(60px); }
-    .face-back   { transform: rotateY(180deg) translateZ(60px); }
-    .face-right  { transform: rotateY(90deg) translateZ(60px); }
-    .face-left   { transform: rotateY(-90deg) translateZ(60px); }
-    .face-top    { transform: rotateX(90deg) translateZ(60px); }
-    .face-bottom { transform: rotateX(-90deg) translateZ(60px); }
+    .face {
+      border-radius: 14px;
+    }
+    .face-front {
+      transform: translateZ(60px);
+    }
+    .face-back {
+      transform: rotateY(180deg) translateZ(60px);
+    }
+    .face-right {
+      transform: rotateY(90deg) translateZ(60px);
+    }
+    .face-left {
+      transform: rotateY(-90deg) translateZ(60px);
+    }
+    .face-top {
+      transform: rotateX(90deg) translateZ(60px);
+    }
+    .face-bottom {
+      transform: rotateX(-90deg) translateZ(60px);
+    }
   }
 </style>
 
 <script>
   // 주사위 숫자 → 회전각 매핑
   const rotations: Record<number, { x: number; y: number }> = {
-    1: { x: 0,   y: 0 },
+    1: { x: 0, y: 0 },
     2: { x: -90, y: 0 },
-    3: { x: 0,   y: -90 },
-    4: { x: 0,   y: 90 },
-    5: { x: 90,  y: 0 },
-    6: { x: 0,   y: 180 },
+    3: { x: 0, y: -90 },
+    4: { x: 0, y: 90 },
+    5: { x: 90, y: 0 },
+    6: { x: 0, y: 180 },
   };
 
   // 면 순서: front, back, right, left, top, bottom
@@ -209,10 +249,10 @@ if (related.length === 0) {
   const faceImageOrder = [1, 6, 3, 4, 2, 5];
 
   function setupCube(cube: HTMLElement) {
-    const faces = cube.querySelectorAll<HTMLElement>('.face');
+    const faces = cube.querySelectorAll<HTMLElement>(".face");
     faces.forEach((face, idx) => {
       const num = faceImageOrder[idx];
-      const padded = String(num).padStart(2, '0');
+      const padded = String(num).padStart(2, "0");
       face.style.backgroundImage = `url('/images/dice/dice${padded}.png')`;
     });
   }
@@ -221,7 +261,11 @@ if (related.length === 0) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  function rollCube(cube: HTMLElement, delay: number, duration: number): number {
+  function rollCube(
+    cube: HTMLElement,
+    delay: number,
+    duration: number,
+  ): number {
     const result = randomInt(1, 6);
     const { x, y } = rotations[result];
     const spinsX = randomInt(4, 5);
@@ -234,7 +278,7 @@ if (related.length === 0) {
       cube.style.transform = `rotateX(${targetX}deg) rotateY(${targetY}deg)`;
 
       window.setTimeout(() => {
-        cube.style.transition = 'none';
+        cube.style.transition = "none";
         cube.style.transform = `rotateX(${x}deg) rotateY(${y}deg)`;
         window.setTimeout(() => {
           cube.style.transition = `transform ${duration}s ease`;
@@ -246,22 +290,33 @@ if (related.length === 0) {
   }
 
   function init() {
-    const cube1 = document.getElementById('cube1');
-    const cube2 = document.getElementById('cube2');
-    const button = document.getElementById('rollButton') as HTMLButtonElement | null;
-    const resultBox = document.getElementById('resultBox');
-    const result1El = document.getElementById('result1');
-    const result2El = document.getElementById('result2');
-    const resultTotalEl = document.getElementById('resultTotal');
+    const cube1 = document.getElementById("cube1");
+    const cube2 = document.getElementById("cube2");
+    const button = document.getElementById(
+      "rollButton",
+    ) as HTMLButtonElement | null;
+    const resultBox = document.getElementById("resultBox");
+    const result1El = document.getElementById("result1");
+    const result2El = document.getElementById("result2");
+    const resultTotalEl = document.getElementById("resultTotal");
 
-    if (!cube1 || !cube2 || !button || !resultBox || !result1El || !result2El || !resultTotalEl) return;
+    if (
+      !cube1 ||
+      !cube2 ||
+      !button ||
+      !resultBox ||
+      !result1El ||
+      !result2El ||
+      !resultTotalEl
+    )
+      return;
 
     setupCube(cube1);
     setupCube(cube2);
 
-    button.addEventListener('click', () => {
+    button.addEventListener("click", () => {
       button.disabled = true;
-      
+
       const delay1 = randomInt(0, 100);
       const delay2 = randomInt(0, 100);
       const dur1 = 2.8 + Math.random() * 0.4;
@@ -282,8 +337,8 @@ if (related.length === 0) {
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
   } else {
     init();
   }
