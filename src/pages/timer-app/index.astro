@@ -1,33 +1,33 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'timer-app');
+const entry = await getEntry("apps", "timer-app");
 if (!entry) {
   throw new Error("timer-app app entry not found");
 }
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({
-    title:            app.data.title,
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
     shortDescription: app.data.shortDescription,
-    slug:             app.data.slug,
-    category:         app.data.category,
+    slug: app.data.slug,
+    category: app.data.category,
   }));
 
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({
-      title:            app.data.title,
+    .map((app) => ({
+      title: app.data.title,
       shortDescription: app.data.shortDescription,
-      slug:             app.data.slug,
-      category:         app.data.category,
+      slug: app.data.slug,
+      category: app.data.category,
     }));
 }
 ---
@@ -47,45 +47,52 @@ if (related.length === 0) {
 >
   <Fragment slot="app">
     <div class="app-calc-layout">
-      <div class="header">
-        <h2 class="label-caps" style="color: var(--color-primary); font-size: var(--font-size-sm); margin-bottom: var(--space-2);">날짜와 시간</h2>
-        <h3 style="font-size: var(--font-size-2xl); margin-bottom: var(--space-2); color: var(--color-on-surface);">타이머 및 스톱워치</h3>
-        <p>간편하게 시간을 측정하고 관리해 보세요.</p>
-      </div>
-
       <!-- Tab Navigation -->
       <div class="app-tab-nav">
-        <button class="app-tab-btn active" data-target="countdown">카운트다운</button>
+        <button class="app-tab-btn active" data-target="countdown"
+          >카운트다운</button
+        >
         <button class="app-tab-btn" data-target="stopwatch">스톱워치</button>
       </div>
 
       <!-- Countdown View -->
       <div id="countdown-view" class="app-view">
-        <div class="state-label" id="cd-state-label" style="visibility: hidden;">남은 시간</div>
-        
+        <div
+          class="state-label"
+          id="cd-state-label"
+          style="visibility: hidden;"
+        >
+          남은 시간
+        </div>
+
         <div class="input-section app-form-group" id="cd-inputs">
           <div class="time-inputs">
             <div class="time-input-group">
-              <input type="number" id="cd-h" placeholder="0" min="0" max="99">
+              <input type="number" id="cd-h" placeholder="0" min="0" max="99" />
               <span>시간</span>
             </div>
             <div class="colon">:</div>
             <div class="time-input-group">
-              <input type="number" id="cd-m" placeholder="0" min="0" max="59">
+              <input type="number" id="cd-m" placeholder="0" min="0" max="59" />
               <span>분</span>
             </div>
             <div class="colon">:</div>
             <div class="time-input-group">
-              <input type="number" id="cd-s" placeholder="0" min="0" max="59">
+              <input type="number" id="cd-s" placeholder="0" min="0" max="59" />
               <span>초</span>
             </div>
           </div>
         </div>
 
         <div class="controls">
-          <button class="app-btn app-btn-secondary" id="cd-reset">초기화</button>
+          <button class="app-btn app-btn-secondary" id="cd-reset">초기화</button
+          >
           <button class="app-btn app-btn-primary" id="cd-start">시작</button>
-          <button class="app-btn app-btn-danger" id="cd-stop" style="display:none;">정지</button>
+          <button
+            class="app-btn app-btn-danger"
+            id="cd-stop"
+            style="display:none;">정지</button
+          >
         </div>
       </div>
 
@@ -93,15 +100,28 @@ if (related.length === 0) {
       <div id="stopwatch-view" class="app-view" style="display:none;">
         <div class="state-label">진행 시간</div>
         <div class="time-display sw-text" id="sw-display">00:00:00.00</div>
-        
+
         <div class="controls">
-          <button class="app-btn app-btn-secondary" id="sw-reset">초기화</button>
-          <button class="app-btn app-btn-secondary" id="sw-lap" style="display:none;">구간 기록</button>
+          <button class="app-btn app-btn-secondary" id="sw-reset">초기화</button
+          >
+          <button
+            class="app-btn app-btn-secondary"
+            id="sw-lap"
+            style="display:none;">구간 기록</button
+          >
           <button class="app-btn app-btn-primary" id="sw-start">시작</button>
-          <button class="app-btn app-btn-danger" id="sw-stop" style="display:none;">정지</button>
+          <button
+            class="app-btn app-btn-danger"
+            id="sw-stop"
+            style="display:none;">정지</button
+          >
         </div>
 
-        <div class="lap-container app-form-group" id="lap-container" style="display:none;">
+        <div
+          class="lap-container app-form-group"
+          id="lap-container"
+          style="display:none;"
+        >
           <ul id="lap-list" class="lap-list"></ul>
         </div>
       </div>
@@ -113,7 +133,9 @@ if (related.length === 0) {
           <p class="app-modal-title" id="app-alert-title">알림</p>
           <p class="app-modal-body" id="app-alert-message"></p>
           <div class="app-modal-actions">
-            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary"
+              >확인</button
+            >
           </div>
         </div>
       </div>
@@ -147,10 +169,16 @@ if (related.length === 0) {
     align-items: center;
     animation: fadeIn var(--transition-base);
   }
-  
+
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .state-label {
@@ -216,7 +244,7 @@ if (related.length === 0) {
     outline: none;
     border-color: var(--color-primary);
   }
-  
+
   .time-input-group input:focus::placeholder {
     color: transparent;
   }
@@ -229,7 +257,7 @@ if (related.length === 0) {
     opacity: 1;
     box-shadow: none;
   }
-  
+
   .time-input-group span {
     font-size: var(--font-size-sm);
     color: var(--color-on-surface-variant);
@@ -293,55 +321,68 @@ if (related.length === 0) {
   }
 
   @media (max-width: 768px) {
-    .time-display { font-size: 48px; }
-    .time-input-group input { width: 60px; height: 60px; font-size: 24px; }
-    .colon { font-size: 24px; margin-bottom: 24px; }
-    .controls { flex-wrap: wrap; }
+    .time-display {
+      font-size: 48px;
+    }
+    .time-input-group input {
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+    }
+    .colon {
+      font-size: 24px;
+      margin-bottom: 24px;
+    }
+    .controls {
+      flex-wrap: wrap;
+    }
   }
 </style>
 
 <script is:inline>
-  document.addEventListener('DOMContentLoaded', function() {
-    const appAlertModal = document.getElementById('app-alert-modal');
-    const appAlertMessage = document.getElementById('app-alert-message');
-    const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn');
+  document.addEventListener("DOMContentLoaded", function () {
+    const appAlertModal = document.getElementById("app-alert-modal");
+    const appAlertMessage = document.getElementById("app-alert-message");
+    const appAlertConfirmBtn = document.getElementById("app-alert-confirm-btn");
 
     function showAlert(msg) {
       appAlertMessage.textContent = msg;
-      appAlertModal.removeAttribute('hidden');
+      appAlertModal.removeAttribute("hidden");
     }
 
     function hideAlert() {
-      appAlertModal.setAttribute('hidden', '');
+      appAlertModal.setAttribute("hidden", "");
     }
 
-    if (appAlertConfirmBtn) appAlertConfirmBtn.addEventListener('click', hideAlert);
-    if (appAlertModal) appAlertModal.addEventListener('click', (e) => {
-      if (e.target === appAlertModal) hideAlert();
-    });
+    if (appAlertConfirmBtn)
+      appAlertConfirmBtn.addEventListener("click", hideAlert);
+    if (appAlertModal)
+      appAlertModal.addEventListener("click", (e) => {
+        if (e.target === appAlertModal) hideAlert();
+      });
 
-    let mode = 'countdown'; // 'countdown' or 'stopwatch'
-    const tabBtns = document.querySelectorAll('.app-tab-btn');
-    const cdView = document.getElementById('countdown-view');
-    const swView = document.getElementById('stopwatch-view');
+    let mode = "countdown"; // 'countdown' or 'stopwatch'
+    const tabBtns = document.querySelectorAll(".app-tab-btn");
+    const cdView = document.getElementById("countdown-view");
+    const swView = document.getElementById("stopwatch-view");
 
     // Countdown elements
-    const cdStateLabel = document.getElementById('cd-state-label');
-    const cdH = document.getElementById('cd-h');
-    const cdM = document.getElementById('cd-m');
-    const cdS = document.getElementById('cd-s');
-    const cdStartBtn = document.getElementById('cd-start');
-    const cdStopBtn = document.getElementById('cd-stop');
-    const cdResetBtn = document.getElementById('cd-reset');
+    const cdStateLabel = document.getElementById("cd-state-label");
+    const cdH = document.getElementById("cd-h");
+    const cdM = document.getElementById("cd-m");
+    const cdS = document.getElementById("cd-s");
+    const cdStartBtn = document.getElementById("cd-start");
+    const cdStopBtn = document.getElementById("cd-stop");
+    const cdResetBtn = document.getElementById("cd-reset");
 
     // Stopwatch elements
-    const swDisplay = document.getElementById('sw-display');
-    const swStartBtn = document.getElementById('sw-start');
-    const swStopBtn = document.getElementById('sw-stop');
-    const swResetBtn = document.getElementById('sw-reset');
-    const swLapBtn = document.getElementById('sw-lap');
-    const lapContainer = document.getElementById('lap-container');
-    const lapList = document.getElementById('lap-list');
+    const swDisplay = document.getElementById("sw-display");
+    const swStartBtn = document.getElementById("sw-start");
+    const swStopBtn = document.getElementById("sw-stop");
+    const swResetBtn = document.getElementById("sw-reset");
+    const swLapBtn = document.getElementById("sw-lap");
+    const lapContainer = document.getElementById("lap-container");
+    const lapList = document.getElementById("lap-list");
 
     // State
     let cdTimer = null;
@@ -358,13 +399,15 @@ if (related.length === 0) {
     // Audio for timer finish
     let alarmSound = null;
     try {
-      alarmSound = new Audio('https://goolapp.com/wp-content/uploads/2023/12/alarm.mp3'); // Fallback or could use local asset
-    } catch(e) {}
+      alarmSound = new Audio(
+        "https://goolapp.com/wp-content/uploads/2023/12/alarm.mp3",
+      ); // Fallback or could use local asset
+    } catch (e) {}
 
     function playAlarm() {
-      if(alarmSound) {
+      if (alarmSound) {
         alarmSound.currentTime = 0;
-        alarmSound.play().catch(() => console.log('Audio play blocked'));
+        alarmSound.play().catch(() => console.log("Audio play blocked"));
       }
     }
 
@@ -376,24 +419,24 @@ if (related.length === 0) {
       const ds = totalDeciSeconds % 100;
 
       if (h > 0) {
-        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ds.toString().padStart(2, '0')}`;
+        return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}.${ds.toString().padStart(2, "0")}`;
       }
-      return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ds.toString().padStart(2, '0')}`;
+      return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}.${ds.toString().padStart(2, "0")}`;
     }
 
     // Tab Switching
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+    tabBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        tabBtns.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
         mode = btn.dataset.target;
-        
-        if (mode === 'countdown') {
-          cdView.style.display = 'flex';
-          swView.style.display = 'none';
+
+        if (mode === "countdown") {
+          cdView.style.display = "flex";
+          swView.style.display = "none";
         } else {
-          cdView.style.display = 'none';
-          swView.style.display = 'flex';
+          cdView.style.display = "none";
+          swView.style.display = "flex";
         }
       });
     });
@@ -404,9 +447,9 @@ if (related.length === 0) {
         const h = Math.floor(cdRemaining / 3600);
         const m = Math.floor((cdRemaining % 3600) / 60);
         const s = cdRemaining % 60;
-        
-        cdH.value = h > 0 ? h : '0';
-        cdM.value = m > 0 || h > 0 ? m : '0';
+
+        cdH.value = h > 0 ? h : "0";
+        cdM.value = m > 0 || h > 0 ? m : "0";
         cdS.value = s;
       }
     }
@@ -418,30 +461,30 @@ if (related.length === 0) {
       return h * 3600 + m * 60 + s;
     }
 
-    cdStartBtn.addEventListener('click', () => {
+    cdStartBtn.addEventListener("click", () => {
       if (!cdIsRunning) {
         if (cdRemaining === 0) {
           cdTotalSeconds = parseCdInputs();
           cdRemaining = cdTotalSeconds;
         }
-        
+
         if (cdRemaining > 0) {
           cdIsRunning = true;
-          [cdH, cdM, cdS].forEach(el => el.disabled = true);
-          cdStateLabel.style.visibility = 'visible';
-          
-          cdStartBtn.style.display = 'none';
-          cdStopBtn.style.display = 'block';
-          
+          [cdH, cdM, cdS].forEach((el) => (el.disabled = true));
+          cdStateLabel.style.visibility = "visible";
+
+          cdStartBtn.style.display = "none";
+          cdStopBtn.style.display = "block";
+
           cdTimer = setInterval(() => {
             cdRemaining--;
             updateCdDisplay();
-            
+
             if (cdRemaining <= 0) {
               clearInterval(cdTimer);
               cdIsRunning = false;
-              cdStartBtn.style.display = 'block';
-              cdStopBtn.style.display = 'none';
+              cdStartBtn.style.display = "block";
+              cdStopBtn.style.display = "none";
               playAlarm();
               showAlert("타이머가 종료되었습니다!");
             }
@@ -450,34 +493,33 @@ if (related.length === 0) {
       }
     });
 
-    cdStopBtn.addEventListener('click', () => {
+    cdStopBtn.addEventListener("click", () => {
       if (cdIsRunning) {
         clearInterval(cdTimer);
         cdIsRunning = false;
-        cdStartBtn.style.display = 'block';
-        cdStartBtn.textContent = '계속';
-        cdStopBtn.style.display = 'none';
+        cdStartBtn.style.display = "block";
+        cdStartBtn.textContent = "계속";
+        cdStopBtn.style.display = "none";
       }
     });
 
-    cdResetBtn.addEventListener('click', () => {
+    cdResetBtn.addEventListener("click", () => {
       clearInterval(cdTimer);
       cdIsRunning = false;
       cdRemaining = 0;
       cdTotalSeconds = 0;
-      
-      [cdH, cdM, cdS].forEach(el => el.disabled = false);
-      cdStateLabel.style.visibility = 'hidden';
-      
-      cdStartBtn.style.display = 'block';
-      cdStartBtn.textContent = '시작';
-      cdStopBtn.style.display = 'none';
-      
-      cdH.value = '';
-      cdM.value = '';
-      cdS.value = '';
-    });
 
+      [cdH, cdM, cdS].forEach((el) => (el.disabled = false));
+      cdStateLabel.style.visibility = "hidden";
+
+      cdStartBtn.style.display = "block";
+      cdStartBtn.textContent = "시작";
+      cdStopBtn.style.display = "none";
+
+      cdH.value = "";
+      cdM.value = "";
+      cdS.value = "";
+    });
 
     // === Stopwatch Logic ===
     function updateSwDisplay() {
@@ -485,32 +527,35 @@ if (related.length === 0) {
     }
 
     function renderLaps() {
-      lapList.innerHTML = '';
+      lapList.innerHTML = "";
       if (swLaps.length > 0) {
-        lapContainer.style.display = 'block';
-        swLaps.slice().reverse().forEach((lap, idx) => {
-          const originalIndex = swLaps.length - 1 - idx;
+        lapContainer.style.display = "block";
+        swLaps
+          .slice()
+          .reverse()
+          .forEach((lap, idx) => {
+            const originalIndex = swLaps.length - 1 - idx;
 
-          const li = document.createElement('li');
-          li.className = 'lap-item';
-          li.textContent = `${originalIndex + 1} - ${formatStopwatchTime(lap)}`;
-          lapList.appendChild(li);
-        });
+            const li = document.createElement("li");
+            li.className = "lap-item";
+            li.textContent = `${originalIndex + 1} - ${formatStopwatchTime(lap)}`;
+            lapList.appendChild(li);
+          });
       } else {
-        lapContainer.style.display = 'none';
+        lapContainer.style.display = "none";
       }
     }
 
-    swStartBtn.addEventListener('click', () => {
+    swStartBtn.addEventListener("click", () => {
       if (!swIsRunning) {
         swIsRunning = true;
         swStartTime = Date.now() - swElapsedTime;
-        
-        swStartBtn.style.display = 'none';
-        swStopBtn.style.display = 'block';
-        swResetBtn.style.display = 'none';
-        swLapBtn.style.display = 'block';
-        
+
+        swStartBtn.style.display = "none";
+        swStopBtn.style.display = "block";
+        swResetBtn.style.display = "none";
+        swLapBtn.style.display = "block";
+
         swTimer = setInterval(() => {
           swElapsedTime = Date.now() - swStartTime;
           updateSwDisplay();
@@ -518,53 +563,53 @@ if (related.length === 0) {
       }
     });
 
-    swStopBtn.addEventListener('click', () => {
+    swStopBtn.addEventListener("click", () => {
       if (swIsRunning) {
         swIsRunning = false;
         clearInterval(swTimer);
-        
-        swStartBtn.style.display = 'block';
-        swStartBtn.textContent = '계속';
-        swStopBtn.style.display = 'none';
-        swResetBtn.style.display = 'block';
-        swLapBtn.style.display = 'none';
+
+        swStartBtn.style.display = "block";
+        swStartBtn.textContent = "계속";
+        swStopBtn.style.display = "none";
+        swResetBtn.style.display = "block";
+        swLapBtn.style.display = "none";
       }
     });
 
-    swLapBtn.addEventListener('click', () => {
+    swLapBtn.addEventListener("click", () => {
       if (swIsRunning) {
         swLaps.push(swElapsedTime);
         renderLaps();
       }
     });
 
-    swResetBtn.addEventListener('click', () => {
+    swResetBtn.addEventListener("click", () => {
       swIsRunning = false;
       clearInterval(swTimer);
       swElapsedTime = 0;
       swLaps = [];
       updateSwDisplay();
       renderLaps();
-      
-      swStartBtn.style.display = 'block';
-      swStartBtn.textContent = '시작';
-      swStopBtn.style.display = 'none';
-      swResetBtn.style.display = 'block';
-      swLapBtn.style.display = 'none';
+
+      swStartBtn.style.display = "block";
+      swStartBtn.textContent = "시작";
+      swStopBtn.style.display = "none";
+      swResetBtn.style.display = "block";
+      swLapBtn.style.display = "none";
     });
 
     // Better input focus logic
-    [cdH, cdM, cdS].forEach(input => {
-      input.addEventListener('focus', function() {
-        if (this.value === '0' || this.value === '00') {
-          this.value = '';
+    [cdH, cdM, cdS].forEach((input) => {
+      input.addEventListener("focus", function () {
+        if (this.value === "0" || this.value === "00") {
+          this.value = "";
         } else {
           this.select();
         }
       });
-      input.addEventListener('blur', function() {
-        if (this.value === '') {
-          this.value = ''; // Leave it blank, placeholder '0' will show
+      input.addEventListener("blur", function () {
+        if (this.value === "") {
+          this.value = ""; // Leave it blank, placeholder '0' will show
         }
       });
     });

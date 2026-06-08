@@ -1,33 +1,33 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'due-date-calculator');
+const entry = await getEntry("apps", "due-date-calculator");
 if (!entry) {
   throw new Error("due-date-calculator app entry not found");
 }
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({
-    title:            app.data.title,
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
     shortDescription: app.data.shortDescription,
-    slug:             app.data.slug,
-    category:         app.data.category,
+    slug: app.data.slug,
+    category: app.data.category,
   }));
 
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({
-      title:            app.data.title,
+    .map((app) => ({
+      title: app.data.title,
       shortDescription: app.data.shortDescription,
-      slug:             app.data.slug,
-      category:         app.data.category,
+      slug: app.data.slug,
+      category: app.data.category,
     }));
 }
 ---
@@ -47,27 +47,23 @@ if (related.length === 0) {
 >
   <Fragment slot="app">
     <div class="dd-calculator-container glass-surface">
-      <div class="header">
-        <h2 class="label-caps" style="color: var(--color-primary); font-size: var(--font-size-sm); margin-bottom: var(--space-2);">계산기</h2>
-        <h3 style="font-size: var(--font-size-2xl); margin-bottom: var(--space-2); color: var(--color-on-surface);">출산예정일 계산기</h3>
-        <p>마지막 생리 시작일과 주기를 입력해 주세요.</p>
-      </div>
-
       <div class="input-section">
         <div class="form-group">
           <label for="lmp-date">마지막 생리 시작일</label>
-          <input type="date" id="lmp-date">
+          <input type="date" id="lmp-date" />
         </div>
         <div class="form-group">
           <label for="cycle-length">평균 생리 주기</label>
-          <input type="number" id="cycle-length" value="28">
+          <input type="number" id="cycle-length" value="28" />
           <small>보통 21~35일 사이입니다.</small>
         </div>
       </div>
 
       <div class="results-section" id="results-section">
         <div class="results-hero">
-          <p class="congrats-msg">축하드려요! 🎉 소중한 아기를 기다리고 계시는군요.</p>
+          <p class="congrats-msg">
+            축하드려요! 🎉 소중한 아기를 기다리고 계시는군요.
+          </p>
           <p class="due-date-label label-caps">예상 출산 예정일</p>
           <div class="due-date-value" id="est-due-date"></div>
           <div class="hero-sub-info">
@@ -84,15 +80,24 @@ if (related.length === 0) {
           <div class="info-card glass-surface-card">
             <h4>나의 임신 타임라인 🗓️</h4>
             <ul>
-              <li><span>예상 수정일</span> <strong id="est-conception-date"></strong></li>
-              <li><span>1분기 종료</span> <strong id="first-trimester-end"></strong></li>
-              <li><span>2분기 종료</span> <strong id="second-trimester-end"></strong></li>
+              <li>
+                <span>예상 수정일</span>
+                <strong id="est-conception-date"></strong>
+              </li>
+              <li>
+                <span>1분기 종료</span>
+                <strong id="first-trimester-end"></strong>
+              </li>
+              <li>
+                <span>2분기 종료</span>
+                <strong id="second-trimester-end"></strong>
+              </li>
             </ul>
           </div>
           <div class="info-card glass-surface-card" id="baby-week-info-card">
             <h4>이번 주 우리 아기는? 👶</h4>
             <div class="baby-size-container">
-              <span id="baby-size-emoji"></span> 
+              <span id="baby-size-emoji"></span>
               <p id="baby-size-text"></p>
             </div>
             <p id="baby-week-desc"></p>
@@ -100,14 +105,23 @@ if (related.length === 0) {
           <div class="info-card glass-surface-card">
             <h4>재미로 알아보는 정보 ✨</h4>
             <ul>
-              <li><span>예상 별자리</span> <strong id="baby-zodiac"></strong></li>
-              <li><span>예상 띠</span> <strong id="baby-chinese-zodiac"></strong></li>
+              <li>
+                <span>예상 별자리</span>
+                <strong id="baby-zodiac"></strong>
+              </li>
+              <li>
+                <span>예상 띠</span>
+                <strong id="baby-chinese-zodiac"></strong>
+              </li>
             </ul>
           </div>
         </div>
       </div>
 
-      <p class="disclaimer">본 계산 결과는 의학적 진단이 아니며, 참고용으로만 활용해 주세요. 정확한 정보는 병원에 방문하여 의사와 상담하시는 것이 가장 좋습니다.</p>
+      <p class="disclaimer">
+        본 계산 결과는 의학적 진단이 아니며, 참고용으로만 활용해 주세요. 정확한
+        정보는 병원에 방문하여 의사와 상담하시는 것이 가장 좋습니다.
+      </p>
     </div>
   </Fragment>
 
@@ -187,19 +201,21 @@ if (related.length === 0) {
     display: none;
     animation: fadeIn var(--transition-base);
   }
-  
+
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .results-hero {
     text-align: center;
-    background: var(--glass-bg-light);
-    padding: var(--space-6);
-    border-radius: var(--radius-xl);
     margin-bottom: var(--space-6);
-    border: 1px solid var(--glass-border);
   }
   .congrats-msg {
     font-size: var(--font-size-lg);
@@ -223,7 +239,7 @@ if (related.length === 0) {
     justify-content: center;
     gap: var(--space-4);
   }
-  
+
   .chip {
     padding: var(--space-1) var(--space-3);
     border-radius: var(--radius-full);
@@ -254,9 +270,9 @@ if (related.length === 0) {
     color: var(--color-on-primary);
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-bold);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
-  
+
   .results-details {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -292,7 +308,7 @@ if (related.length === 0) {
   .info-card ul li strong {
     color: var(--color-on-surface);
   }
-  
+
   .baby-size-container {
     display: flex;
     align-items: center;
@@ -334,8 +350,8 @@ if (related.length === 0) {
     .results-details {
       grid-template-columns: 1fr;
     }
-    .due-date-value { 
-      font-size: var(--font-size-2xl); 
+    .due-date-value {
+      font-size: var(--font-size-2xl);
     }
     .hero-sub-info {
       flex-direction: column;
@@ -345,84 +361,275 @@ if (related.length === 0) {
 </style>
 
 <script is:inline>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener("DOMContentLoaded", function () {
     const weeklyInfo = [
-      { week: 4, size: "깨알", emoji: "🟠", desc: "세포 분열이 활발히 일어나며, 아기집이 자궁 내벽에 착상하는 시기예요." },
-      { week: 5, size: "참깨", emoji: "🍚", desc: "심장이 뛰기 시작하고, 뇌와 척수 같은 주요 기관의 기초가 만들어져요." },
-      { week: 6, size: "녹두알", emoji: "🫘", desc: "눈, 코, 귀가 될 부분이 형성되고, 팔다리가 될 작은 돌기가 나타나요." },
-      { week: 7, size: "블루베리", emoji: "🫐", desc: "손과 발이 자라나며, 뇌가 빠르게 발달하는 중요한 시기랍니다." },
-      { week: 8, size: "산딸기", emoji: "🍓", desc: "이제 '배아'가 아닌 '태아'라고 불려요. 모든 주요 신체 기관이 형성되었어요." },
-      { week: 9, size: "포도알", emoji: "🍇", desc: "얼굴의 특징이 뚜렷해지고, 손가락과 발가락이 거의 완성돼요." },
-      { week: 10, size: "방울토마토", emoji: "🍅", desc: "뼈와 연골이 형성되고, 중요한 장기들이 제 기능을 하기 시작해요." },
-      { week: 11, size: "라임", emoji: "🍋", desc: "이제 제법 사람의 모습을 갖췄어요. 생식기가 발달하기 시작해요." },
-      { week: 12, size: "자두", emoji: "🍑", desc: "반사 신경이 발달해서 손가락을 쥐거나 발가락을 꼼지락거릴 수 있어요." },
-      { week: 13, size: "키위", emoji: "🥝", desc: "지문이 생기고, 얼굴 표정을 지을 수 있게 된답니다. 1분기가 끝났어요!" },
-      { week: 14, size: "레몬", emoji: "🍋", desc: "목이 길어지고, 몸이 머리보다 더 빨리 자라기 시작해요. 솜털이 온몸을 덮어요." },
-      { week: 15, size: "사과", emoji: "🍎", desc: "골격이 발달하고, 눈꺼풀 아래에서 눈동자를 움직일 수 있어요." },
-      { week: 16, size: "아보카도", emoji: "🥑", desc: "다리가 길어지면서 이제 제법 아기다운 비율을 갖추게 돼요." },
-      { week: 17, size: "양파", emoji: "🧅", desc: "청력이 발달해 엄마의 목소리나 심장 소리를 들을 수 있어요." },
-      { week: 18, size: "피망", emoji: "🫑", desc: "신경계가 발달하면서 움직임이 더욱 활발해져요. 첫 태동을 느낄 수도 있어요." },
-      { week: 19, size: "망고", emoji: "🥭", desc: "피부를 보호하는 태지가 몸을 덮기 시작해요." },
-      { week: 20, size: "바나나", emoji: "🍌", desc: "소화기관이 발달하고, 이제 양수를 삼키고 뱉을 수 있답니다." },
-      { week: 21, size: "당근", emoji: "🥕", desc: "눈썹과 눈꺼풀이 완전히 형성되고, 움직임이 더욱 강해져요." },
-      { week: 22, size: "파파야", emoji: "🥭", desc: "시각과 미각, 촉각 등 감각이 발달하고 있어요." },
-      { week: 23, size: "가지", emoji: "🍆", desc: "폐가 발달하고, 아기는 바깥의 큰 소리에 깜짝 놀라기도 해요." },
-      { week: 24, size: "옥수수", emoji: "🌽", desc: "피부가 투명한 상태에서 점차 불투명해지고, 제법 통통해져요." },
-      { week: 25, size: "참외", emoji: "🍈", desc: "머리카락이 자라고 색깔이 생기기 시작해요." },
-      { week: 26, size: "오이", emoji: "🥒", desc: "눈을 뜨고 감을 수 있게 되며, 폐가 호흡 연습을 시작해요." },
-      { week: 27, size: "브로콜리", emoji: "🥦", desc: "뇌가 매우 활발하게 발달해요. 2분기가 거의 끝났어요!" },
-      { week: 28, size: "큰 가지", emoji: "🍆", desc: "이제 아기는 꿈을 꿀 수도 있어요. 3분기가 시작되었어요." },
-      { week: 29, size: "작은 단호박", emoji: "🎃", desc: "근육과 폐가 계속 성숙하고, 머리가 몸에 맞게 커져요." },
-      { week: 30, size: "양배추", emoji: "🥬", desc: "시력이 발달해 자궁 안에서 빛과 어둠을 구별할 수 있어요." },
-      { week: 31, size: "코코넛", emoji: "🥥", desc: "중추신경계가 발달해 체온을 조절할 수 있게 돼요." },
-      { week: 32, size: "큰 배", emoji: "🍐", desc: "피하지방이 늘어나면서 아기의 피부가 부드러워져요." },
-      { week: 33, size: "파인애플", emoji: "🍍", desc: "뼈가 단단해지지만, 두개골은 출산을 위해 부드러운 상태를 유지해요." },
-      { week: 34, size: "작은 멜론", emoji: "🍈", desc: "폐와 신경계가 거의 발달을 마쳤어요." },
-      { week: 35, size: "작은 무", emoji: "🥕", desc: "자궁이 좁아져 움직임이 줄어든 것처럼 느껴질 수 있어요." },
-      { week: 36, size: "작은 배추", emoji: "🥬", desc: "아기가 세상 밖으로 나올 준비를 하며 머리를 아래로 향해요." },
-      { week: 37, size: "아기 머리 정도", emoji: "👶", desc: "이제 아기는 '만삭아'로 간주돼요. 언제 태어나도 괜찮아요." },
-      { week: 38, size: "큰 애호박", emoji: "🥒", desc: "솜털과 태지가 점차 사라지고, 폐 기능이 완벽해져요." },
-      { week: 39, size: "미니 수박", emoji: "🍉", desc: "뇌 발달이 계속되고, 지방층이 두꺼워져 체온을 유지할 수 있어요." },
-      { week: 40, size: "단호박", emoji: "🎃", desc: "엄마를 만날 모든 준비가 끝났어요! 곧 만나게 될 거예요." }
+      {
+        week: 4,
+        size: "깨알",
+        emoji: "🟠",
+        desc: "세포 분열이 활발히 일어나며, 아기집이 자궁 내벽에 착상하는 시기예요.",
+      },
+      {
+        week: 5,
+        size: "참깨",
+        emoji: "🍚",
+        desc: "심장이 뛰기 시작하고, 뇌와 척수 같은 주요 기관의 기초가 만들어져요.",
+      },
+      {
+        week: 6,
+        size: "녹두알",
+        emoji: "🫘",
+        desc: "눈, 코, 귀가 될 부분이 형성되고, 팔다리가 될 작은 돌기가 나타나요.",
+      },
+      {
+        week: 7,
+        size: "블루베리",
+        emoji: "🫐",
+        desc: "손과 발이 자라나며, 뇌가 빠르게 발달하는 중요한 시기랍니다.",
+      },
+      {
+        week: 8,
+        size: "산딸기",
+        emoji: "🍓",
+        desc: "이제 '배아'가 아닌 '태아'라고 불려요. 모든 주요 신체 기관이 형성되었어요.",
+      },
+      {
+        week: 9,
+        size: "포도알",
+        emoji: "🍇",
+        desc: "얼굴의 특징이 뚜렷해지고, 손가락과 발가락이 거의 완성돼요.",
+      },
+      {
+        week: 10,
+        size: "방울토마토",
+        emoji: "🍅",
+        desc: "뼈와 연골이 형성되고, 중요한 장기들이 제 기능을 하기 시작해요.",
+      },
+      {
+        week: 11,
+        size: "라임",
+        emoji: "🍋",
+        desc: "이제 제법 사람의 모습을 갖췄어요. 생식기가 발달하기 시작해요.",
+      },
+      {
+        week: 12,
+        size: "자두",
+        emoji: "🍑",
+        desc: "반사 신경이 발달해서 손가락을 쥐거나 발가락을 꼼지락거릴 수 있어요.",
+      },
+      {
+        week: 13,
+        size: "키위",
+        emoji: "🥝",
+        desc: "지문이 생기고, 얼굴 표정을 지을 수 있게 된답니다. 1분기가 끝났어요!",
+      },
+      {
+        week: 14,
+        size: "레몬",
+        emoji: "🍋",
+        desc: "목이 길어지고, 몸이 머리보다 더 빨리 자라기 시작해요. 솜털이 온몸을 덮어요.",
+      },
+      {
+        week: 15,
+        size: "사과",
+        emoji: "🍎",
+        desc: "골격이 발달하고, 눈꺼풀 아래에서 눈동자를 움직일 수 있어요.",
+      },
+      {
+        week: 16,
+        size: "아보카도",
+        emoji: "🥑",
+        desc: "다리가 길어지면서 이제 제법 아기다운 비율을 갖추게 돼요.",
+      },
+      {
+        week: 17,
+        size: "양파",
+        emoji: "🧅",
+        desc: "청력이 발달해 엄마의 목소리나 심장 소리를 들을 수 있어요.",
+      },
+      {
+        week: 18,
+        size: "피망",
+        emoji: "🫑",
+        desc: "신경계가 발달하면서 움직임이 더욱 활발해져요. 첫 태동을 느낄 수도 있어요.",
+      },
+      {
+        week: 19,
+        size: "망고",
+        emoji: "🥭",
+        desc: "피부를 보호하는 태지가 몸을 덮기 시작해요.",
+      },
+      {
+        week: 20,
+        size: "바나나",
+        emoji: "🍌",
+        desc: "소화기관이 발달하고, 이제 양수를 삼키고 뱉을 수 있답니다.",
+      },
+      {
+        week: 21,
+        size: "당근",
+        emoji: "🥕",
+        desc: "눈썹과 눈꺼풀이 완전히 형성되고, 움직임이 더욱 강해져요.",
+      },
+      {
+        week: 22,
+        size: "파파야",
+        emoji: "🥭",
+        desc: "시각과 미각, 촉각 등 감각이 발달하고 있어요.",
+      },
+      {
+        week: 23,
+        size: "가지",
+        emoji: "🍆",
+        desc: "폐가 발달하고, 아기는 바깥의 큰 소리에 깜짝 놀라기도 해요.",
+      },
+      {
+        week: 24,
+        size: "옥수수",
+        emoji: "🌽",
+        desc: "피부가 투명한 상태에서 점차 불투명해지고, 제법 통통해져요.",
+      },
+      {
+        week: 25,
+        size: "참외",
+        emoji: "🍈",
+        desc: "머리카락이 자라고 색깔이 생기기 시작해요.",
+      },
+      {
+        week: 26,
+        size: "오이",
+        emoji: "🥒",
+        desc: "눈을 뜨고 감을 수 있게 되며, 폐가 호흡 연습을 시작해요.",
+      },
+      {
+        week: 27,
+        size: "브로콜리",
+        emoji: "🥦",
+        desc: "뇌가 매우 활발하게 발달해요. 2분기가 거의 끝났어요!",
+      },
+      {
+        week: 28,
+        size: "큰 가지",
+        emoji: "🍆",
+        desc: "이제 아기는 꿈을 꿀 수도 있어요. 3분기가 시작되었어요.",
+      },
+      {
+        week: 29,
+        size: "작은 단호박",
+        emoji: "🎃",
+        desc: "근육과 폐가 계속 성숙하고, 머리가 몸에 맞게 커져요.",
+      },
+      {
+        week: 30,
+        size: "양배추",
+        emoji: "🥬",
+        desc: "시력이 발달해 자궁 안에서 빛과 어둠을 구별할 수 있어요.",
+      },
+      {
+        week: 31,
+        size: "코코넛",
+        emoji: "🥥",
+        desc: "중추신경계가 발달해 체온을 조절할 수 있게 돼요.",
+      },
+      {
+        week: 32,
+        size: "큰 배",
+        emoji: "🍐",
+        desc: "피하지방이 늘어나면서 아기의 피부가 부드러워져요.",
+      },
+      {
+        week: 33,
+        size: "파인애플",
+        emoji: "🍍",
+        desc: "뼈가 단단해지지만, 두개골은 출산을 위해 부드러운 상태를 유지해요.",
+      },
+      {
+        week: 34,
+        size: "작은 멜론",
+        emoji: "🍈",
+        desc: "폐와 신경계가 거의 발달을 마쳤어요.",
+      },
+      {
+        week: 35,
+        size: "작은 무",
+        emoji: "🥕",
+        desc: "자궁이 좁아져 움직임이 줄어든 것처럼 느껴질 수 있어요.",
+      },
+      {
+        week: 36,
+        size: "작은 배추",
+        emoji: "🥬",
+        desc: "아기가 세상 밖으로 나올 준비를 하며 머리를 아래로 향해요.",
+      },
+      {
+        week: 37,
+        size: "아기 머리 정도",
+        emoji: "👶",
+        desc: "이제 아기는 '만삭아'로 간주돼요. 언제 태어나도 괜찮아요.",
+      },
+      {
+        week: 38,
+        size: "큰 애호박",
+        emoji: "🥒",
+        desc: "솜털과 태지가 점차 사라지고, 폐 기능이 완벽해져요.",
+      },
+      {
+        week: 39,
+        size: "미니 수박",
+        emoji: "🍉",
+        desc: "뇌 발달이 계속되고, 지방층이 두꺼워져 체온을 유지할 수 있어요.",
+      },
+      {
+        week: 40,
+        size: "단호박",
+        emoji: "🎃",
+        desc: "엄마를 만날 모든 준비가 끝났어요! 곧 만나게 될 거예요.",
+      },
     ];
 
-    const lmpDateInput = document.getElementById('lmp-date');
-    const cycleLengthInput = document.getElementById('cycle-length');
-    const resultsSection = document.getElementById('results-section');
+    const lmpDateInput = document.getElementById("lmp-date");
+    const cycleLengthInput = document.getElementById("cycle-length");
+    const resultsSection = document.getElementById("results-section");
 
-    const estDueDateEl = document.getElementById('est-due-date');
-    const currentGestationEl = document.getElementById('current-gestation');
-    const daysCountdownEl = document.getElementById('days-countdown');
-    const progressBar = document.getElementById('progress-bar');
-    const progressLabel = document.getElementById('progress-label');
+    const estDueDateEl = document.getElementById("est-due-date");
+    const currentGestationEl = document.getElementById("current-gestation");
+    const daysCountdownEl = document.getElementById("days-countdown");
+    const progressBar = document.getElementById("progress-bar");
+    const progressLabel = document.getElementById("progress-label");
 
-    const estConceptionDateEl = document.getElementById('est-conception-date');
-    const firstTrimesterEndEl = document.getElementById('first-trimester-end');
-    const secondTrimesterEndEl = document.getElementById('second-trimester-end');
-    
-    const babySizeEmojiEl = document.getElementById('baby-size-emoji');
-    const babySizeTextEl = document.getElementById('baby-size-text');
-    const babyWeekDescEl = document.getElementById('baby-week-desc');
+    const estConceptionDateEl = document.getElementById("est-conception-date");
+    const firstTrimesterEndEl = document.getElementById("first-trimester-end");
+    const secondTrimesterEndEl = document.getElementById(
+      "second-trimester-end",
+    );
 
-    const babyZodiacEl = document.getElementById('baby-zodiac');
-    const babyChineseZodiacEl = document.getElementById('baby-chinese-zodiac');
+    const babySizeEmojiEl = document.getElementById("baby-size-emoji");
+    const babySizeTextEl = document.getElementById("baby-size-text");
+    const babyWeekDescEl = document.getElementById("baby-week-desc");
+
+    const babyZodiacEl = document.getElementById("baby-zodiac");
+    const babyChineseZodiacEl = document.getElementById("baby-chinese-zodiac");
 
     const todayForDefault = new Date();
-    const lmpDefault = new Date(todayForDefault.getTime() - (8 * 7 * 24 * 60 * 60 * 1000));
+    const lmpDefault = new Date(
+      todayForDefault.getTime() - 8 * 7 * 24 * 60 * 60 * 1000,
+    );
     if (lmpDateInput) {
-      lmpDateInput.value = lmpDefault.toISOString().split('T')[0];
+      lmpDateInput.value = lmpDefault.toISOString().split("T")[0];
     }
 
-    [lmpDateInput, cycleLengthInput].forEach(input => {
-      if(input) input.addEventListener('input', calculateAndDisplay);
+    [lmpDateInput, cycleLengthInput].forEach((input) => {
+      if (input) input.addEventListener("input", calculateAndDisplay);
     });
 
     function formatDate(date, withDay = true) {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
-      if(withDay) {
-        const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
+      if (withDay) {
+        const dayOfWeek = ["일", "월", "화", "수", "목", "금", "토"][
+          date.getDay()
+        ];
         return `${year}년 ${month}월 ${day}일 (${dayOfWeek})`;
       }
       return `${year}년 ${month}월 ${day}일`;
@@ -431,46 +638,147 @@ if (related.length === 0) {
     function getZodiacSign(date) {
       const day = date.getDate();
       const month = date.getMonth() + 1;
-      if ( month == 1 ) { if ( day >= 20 ) {  return "물병자리";  }  }
-      if ( month == 2 ) { if ( day <= 18 ) {  return "물병자리";  }  }
-      if ( month == 2 ) { if ( day >= 19 ) {  return "물고기자리";  }  }
-      if ( month == 3 ) { if ( day <= 20 ) {  return "물고기자리";  }  }
-      if ( month == 3 ) { if ( day >= 21 ) {  return "양자리";  }  }
-      if ( month == 4 ) { if ( day <= 19 ) {  return "양자리";  }  }
-      if ( month == 4 ) { if ( day >= 20 ) {  return "황소자리";  }  }
-      if ( month == 5 ) { if ( day <= 20 ) {  return "황소자리";  }  }
-      if ( month == 5 ) { if ( day >= 21 ) {  return "쌍둥이자리";  }  }
-      if ( month == 6 ) { if ( day <= 21 ) {  return "쌍둥이자리";  }  }
-      if ( month == 6 ) { if ( day >= 22 ) {  return "게자리";  }  }
-      if ( month == 7 ) { if ( day <= 22 ) {  return "게자리";  }  }
-      if ( month == 7 ) { if ( day >= 23 ) {  return "사자자리";  }  }
-      if ( month == 8 ) { if ( day <= 22 ) {  return "사자자리";  }  }
-      if ( month == 8 ) { if ( day >= 23 ) {  return "처녀자리";  }  }
-      if ( month == 9 ) { if ( day <= 23 ) {  return "처녀자리";  }  }
-      if ( month == 9 ) { if ( day >= 24 ) {  return "천칭자리";  }  }
-      if ( month == 10 ) { if ( day <= 23 ) {  return "천칭자리";  }  }
-      if ( month == 10 ) { if ( day >= 23 ) {  return "전갈자리";  }  }
-      if ( month == 11 ) { if ( day <= 22 ) {  return "전갈자리";  }  }
-      if ( month == 11 ) { if ( day >= 23 ) {  return "사수자리";  }  }
-      if ( month == 12 ) { if ( day <= 24 ) {  return "사수자리";  }  }
+      if (month == 1) {
+        if (day >= 20) {
+          return "물병자리";
+        }
+      }
+      if (month == 2) {
+        if (day <= 18) {
+          return "물병자리";
+        }
+      }
+      if (month == 2) {
+        if (day >= 19) {
+          return "물고기자리";
+        }
+      }
+      if (month == 3) {
+        if (day <= 20) {
+          return "물고기자리";
+        }
+      }
+      if (month == 3) {
+        if (day >= 21) {
+          return "양자리";
+        }
+      }
+      if (month == 4) {
+        if (day <= 19) {
+          return "양자리";
+        }
+      }
+      if (month == 4) {
+        if (day >= 20) {
+          return "황소자리";
+        }
+      }
+      if (month == 5) {
+        if (day <= 20) {
+          return "황소자리";
+        }
+      }
+      if (month == 5) {
+        if (day >= 21) {
+          return "쌍둥이자리";
+        }
+      }
+      if (month == 6) {
+        if (day <= 21) {
+          return "쌍둥이자리";
+        }
+      }
+      if (month == 6) {
+        if (day >= 22) {
+          return "게자리";
+        }
+      }
+      if (month == 7) {
+        if (day <= 22) {
+          return "게자리";
+        }
+      }
+      if (month == 7) {
+        if (day >= 23) {
+          return "사자자리";
+        }
+      }
+      if (month == 8) {
+        if (day <= 22) {
+          return "사자자리";
+        }
+      }
+      if (month == 8) {
+        if (day >= 23) {
+          return "처녀자리";
+        }
+      }
+      if (month == 9) {
+        if (day <= 23) {
+          return "처녀자리";
+        }
+      }
+      if (month == 9) {
+        if (day >= 24) {
+          return "천칭자리";
+        }
+      }
+      if (month == 10) {
+        if (day <= 23) {
+          return "천칭자리";
+        }
+      }
+      if (month == 10) {
+        if (day >= 23) {
+          return "전갈자리";
+        }
+      }
+      if (month == 11) {
+        if (day <= 22) {
+          return "전갈자리";
+        }
+      }
+      if (month == 11) {
+        if (day >= 23) {
+          return "사수자리";
+        }
+      }
+      if (month == 12) {
+        if (day <= 24) {
+          return "사수자리";
+        }
+      }
       return "염소자리";
     }
 
     function getChineseZodiac(year) {
-      const animals = ['원숭이', '닭', '개', '돼지', '쥐', '소', '호랑이', '토끼', '용', '뱀', '말', '양'];
-      return animals[(year - 4) % 12] + '띠';
+      const animals = [
+        "원숭이",
+        "닭",
+        "개",
+        "돼지",
+        "쥐",
+        "소",
+        "호랑이",
+        "토끼",
+        "용",
+        "뱀",
+        "말",
+        "양",
+      ];
+      return animals[(year - 4) % 12] + "띠";
     }
-    
+
     function calculateAndDisplay() {
-      if(!lmpDateInput || !cycleLengthInput || !resultsSection) return;
-      
+      if (!lmpDateInput || !cycleLengthInput || !resultsSection) return;
+
       const lmpStr = lmpDateInput.value;
       if (!lmpStr) {
-        resultsSection.style.display = 'none';
+        resultsSection.style.display = "none";
         return;
       }
       const lmp = new Date(lmpStr);
-      lmp.setHours(0,0,0,0);
+      lmp.setHours(0, 0, 0, 0);
       const cycleLength = parseInt(cycleLengthInput.value) || 28;
 
       const dueDate = new Date(lmp);
@@ -480,53 +788,64 @@ if (related.length === 0) {
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (lmp > today) {
-        resultsSection.style.display = 'none';
+        resultsSection.style.display = "none";
         return;
       }
 
       const gestationInMs = today.getTime() - lmp.getTime();
       const gestationInDays = Math.floor(gestationInMs / (1000 * 60 * 60 * 24));
-      
+
       const weeks = Math.floor(gestationInDays / 7);
       const days = gestationInDays % 7;
       currentGestationEl.textContent = `현재 ${weeks}주 ${days}일째`;
 
       const countdownInMs = dueDate.getTime() - today.getTime();
       const daysLeft = Math.ceil(countdownInMs / (1000 * 60 * 60 * 24));
-      daysCountdownEl.textContent = daysLeft >= 0 ? `예정일까지 ${daysLeft}일` : `예정일이 지났습니다.`;
+      daysCountdownEl.textContent =
+        daysLeft >= 0 ? `예정일까지 ${daysLeft}일` : `예정일이 지났습니다.`;
 
       const progressPercentage = Math.min((gestationInDays / 280) * 100, 100);
       progressBar.style.width = `${progressPercentage}%`;
       // Update label color based on width
       if (progressPercentage > 55) {
-        progressLabel.style.color = 'var(--color-on-primary)';
+        progressLabel.style.color = "var(--color-on-primary)";
       } else {
-        progressLabel.style.color = 'var(--color-on-surface-variant)';
+        progressLabel.style.color = "var(--color-on-surface-variant)";
       }
       progressLabel.textContent = `${weeks}주 / 40주`;
 
       const conceptionDate = new Date(lmp);
       conceptionDate.setDate(lmp.getDate() + 14 + cycleAdjustment);
-      estConceptionDateEl.textContent = formatDate(conceptionDate, false).substring(5);
+      estConceptionDateEl.textContent = formatDate(
+        conceptionDate,
+        false,
+      ).substring(5);
 
       const firstTrimesterEnd = new Date(lmp);
-      firstTrimesterEnd.setDate(firstTrimesterEnd.getDate() + (13*7) + 6);
-      firstTrimesterEndEl.textContent = formatDate(firstTrimesterEnd, false).substring(5);
-      
+      firstTrimesterEnd.setDate(firstTrimesterEnd.getDate() + 13 * 7 + 6);
+      firstTrimesterEndEl.textContent = formatDate(
+        firstTrimesterEnd,
+        false,
+      ).substring(5);
+
       const secondTrimesterEnd = new Date(lmp);
-      secondTrimesterEnd.setDate(secondTrimesterEnd.getDate() + (27*7) + 6);
-      secondTrimesterEndEl.textContent = formatDate(secondTrimesterEnd, false).substring(5);
-      
-      let currentWeekInfo = weeklyInfo.find(info => info.week === weeks);
+      secondTrimesterEnd.setDate(secondTrimesterEnd.getDate() + 27 * 7 + 6);
+      secondTrimesterEndEl.textContent = formatDate(
+        secondTrimesterEnd,
+        false,
+      ).substring(5);
+
+      let currentWeekInfo = weeklyInfo.find((info) => info.week === weeks);
       if (weeks >= 41) currentWeekInfo = weeklyInfo[weeklyInfo.length - 1];
-      
+
       if (weeks < 4) {
         babySizeEmojiEl.textContent = "❓";
         babySizeTextEl.textContent = "아직은 아주 작은 세포예요.";
-        babyWeekDescEl.textContent = "곧 놀라운 여정이 시작될 거예요. 몸을 편안하게 해주세요.";
-      } else if (currentWeekInfo){
+        babyWeekDescEl.textContent =
+          "곧 놀라운 여정이 시작될 거예요. 몸을 편안하게 해주세요.";
+      } else if (currentWeekInfo) {
         babySizeEmojiEl.textContent = currentWeekInfo.emoji;
         babySizeTextEl.textContent = currentWeekInfo.size;
         babyWeekDescEl.textContent = currentWeekInfo.desc;
@@ -534,8 +853,8 @@ if (related.length === 0) {
 
       babyZodiacEl.textContent = getZodiacSign(dueDate);
       babyChineseZodiacEl.textContent = getChineseZodiac(dueDate.getFullYear());
-      
-      resultsSection.style.display = 'block';
+
+      resultsSection.style.display = "block";
     }
 
     calculateAndDisplay();

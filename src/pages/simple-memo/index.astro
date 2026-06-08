@@ -1,9 +1,9 @@
 ---
-import { getEntry, render } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
+import { getEntry, render } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
 
-const entry = await getEntry('apps', 'simple-memo');
-if (!entry) throw new Error('simple-memo entry not found');
+const entry = await getEntry("apps", "simple-memo");
+if (!entry) throw new Error("simple-memo entry not found");
 const { Content } = await render(entry);
 ---
 
@@ -22,27 +22,72 @@ const { Content } = await render(entry);
   <Fragment slot="app">
     <section class="app-calc-layout" aria-label="보안 메모장">
       <div class="security-badge" role="status">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
         </svg>
         <span>모든 메모는 이 브라우저에만 안전하게 저장됩니다</span>
       </div>
 
+      <div class="app-spacer-sm"></div>
+
       <div id="memo-main-view">
-        <button class="memo-add-button" id="memo-add-button" type="button" aria-label="새 메모 추가">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+        <button
+          class="memo-add-button"
+          id="memo-add-button"
+          type="button"
+          aria-label="새 메모 추가"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+            ></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+            ></path>
           </svg>
           <span>새 메모 작성</span>
         </button>
+
+        <div class="app-spacer-sm"></div>
 
         <div id="memo-list" class="memo-list" aria-live="polite"></div>
 
         <div id="empty-state" class="empty-state" hidden>
           <div class="empty-icon" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              ></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="9" y1="13" x2="15" y2="13"></line>
               <line x1="9" y1="17" x2="13" y2="17"></line>
@@ -62,32 +107,60 @@ const { Content } = await render(entry);
           id="memo-textarea"
           placeholder="메모 내용을 입력하세요..."
           rows="10"
-          aria-label="메모 내용"
-        ></textarea>
+          aria-label="메모 내용"></textarea>
         <div class="char-count">
           <span id="char-count">0</span>자
         </div>
         <div class="editor-actions">
-          <button type="button" class="app-btn app-btn-primary" id="btn-save">저장</button>
-          <button type="button" class="app-btn app-btn-secondary" id="btn-cancel">취소</button>
-          <button type="button" class="app-btn app-btn-secondary" id="btn-copy">클립보드 복사</button>
-          <button type="button" class="app-btn app-btn-danger" id="btn-delete" hidden>삭제</button>
+          <button type="button" class="app-btn app-btn-primary" id="btn-save"
+            >저장</button
+          >
+          <button
+            type="button"
+            class="app-btn app-btn-secondary"
+            id="btn-cancel">취소</button
+          >
+          <button type="button" class="app-btn app-btn-secondary" id="btn-copy"
+            >클립보드 복사</button
+          >
+          <button
+            type="button"
+            class="app-btn app-btn-danger"
+            id="btn-delete"
+            hidden>삭제</button
+          >
         </div>
       </div>
 
-      <div id="dialog-container" class="dialog-container" hidden role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+      <div
+        id="dialog-container"
+        class="dialog-container"
+        hidden
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dialog-title"
+      >
         <div class="dialog-backdrop" id="dialog-backdrop"></div>
         <div class="dialog">
           <h3 id="dialog-title" class="dialog-title">메모를 삭제할까요?</h3>
           <p class="dialog-desc">삭제한 메모는 복구할 수 없습니다.</p>
           <div class="dialog-actions">
-            <button type="button" class="app-btn app-btn-secondary" id="btn-cancel-delete">삭제 안함</button>
-            <button type="button" class="app-btn app-btn-danger" id="btn-confirm-delete">삭제</button>
+            <button
+              type="button"
+              class="app-btn app-btn-secondary"
+              id="btn-cancel-delete">삭제 안함</button
+            >
+            <button
+              type="button"
+              class="app-btn app-btn-danger"
+              id="btn-confirm-delete">삭제</button
+            >
           </div>
         </div>
       </div>
 
-      <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+      <div id="toast" class="toast" role="status" aria-live="polite" hidden>
+      </div>
     </section>
   </Fragment>
 
@@ -131,12 +204,18 @@ const { Content } = await render(entry);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: filter 0.15s ease, transform 0.05s ease;
+    transition:
+      filter 0.15s ease,
+      transform 0.05s ease;
     font-family: var(--font-family-gothic);
   }
 
-  .memo-add-button:hover { filter: brightness(0.95); }
-  .memo-add-button:active { transform: translateY(1px); }
+  .memo-add-button:hover {
+    filter: brightness(0.95);
+  }
+  .memo-add-button:active {
+    transform: translateY(1px);
+  }
 
   .memo-list {
     display: flex;
@@ -154,7 +233,10 @@ const { Content } = await render(entry);
     border: 1px solid var(--color-outline-variant);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.05s ease;
   }
 
   .memo-list :global(.memo-bar:hover) {
@@ -199,9 +281,22 @@ const { Content } = await render(entry);
     display: none;
   }
 
-  .empty-icon { color: var(--color-outline-variant); margin-bottom: 0.75rem; }
-  .empty-title { font-size: 1rem; font-weight: 600; margin: 0 0 0.25rem; color: var(--color-on-surface); font-family: var(--font-family-gothic); }
-  .empty-desc { font-size: 0.85rem; margin: 0; font-family: var(--font-family-gothic); }
+  .empty-icon {
+    color: var(--color-outline-variant);
+    margin-bottom: 0.75rem;
+  }
+  .empty-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+    color: var(--color-on-surface);
+    font-family: var(--font-family-gothic);
+  }
+  .empty-desc {
+    font-size: 0.85rem;
+    margin: 0;
+    font-family: var(--font-family-gothic);
+  }
 
   .memo-editor {
     display: flex;
@@ -295,7 +390,9 @@ const { Content } = await render(entry);
     gap: 0.5rem;
   }
 
-  .dialog-actions .app-btn-danger { margin-left: 0; }
+  .dialog-actions .app-btn-danger {
+    margin-left: 0;
+  }
 
   .toast {
     position: fixed;
@@ -313,43 +410,55 @@ const { Content } = await render(entry);
   }
 
   @keyframes toast-in {
-    from { opacity: 0; transform: translate(-50%, 10px); }
-    to { opacity: 1; transform: translate(-50%, 0); }
+    from {
+      opacity: 0;
+      transform: translate(-50%, 10px);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
   }
 
   @media (max-width: 480px) {
-    .editor-actions { flex-direction: column; }
-    .editor-actions .btn { width: 100%; }
-    .btn-danger { margin-left: 0; }
+    .editor-actions {
+      flex-direction: column;
+    }
+    .editor-actions .btn {
+      width: 100%;
+    }
+    .btn-danger {
+      margin-left: 0;
+    }
   }
 </style>
 
 <script>
   (function () {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     interface Memo {
       content: string;
       timestamp: string;
     }
 
-    const STORAGE_KEY = 'memos';
+    const STORAGE_KEY = "memos";
     let memos: Memo[] = [];
     let currentMemoIndex = -1;
 
     const $ = <T extends HTMLElement = HTMLElement>(id: string) =>
       document.getElementById(id) as T | null;
 
-    const memoMainView = $('memo-main-view');
-    const memoList = $('memo-list');
-    const emptyState = $('empty-state');
-    const memoEditor = $('memo-editor');
-    const memoTextarea = $<HTMLTextAreaElement>('memo-textarea');
-    const editorTitle = $('editor-title');
-    const btnDelete = $<HTMLButtonElement>('btn-delete');
-    const charCount = $('char-count');
-    const dialogContainer = $('dialog-container');
-    const toastEl = $('toast');
+    const memoMainView = $("memo-main-view");
+    const memoList = $("memo-list");
+    const emptyState = $("empty-state");
+    const memoEditor = $("memo-editor");
+    const memoTextarea = $<HTMLTextAreaElement>("memo-textarea");
+    const editorTitle = $("editor-title");
+    const btnDelete = $<HTMLButtonElement>("btn-delete");
+    const charCount = $("char-count");
+    const dialogContainer = $("dialog-container");
+    const toastEl = $("toast");
 
     function loadMemos(): Memo[] {
       try {
@@ -366,18 +475,18 @@ const { Content } = await render(entry);
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(memos));
       } catch {
-        showToast('저장 공간이 부족합니다');
+        showToast("저장 공간이 부족합니다");
       }
     }
 
     function formatTimestamp(ts: string | Date): string {
       const d = new Date(ts);
-      if (isNaN(d.getTime())) return '';
+      if (isNaN(d.getTime())) return "";
       const y = d.getFullYear();
       const mo = d.getMonth() + 1;
       const day = d.getDate();
       const h = d.getHours();
-      const mi = String(d.getMinutes()).padStart(2, '0');
+      const mi = String(d.getMinutes()).padStart(2, "0");
       return `${y}년 ${mo}월 ${day}일 ${h}시 ${mi}분`;
     }
 
@@ -393,7 +502,7 @@ const { Content } = await render(entry);
 
     function renderMemos() {
       if (!memoList || !emptyState) return;
-      memoList.innerHTML = '';
+      memoList.innerHTML = "";
 
       if (memos.length === 0) {
         emptyState.hidden = false;
@@ -402,28 +511,29 @@ const { Content } = await render(entry);
       emptyState.hidden = true;
 
       memos.forEach((memo, index) => {
-        const firstLine = (memo.content || '').split('\n')[0].trim() || '(빈 메모)';
+        const firstLine =
+          (memo.content || "").split("\n")[0].trim() || "(빈 메모)";
 
-        const bar = document.createElement('div');
-        bar.className = 'memo-bar';
-        bar.setAttribute('role', 'button');
-        bar.setAttribute('tabindex', '0');
-        bar.setAttribute('aria-label', `${firstLine} 메모 열기`);
+        const bar = document.createElement("div");
+        bar.className = "memo-bar";
+        bar.setAttribute("role", "button");
+        bar.setAttribute("tabindex", "0");
+        bar.setAttribute("aria-label", `${firstLine} 메모 열기`);
 
-        const content = document.createElement('p');
-        content.className = 'memo-content';
+        const content = document.createElement("p");
+        content.className = "memo-content";
         content.textContent = firstLine;
 
-        const time = document.createElement('div');
-        time.className = 'memo-timestamp';
+        const time = document.createElement("div");
+        time.className = "memo-timestamp";
         time.textContent = formatTimestamp(memo.timestamp);
 
         bar.appendChild(content);
         bar.appendChild(time);
 
-        bar.addEventListener('click', () => showEditor(index));
-        bar.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+        bar.addEventListener("click", () => showEditor(index));
+        bar.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             showEditor(index);
           }
@@ -445,13 +555,13 @@ const { Content } = await render(entry);
       if (memoEditor) memoEditor.hidden = false;
 
       if (index >= 0) {
-        if (editorTitle) editorTitle.textContent = '메모 편집';
+        if (editorTitle) editorTitle.textContent = "메모 편집";
         if (btnDelete) btnDelete.hidden = false;
         if (memoTextarea) memoTextarea.value = memos[index].content;
       } else {
-        if (editorTitle) editorTitle.textContent = '새 메모';
+        if (editorTitle) editorTitle.textContent = "새 메모";
         if (btnDelete) btnDelete.hidden = true;
-        if (memoTextarea) memoTextarea.value = '';
+        if (memoTextarea) memoTextarea.value = "";
       }
 
       updateCharCount();
@@ -460,16 +570,22 @@ const { Content } = await render(entry);
 
     function cancelEdit() {
       if (memoEditor) memoEditor.hidden = true;
-      if (memoTextarea) memoTextarea.value = '';
+      if (memoTextarea) memoTextarea.value = "";
       currentMemoIndex = -1;
       if (memoMainView) memoMainView.hidden = false;
       updateCharCount();
+
+      const appContainer = document.querySelector(".app-calc-layout");
+      if (appContainer) {
+        const y = appContainer.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+      }
     }
 
     function saveMemo() {
-      const content = (memoTextarea?.value || '').trim();
+      const content = (memoTextarea?.value || "").trim();
       if (!content) {
-        showToast('메모 내용을 입력해 주세요');
+        showToast("메모 내용을 입력해 주세요");
         memoTextarea?.focus();
         return;
       }
@@ -480,20 +596,20 @@ const { Content } = await render(entry);
       saveStorage();
       renderMemos();
       cancelEdit();
-      showToast('메모가 저장되었습니다');
+      showToast("메모가 저장되었습니다");
     }
 
     async function copyToClipboard() {
-      const text = (memoTextarea?.value || '').trim();
+      const text = (memoTextarea?.value || "").trim();
       if (!text) {
-        showToast('복사할 내용이 없습니다');
+        showToast("복사할 내용이 없습니다");
         return;
       }
       try {
         await navigator.clipboard.writeText(text);
-        showToast('클립보드에 복사되었습니다');
+        showToast("클립보드에 복사되었습니다");
       } catch {
-        showToast('복사에 실패했습니다');
+        showToast("복사에 실패했습니다");
       }
     }
 
@@ -514,23 +630,23 @@ const { Content } = await render(entry);
       hideDeleteDialog();
       cancelEdit();
       renderMemos();
-      showToast('메모가 삭제되었습니다');
+      showToast("메모가 삭제되었습니다");
     }
 
     // 이벤트 바인딩
-    $('memo-add-button')?.addEventListener('click', () => showEditor(-1));
-    $('btn-save')?.addEventListener('click', saveMemo);
-    $('btn-cancel')?.addEventListener('click', cancelEdit);
-    $('btn-copy')?.addEventListener('click', copyToClipboard);
-    $('btn-delete')?.addEventListener('click', showDeleteDialog);
-    $('btn-cancel-delete')?.addEventListener('click', hideDeleteDialog);
-    $('btn-confirm-delete')?.addEventListener('click', deleteMemo);
-    $('dialog-backdrop')?.addEventListener('click', hideDeleteDialog);
+    $("memo-add-button")?.addEventListener("click", () => showEditor(-1));
+    $("btn-save")?.addEventListener("click", saveMemo);
+    $("btn-cancel")?.addEventListener("click", cancelEdit);
+    $("btn-copy")?.addEventListener("click", copyToClipboard);
+    $("btn-delete")?.addEventListener("click", showDeleteDialog);
+    $("btn-cancel-delete")?.addEventListener("click", hideDeleteDialog);
+    $("btn-confirm-delete")?.addEventListener("click", deleteMemo);
+    $("dialog-backdrop")?.addEventListener("click", hideDeleteDialog);
 
-    memoTextarea?.addEventListener('input', updateCharCount);
+    memoTextarea?.addEventListener("input", updateCharCount);
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
         if (dialogContainer && !dialogContainer.hidden) {
           hideDeleteDialog();
         } else if (memoEditor && !memoEditor.hidden) {
