@@ -294,7 +294,7 @@ if (related.length === 0) {
       if (e.target === appAlertModal) hideAlert();
     });
 
-    const screens = document.querySelectorAll<HTMLElement>('.screen');
+    const screens = document.querySelectorAll<HTMLElement>('section[id^="screen"]');
 
     function showScreen(id: string) {
       screens.forEach((s) => {
