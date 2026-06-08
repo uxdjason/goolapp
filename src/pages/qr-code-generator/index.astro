@@ -1,21 +1,31 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'qr-code-generator');
-if (!entry) throw new Error('qr-code-generator entry not found');
+const entry = await getEntry("apps", "qr-code-generator");
+if (!entry) throw new Error("qr-code-generator entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
 }
 ---
 
@@ -42,28 +52,46 @@ if (related.length === 0) {
           placeholder="예: https://goolapp.com"
           autocomplete="off"
         />
-        <p class="input-hint">URL, 앱 링크, 일반 텍스트 등 어떤 내용이든 입력할 수 있습니다.</p>
+        <p class="input-hint">
+          URL, 앱 링크, 일반 텍스트 등 어떤 내용이든 입력할 수 있습니다.
+        </p>
       </div>
 
       <div class="button-group">
-        <button type="button" id="generateButton" class="app-btn app-btn-primary">
+        <button
+          type="button"
+          id="generateButton"
+          class="app-btn app-btn-primary"
+        >
           QR 코드 생성
         </button>
-        <button type="button" id="saveButton" class="app-btn app-btn-secondary" hidden>
+        <button
+          type="button"
+          id="saveButton"
+          class="app-btn app-btn-secondary"
+          hidden
+        >
           QR 코드 저장 (PNG)
         </button>
       </div>
 
+      <div class="app-spacer-sm"></div>
       <div class="result-section" id="resultSection" hidden>
         <div class="qr-wrapper">
           <div id="qrcode" class="qrcode-container"></div>
         </div>
-        <p class="result-hint">QR 코드를 스캔하여 내용을 확인하거나 저장 버튼을 눌러 이미지로 저장하세요.</p>
+        <p class="result-hint">
+          QR 코드를 스캔하여 내용을 확인하거나 저장 버튼을 눌러 이미지로
+          저장하세요.
+        </p>
       </div>
 
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">📱</div>
-        <p>위 입력란에 URL 또는 텍스트를 입력한 뒤<br />[QR 코드 생성] 버튼을 눌러주세요.</p>
+        <p>
+          위 입력란에 URL 또는 텍스트를 입력한 뒤<br />[QR 코드 생성] 버튼을
+          눌러주세요.
+        </p>
       </div>
 
       <!-- 공통 경고 모달 -->
@@ -73,7 +101,9 @@ if (related.length === 0) {
           <p class="app-modal-title" id="app-alert-title">알림</p>
           <p class="app-modal-body" id="app-alert-message"></p>
           <div class="app-modal-actions">
-            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary">확인</button>
+            <button id="app-alert-confirm-btn" class="app-btn app-btn-primary"
+              >확인</button
+            >
           </div>
         </div>
       </div>
@@ -94,54 +124,77 @@ if (related.length === 0) {
         resolve();
         return;
       }
-      const existing = document.querySelector('script[data-qrcodejs]');
+      const existing = document.querySelector("script[data-qrcodejs]");
       if (existing) {
-        existing.addEventListener('load', () => resolve());
-        existing.addEventListener('error', () => reject(new Error('QRCode lib load failed')));
+        existing.addEventListener("load", () => resolve());
+        existing.addEventListener("error", () =>
+          reject(new Error("QRCode lib load failed")),
+        );
         return;
       }
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+      const script = document.createElement("script");
+      script.src =
+        "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
       script.async = true;
-      script.dataset.qrcodejs = 'true';
+      script.dataset.qrcodejs = "true";
       script.onload = () => resolve();
-      script.onerror = () => reject(new Error('QRCode lib load failed'));
+      script.onerror = () => reject(new Error("QRCode lib load failed"));
       document.head.appendChild(script);
     });
   }
 
   function initApp() {
-    const urlInput = document.getElementById('urlInput') as HTMLInputElement | null;
-    const generateButton = document.getElementById('generateButton') as HTMLButtonElement | null;
-    const saveButton = document.getElementById('saveButton') as HTMLButtonElement | null;
-    const qrcodeContainer = document.getElementById('qrcode');
-    const resultSection = document.getElementById('resultSection');
-    const emptyState = document.getElementById('emptyState');
+    const urlInput = document.getElementById(
+      "urlInput",
+    ) as HTMLInputElement | null;
+    const generateButton = document.getElementById(
+      "generateButton",
+    ) as HTMLButtonElement | null;
+    const saveButton = document.getElementById(
+      "saveButton",
+    ) as HTMLButtonElement | null;
+    const qrcodeContainer = document.getElementById("qrcode");
+    const resultSection = document.getElementById("resultSection");
+    const emptyState = document.getElementById("emptyState");
 
-    const appAlertModal = document.getElementById('app-alert-modal') as HTMLElement;
-    const appAlertMessage = document.getElementById('app-alert-message') as HTMLElement;
-    const appAlertConfirmBtn = document.getElementById('app-alert-confirm-btn') as HTMLButtonElement;
+    const appAlertModal = document.getElementById(
+      "app-alert-modal",
+    ) as HTMLElement;
+    const appAlertMessage = document.getElementById(
+      "app-alert-message",
+    ) as HTMLElement;
+    const appAlertConfirmBtn = document.getElementById(
+      "app-alert-confirm-btn",
+    ) as HTMLButtonElement;
 
     function showAlert(msg: string) {
       appAlertMessage.textContent = msg;
-      appAlertModal.removeAttribute('hidden');
+      appAlertModal.removeAttribute("hidden");
     }
 
     function hideAlert() {
-      appAlertModal.setAttribute('hidden', '');
+      appAlertModal.setAttribute("hidden", "");
     }
 
-    appAlertConfirmBtn?.addEventListener('click', hideAlert);
-    appAlertModal?.addEventListener('click', (e) => {
+    appAlertConfirmBtn?.addEventListener("click", hideAlert);
+    appAlertModal?.addEventListener("click", (e) => {
       if (e.target === appAlertModal) hideAlert();
     });
 
-    if (!urlInput || !generateButton || !saveButton || !qrcodeContainer || !resultSection || !emptyState) return;
+    if (
+      !urlInput ||
+      !generateButton ||
+      !saveButton ||
+      !qrcodeContainer ||
+      !resultSection ||
+      !emptyState
+    )
+      return;
 
     async function generateQRCode() {
       const value = urlInput!.value.trim();
       if (!value) {
-        showAlert('URL 또는 텍스트를 입력해주세요.');
+        showAlert("URL 또는 텍스트를 입력해주세요.");
         urlInput!.focus();
         return;
       }
@@ -149,19 +202,21 @@ if (related.length === 0) {
       try {
         await loadQRCodeLib();
       } catch (err) {
-        showAlert('QR 코드 생성 라이브러리를 불러오지 못했습니다. 네트워크 상태를 확인해주세요.');
+        showAlert(
+          "QR 코드 생성 라이브러리를 불러오지 못했습니다. 네트워크 상태를 확인해주세요.",
+        );
         return;
       }
 
-      qrcodeContainer!.innerHTML = '';
+      qrcodeContainer!.innerHTML = "";
 
       const QRCode = (window as any).QRCode;
       new QRCode(qrcodeContainer, {
         text: value,
         width: 220,
         height: 220,
-        colorDark: '#000000',
-        colorLight: '#ffffff',
+        colorDark: "#000000",
+        colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H,
       });
 
@@ -174,38 +229,40 @@ if (related.length === 0) {
     }
 
     function saveQRCode() {
-      const canvas = qrcodeContainer!.querySelector('canvas') as HTMLCanvasElement | null;
+      const canvas = qrcodeContainer!.querySelector(
+        "canvas",
+      ) as HTMLCanvasElement | null;
       if (!canvas) {
-        showAlert('먼저 QR 코드를 생성해주세요.');
+        showAlert("먼저 QR 코드를 생성해주세요.");
         return;
       }
 
       try {
-        const dataURL = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
+        const dataURL = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
         link.href = dataURL;
-        link.download = 'qrcode.png';
+        link.download = "qrcode.png";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       } catch (err) {
-        showAlert('QR 코드 저장 중 오류가 발생했습니다.');
+        showAlert("QR 코드 저장 중 오류가 발생했습니다.");
       }
     }
 
-    generateButton.addEventListener('click', generateQRCode);
-    saveButton.addEventListener('click', saveQRCode);
+    generateButton.addEventListener("click", generateQRCode);
+    saveButton.addEventListener("click", saveQRCode);
 
-    urlInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+    urlInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
         e.preventDefault();
         generateQRCode();
       }
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initApp);
   } else {
     initApp();
   }
