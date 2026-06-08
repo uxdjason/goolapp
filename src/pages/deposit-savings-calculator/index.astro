@@ -1,33 +1,33 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'deposit-savings-calculator');
+const entry = await getEntry("apps", "deposit-savings-calculator");
 if (!entry) {
   throw new Error("deposit-savings-calculator app entry not found");
 }
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({
-    title:            app.data.title,
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
     shortDescription: app.data.shortDescription,
-    slug:             app.data.slug,
-    category:         app.data.category,
+    slug: app.data.slug,
+    category: app.data.category,
   }));
 
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({
-      title:            app.data.title,
+    .map((app) => ({
+      title: app.data.title,
       shortDescription: app.data.shortDescription,
-      slug:             app.data.slug,
-      category:         app.data.category,
+      slug: app.data.slug,
+      category: app.data.category,
     }));
 }
 ---
@@ -47,15 +47,11 @@ if (related.length === 0) {
 >
   <Fragment slot="app">
     <div class="calculator-container glass-surface">
-      <div class="header">
-        <h2 class="label-caps" style="color: var(--color-primary); font-size: var(--font-size-sm); margin-bottom: var(--space-2);">금융 재테크</h2>
-        <h3 style="font-size: var(--font-size-2xl); margin-bottom: var(--space-2); color: var(--color-on-surface);">예적금 이자 계산기</h3>
-        <p>단리/복리와 세후 이자를 정확히 계산해 보세요.</p>
-      </div>
-
       <!-- Tab Navigation -->
       <div class="app-tab-nav">
-        <button class="app-tab-btn active" data-target="deposit-calc">정기예금</button>
+        <button class="app-tab-btn active" data-target="deposit-calc"
+          >정기예금</button
+        >
         <button class="app-tab-btn" data-target="saving-calc">정기적금</button>
       </div>
 
@@ -63,7 +59,7 @@ if (related.length === 0) {
         <div class="form-group">
           <label id="amount-label" for="amount">예치 금액</label>
           <div class="input-with-unit">
-            <input type="number" id="amount" placeholder="0" min="0">
+            <input type="number" id="amount" placeholder="0" min="0" />
             <span class="unit">원</span>
           </div>
           <small id="amount-hint">한 번에 맡길 금액을 입력하세요.</small>
@@ -73,14 +69,14 @@ if (related.length === 0) {
           <div class="form-group">
             <label for="months">예치 기간</label>
             <div class="input-with-unit">
-              <input type="number" id="months" value="12" min="1">
+              <input type="number" id="months" value="12" min="1" />
               <span class="unit">개월</span>
             </div>
           </div>
           <div class="form-group">
             <label for="rate">연 이자율</label>
             <div class="input-with-unit">
-              <input type="number" id="rate" step="0.1" value="3.0" min="0.1">
+              <input type="number" id="rate" step="0.1" value="3.0" min="0.1" />
               <span class="unit">%</span>
             </div>
           </div>
@@ -90,11 +86,11 @@ if (related.length === 0) {
           <label>이자 계산 방식</label>
           <div class="radio-group">
             <label class="radio-label">
-              <input type="radio" name="interest-type" value="simple" checked>
+              <input type="radio" name="interest-type" value="simple" checked />
               <span class="radio-custom">단리</span>
             </label>
             <label class="radio-label">
-              <input type="radio" name="interest-type" value="compound">
+              <input type="radio" name="interest-type" value="compound" />
               <span class="radio-custom">월복리</span>
             </label>
           </div>
@@ -105,7 +101,7 @@ if (related.length === 0) {
         <div class="results-hero">
           <p class="due-date-label label-caps">세후 만기 수령액 (15.4% 공제)</p>
           <div class="due-date-value" id="total-received">0 원</div>
-          
+
           <div class="results-details-cards">
             <div class="info-card glass-surface-card">
               <span>원금 총액</span>
@@ -119,7 +115,11 @@ if (related.length === 0) {
         </div>
       </div>
 
-      <p class="disclaimer">본 계산 결과는 일반적인 세금(15.4%)을 기준으로 계산된 참고용이며, 우대 금리나 비과세 혜택 등 각 금융상품의 조건에 따라 실제 수령액과 약간의 차이가 있을 수 있습니다.</p>
+      <p class="disclaimer">
+        본 계산 결과는 일반적인 세금(15.4%)을 기준으로 계산된 참고용이며, 우대
+        금리나 비과세 혜택 등 각 금융상품의 조건에 따라 실제 수령액과 약간의
+        차이가 있을 수 있습니다.
+      </p>
     </div>
   </Fragment>
 
@@ -248,10 +248,16 @@ if (related.length === 0) {
     margin-top: var(--space-6);
     animation: fadeIn var(--transition-base);
   }
-  
+
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .results-hero {
@@ -272,7 +278,7 @@ if (related.length === 0) {
     font-family: var(--font-family-base);
     margin: var(--space-2) 0 var(--space-6);
   }
-  
+
   .results-details-cards {
     display: flex;
     gap: var(--space-4);
@@ -307,68 +313,86 @@ if (related.length === 0) {
   }
 
   @media (max-width: 768px) {
-    .calculator-container { padding: var(--space-5); }
-    .input-section { padding: var(--space-5); }
-    .form-row { flex-direction: column; gap: var(--space-5); }
-    .results-details-cards { flex-direction: column; }
-    .due-date-value { font-size: 28px; }
+    .calculator-container {
+      padding: var(--space-5);
+    }
+    .input-section {
+      padding: var(--space-5);
+    }
+    .form-row {
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+    .results-details-cards {
+      flex-direction: column;
+    }
+    .due-date-value {
+      font-size: 28px;
+    }
   }
 </style>
 
 <script is:inline>
-  document.addEventListener('DOMContentLoaded', function() {
-    let mode = 'deposit-calc'; // 'deposit-calc' or 'saving-calc'
+  document.addEventListener("DOMContentLoaded", function () {
+    let mode = "deposit-calc"; // 'deposit-calc' or 'saving-calc'
 
-    const tabBtns = document.querySelectorAll('.app-tab-btn');
-    const amountLabel = document.getElementById('amount-label');
-    const amountHint = document.getElementById('amount-hint');
-    
-    const amountInput = document.getElementById('amount');
-    const monthsInput = document.getElementById('months');
-    const rateInput = document.getElementById('rate');
+    const tabBtns = document.querySelectorAll(".app-tab-btn");
+    const amountLabel = document.getElementById("amount-label");
+    const amountHint = document.getElementById("amount-hint");
+
+    const amountInput = document.getElementById("amount");
+    const monthsInput = document.getElementById("months");
+    const rateInput = document.getElementById("rate");
     const radios = document.querySelectorAll('input[name="interest-type"]');
-    
-    const totalReceivedEl = document.getElementById('total-received');
-    const principalTotalEl = document.getElementById('principal-total');
-    const interestPretaxEl = document.getElementById('interest-pretax');
+
+    const totalReceivedEl = document.getElementById("total-received");
+    const principalTotalEl = document.getElementById("principal-total");
+    const interestPretaxEl = document.getElementById("interest-pretax");
 
     function calculate() {
       const amount = parseFloat(amountInput.value) || 0;
       const months = parseInt(monthsInput.value) || 0;
       const rate = parseFloat(rateInput.value) || 0;
-      const type = document.querySelector('input[name="interest-type"]:checked').value;
-      
+      const type = document.querySelector(
+        'input[name="interest-type"]:checked',
+      ).value;
+
       let interest = 0;
       let totalPrincipal = 0;
-      
+
       if (amount <= 0 || months <= 0 || rate <= 0) {
-        totalReceivedEl.textContent = '0 원';
-        principalTotalEl.textContent = '0 원';
-        interestPretaxEl.textContent = '0 원';
+        totalReceivedEl.textContent = "0 원";
+        principalTotalEl.textContent = "0 원";
+        interestPretaxEl.textContent = "0 원";
         return;
       }
 
-      if (mode === 'deposit-calc') { // 정기예금
+      if (mode === "deposit-calc") {
+        // 정기예금
         totalPrincipal = amount;
         const years = months / 12;
-        if (type === 'simple') {
-          interest = totalPrincipal * rate * years / 100;
-        } else { // compound
-          const frequency = 12; 
+        if (type === "simple") {
+          interest = (totalPrincipal * rate * years) / 100;
+        } else {
+          // compound
+          const frequency = 12;
           const compoundRate = rate / 100 / frequency;
           const periods = frequency * years;
           interest = totalPrincipal * (Math.pow(1 + compoundRate, periods) - 1);
         }
-      } else { // 정기적금
+      } else {
+        // 정기적금
         totalPrincipal = amount * months;
-        if (type === 'simple') {
+        if (type === "simple") {
           for (let i = 1; i <= months; i++) {
             interest += amount * (rate / 100) * (i / 12);
           }
-        } else { // compound
+        } else {
+          // compound
           let totalAccumulated = 0;
           for (let i = 0; i < months; i++) {
-            totalAccumulated = (totalAccumulated + amount) * (1 + rate / 100 / 12);
+            totalAccumulated =
+              (totalAccumulated + amount) * (1 + rate / 100 / 12);
           }
           interest = totalAccumulated - totalPrincipal;
         }
@@ -383,31 +407,31 @@ if (related.length === 0) {
     }
 
     // Switch Tabs
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        tabBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+    tabBtns.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        tabBtns.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
         mode = btn.dataset.target;
-        
-        if (mode === 'deposit-calc') {
-          amountLabel.textContent = '예치 금액';
-          amountHint.textContent = '한 번에 맡길 금액을 입력하세요.';
+
+        if (mode === "deposit-calc") {
+          amountLabel.textContent = "예치 금액";
+          amountHint.textContent = "한 번에 맡길 금액을 입력하세요.";
         } else {
-          amountLabel.textContent = '매월 납입 금액';
-          amountHint.textContent = '매달 일정하게 저축할 금액을 입력하세요.';
+          amountLabel.textContent = "매월 납입 금액";
+          amountHint.textContent = "매달 일정하게 저축할 금액을 입력하세요.";
         }
         calculate();
       });
     });
 
     // Event Listeners for inputs
-    [amountInput, monthsInput, rateInput].forEach(input => {
-      input.addEventListener('input', calculate);
+    [amountInput, monthsInput, rateInput].forEach((input) => {
+      input.addEventListener("input", calculate);
     });
-    radios.forEach(radio => {
-      radio.addEventListener('change', calculate);
+    radios.forEach((radio) => {
+      radio.addEventListener("change", calculate);
     });
-    
+
     // Initial Calculation
     calculate();
   });
