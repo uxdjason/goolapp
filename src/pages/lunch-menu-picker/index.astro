@@ -1,21 +1,31 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'lunch-menu-picker');
-if (!entry) throw new Error('lunch-menu-picker entry not found');
+const entry = await getEntry("apps", "lunch-menu-picker");
+if (!entry) throw new Error("lunch-menu-picker entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
 }
 ---
 
@@ -37,8 +47,16 @@ if (related.length === 0) {
       <section id="screen1" class="screen screen-initial">
         <div class="emoji" aria-hidden="true">🍱</div>
         <h2 class="screen-title">오늘 점심, 뭐 먹지?</h2>
-        <p class="screen-desc">고민하지 말고 버튼을 눌러보세요.<br/>200가지 메뉴 중 하나를 골라드려요.</p>
-        <button type="button" id="startBtn" class="app-btn app-btn-primary" style="width: 100%;">메뉴 정하기</button>
+        <p class="screen-desc">
+          고민하지 말고 버튼을 눌러보세요.<br />200가지 메뉴 중 하나를
+          골라드려요.
+        </p>
+        <button
+          type="button"
+          id="startBtn"
+          class="app-btn app-btn-primary"
+          style="width: 100%;">메뉴 정하기</button
+        >
       </section>
 
       <!-- Screen 2: 스피너 -->
@@ -51,12 +69,29 @@ if (related.length === 0) {
       <section id="screen3" class="screen screen-result" hidden>
         <p class="result-label">오늘의 추천 메뉴</p>
         <div class="result-box">
-          <span class="result-emoji" aria-hidden="true">🍽️</span>
+          <img
+            id="menuImage"
+            src=""
+            alt="Menu Image"
+            class="result-image"
+            hidden
+          />
+          <span id="menuEmoji" class="result-emoji" aria-hidden="true">🍽️</span>
           <p id="menuResult" class="result-menu"></p>
         </div>
         <div class="result-actions">
-          <button type="button" id="retryBtn" class="app-btn app-btn-primary" style="width: 100%;">메뉴 다시 정하기</button>
-          <button type="button" id="resetBtn" class="app-btn app-btn-text" style="width: 100%;">처음으로</button>
+          <button
+            type="button"
+            id="retryBtn"
+            class="app-btn app-btn-primary"
+            style="width: 100%;">메뉴 다시 정하기</button
+          >
+          <button
+            type="button"
+            id="resetBtn"
+            class="app-btn app-btn-text"
+            style="width: 100%;">처음으로</button
+          >
         </div>
       </section>
     </div>
@@ -69,7 +104,7 @@ if (related.length === 0) {
 </AppLayout>
 
 <style>
-<style>
+  <style>
   /* lunch-menu-picker 특화 스타일 */
   .screen {
     display: flex;
@@ -121,7 +156,9 @@ if (related.length === 0) {
   }
 
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .loading-text {
@@ -141,17 +178,42 @@ if (related.length === 0) {
 
   .result-box {
     width: 100%;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 8%, transparent), color-mix(in srgb, var(--color-primary) 2%, transparent));
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-primary) 8%, transparent),
+      color-mix(in srgb, var(--color-primary) 2%, transparent)
+    );
     border: 2px dashed var(--color-primary);
     border-radius: var(--radius-lg);
     padding: 2rem 1rem;
     margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
   .result-emoji {
     display: block;
     font-size: 2.5rem;
     margin-bottom: 0.75rem;
+  }
+
+  .result-emoji[hidden] {
+    display: none;
+  }
+
+  .result-image {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .result-image[hidden] {
+    display: none;
   }
 
   .result-menu {
@@ -170,53 +232,258 @@ if (related.length === 0) {
   }
 
   @media (max-width: 480px) {
-    .screen { padding: 2rem 1rem; min-height: 300px; }
-    .screen-title { font-size: 1.3rem; }
-    .result-menu { font-size: 1.5rem; }
-    .emoji { font-size: 3.25rem; }
+    .screen {
+      padding: 2rem 1rem;
+      min-height: 300px;
+    }
+    .screen-title {
+      font-size: 1.3rem;
+    }
+    .result-menu {
+      font-size: 1.5rem;
+    }
+    .emoji {
+      font-size: 3.25rem;
+    }
   }
 </style>
 
 <script>
   const menus: string[] = [
-    "김치찌개", "된장찌개", "순두부찌개", "부대찌개", "청국장", "삼계탕", "갈비탕", "설렁탕", "곰탕", "육개장",
-    "감자탕", "해장국", "추어탕", "매운탕", "알탕", "꽃게탕", "북엇국", "콩나물국밥", "순대국밥", "돼지국밥",
-    "소고기국밥", "내장탕", "도가니탕", "삼선짬뽕", "짜장면", "짬뽕", "볶음밥", "마파두부", "탕수육", "유린기",
-    "깐풍기", "라조기", "양장피", "팔보채", "고추잡채", "동파육", "마라탕", "마라샹궈", "훠궈", "딤섬",
-    "초밥", "회덮밥", "연어덮밥", "참치덮밥", "장어덮밥", "가츠동", "규동", "오야코동", "텐동", "우동",
-    "소바", "라멘", "츠케멘", "돈코츠라멘", "미소라멘", "시오라멘", "쇼유라멘", "야키소바", "오코노미야키", "타코야키",
-    "스시", "사시미", "텐푸라", "돈가스", "치킨가츠", "함박스테이크", "오므라이스", "카레라이스", "하이라이스", "샤브샤브",
-    "파스타", "스파게티", "까르보나라", "토마토파스타", "오일파스타", "알리오올리오", "라자냐", "리조또", "뇨끼", "피자",
-    "마르게리타피자", "페퍼로니피자", "고르곤졸라피자", "포테이토피자", "불고기피자", "스테이크", "립아이스테이크", "안심스테이크", "티본스테이크", "양갈비",
-    "햄버거", "치즈버거", "더블치즈버거", "치킨버거", "새우버거", "수제버거", "핫도그", "샌드위치", "클럽샌드위치", "베이글샌드위치",
-    "파니니", "랩샌드위치", "샐러드", "씨저샐러드", "그릭샐러드", "콥샐러드", "포케", "타코", "부리또", "퀘사디아",
-    "나초", "엔칠라다", "파히타", "치미창가", "비빔밥", "돌솥비빔밥", "전주비빔밥", "육회비빔밥", "보리밥", "쌈밥",
-    "제육볶음", "오징어볶음", "낙지볶음", "주꾸미볶음", "닭갈비", "춘천닭갈비", "찜닭", "안동찜닭", "닭볶음탕", "백숙",
-    "삼겹살", "오겹살", "목살", "갈매기살", "항정살", "가브리살", "돼지갈비", "양념돼지갈비", "소갈비", "양념소갈비",
-    "LA갈비", "차돌박이", "우삼겹", "등심", "안심", "채끝살", "곱창", "막창", "대창", "곱창전골",
-    "낙곱새", "보쌈", "족발", "수육", "편육", "전", "파전", "해물파전", "김치전", "부추전",
-    "감자전", "녹두빈대떡", "모듬전", "잡채", "잡채밥", "떡볶이", "라볶이", "치즈떡볶이", "로제떡볶이", "궁중떡볶이",
-    "순대", "순대볶음", "튀김", "김밥", "참치김밥", "치즈김밥", "누드김밥", "충무김밥", "꼬마김밥", "유부초밥",
-    "주먹밥", "오니기리", "라면", "김치라면", "치즈라면", "짜파게티", "비빔국수", "잔치국수", "칼국수", "바지락칼국수",
-    "닭칼국수", "들깨칼국수", "수제비", "콩국수", "막국수", "메밀국수", "쌀국수", "분짜", "월남쌈", "팟타이",
-    "똠양꿍", "그린커리", "옐로우커리", "나시고렝", "미고렝", "라쌈", "탄두리치킨", "버터치킨", "치킨", "후라이드치킨",
-    "양념치킨", "간장치킨", "마늘치킨", "파닭", "허니콤보", "닭강정", "치킨너겟", "케밥", "되네르케밥", "팔라펠"
+    "김치찌개",
+    "된장찌개",
+    "순두부찌개",
+    "부대찌개",
+    "청국장",
+    "삼계탕",
+    "갈비탕",
+    "설렁탕",
+    "곰탕",
+    "육개장",
+    "감자탕",
+    "해장국",
+    "추어탕",
+    "매운탕",
+    "알탕",
+    "꽃게탕",
+    "황태해장국",
+    "콩나물국밥",
+    "순대국밥",
+    "돼지국밥",
+    "소고기국밥",
+    "내장탕",
+    "도가니탕",
+    "삼선짬뽕",
+    "짜장면",
+    "짬뽕",
+    "볶음밥",
+    "마파두부",
+    "탕수육",
+    "유린기",
+    "깐풍기",
+    "라조기",
+    "양장피",
+    "팔보채",
+    "고추잡채",
+    "동파육",
+    "마라탕",
+    "마라샹궈",
+    "훠궈",
+    "딤섬",
+    "초밥",
+    "회덮밥",
+    "연어덮밥",
+    "참치덮밥",
+    "장어덮밥",
+    "가츠동",
+    "규동",
+    "오야코동",
+    "텐동",
+    "우동",
+    "소바",
+    "라멘",
+    "츠케멘",
+    "돈코츠라멘",
+    "미소라멘",
+    "시오라멘",
+    "쇼유라멘",
+    "야키소바",
+    "오코노미야키",
+    "타코야키",
+    "스시",
+    "사시미",
+    "텐푸라",
+    "돈가스",
+    "치킨가츠",
+    "함박스테이크",
+    "오므라이스",
+    "카레라이스",
+    "하이라이스",
+    "샤브샤브",
+    "파스타",
+    "스파게티",
+    "까르보나라",
+    "토마토파스타",
+    "오일파스타",
+    "알리오올리오",
+    "라자냐",
+    "리조또",
+    "뇨끼",
+    "피자",
+    "마르게리타피자",
+    "페퍼로니피자",
+    "고르곤졸라피자",
+    "포테이토피자",
+    "불고기피자",
+    "스테이크",
+    "립아이스테이크",
+    "안심스테이크",
+    "티본스테이크",
+    "양갈비",
+    "햄버거",
+    "치즈버거",
+    "더블치즈버거",
+    "치킨버거",
+    "새우버거",
+    "수제버거",
+    "핫도그",
+    "샌드위치",
+    "클럽샌드위치",
+    "베이글샌드위치",
+    "파니니",
+    "랩샌드위치",
+    "샐러드",
+    "씨저샐러드",
+    "그릭샐러드",
+    "콥샐러드",
+    "포케",
+    "타코",
+    "부리또",
+    "퀘사디아",
+    "나초",
+    "엔칠라다",
+    "파히타",
+    "치미창가",
+    "비빔밥",
+    "돌솥비빔밥",
+    "전주비빔밥",
+    "육회비빔밥",
+    "보리밥",
+    "쌈밥",
+    "제육볶음",
+    "오징어볶음",
+    "낙지볶음",
+    "주꾸미볶음",
+    "닭갈비",
+    "춘천닭갈비",
+    "찜닭",
+    "안동찜닭",
+    "닭볶음탕",
+    "백숙",
+    "삼겹살",
+    "오겹살",
+    "목살",
+    "갈매기살",
+    "항정살",
+    "가브리살",
+    "돼지갈비",
+    "양념돼지갈비",
+    "소갈비",
+    "양념소갈비",
+    "LA갈비",
+    "차돌박이",
+    "우삼겹",
+    "등심",
+    "안심",
+    "채끝살",
+    "곱창",
+    "막창",
+    "대창",
+    "곱창전골",
+    "낙곱새",
+    "보쌈",
+    "족발",
+    "수육",
+    "전",
+    "파전",
+    "해물파전",
+    "김치전",
+    "부추전",
+    "감자전",
+    "녹두빈대떡",
+    "모듬전",
+    "잡채",
+    "잡채밥",
+    "떡볶이",
+    "라볶이",
+    "치즈떡볶이",
+    "로제떡볶이",
+    "궁중떡볶이",
+    "순대",
+    "순대볶음",
+    "튀김",
+    "김밥",
+    "참치김밥",
+    "치즈김밥",
+    "충무김밥",
+    "꼬마김밥",
+    "유부초밥",
+    "주먹밥",
+    "오니기리",
+    "라면",
+    "김치라면",
+    "치즈라면",
+    "짜장라면",
+    "비빔국수",
+    "잔치국수",
+    "칼국수",
+    "바지락칼국수",
+    "닭칼국수",
+    "들깨칼국수",
+    "수제비",
+    "콩국수",
+    "막국수",
+    "메밀국수",
+    "쌀국수",
+    "분짜",
+    "월남쌈",
+    "팟타이",
+    "똠양꿍",
+    "그린커리",
+    "옐로우커리",
+    "나시고렝",
+    "미고렝",
+    "탄두리치킨",
+    "후라이드치킨",
+    "치킨",
+    "양념치킨",
+    "간장치킨",
+    "마늘치킨",
+    "파닭",
+    "닭강정",
+    "치킨너겟",
+    "케밥",
+    "되너케밥",
+    "팔라펠",
+    "그냥 굶는다 (간헐적 단식)",
   ];
 
-  const screen1 = document.getElementById('screen1') as HTMLElement;
-  const screen2 = document.getElementById('screen2') as HTMLElement;
-  const screen3 = document.getElementById('screen3') as HTMLElement;
-  const menuResult = document.getElementById('menuResult') as HTMLElement;
-  const startBtn = document.getElementById('startBtn');
-  const retryBtn = document.getElementById('retryBtn');
-  const resetBtn = document.getElementById('resetBtn');
+  const screen1 = document.getElementById("screen1") as HTMLElement;
+  const screen2 = document.getElementById("screen2") as HTMLElement;
+  const screen3 = document.getElementById("screen3") as HTMLElement;
+  const menuImage = document.getElementById("menuImage") as HTMLImageElement;
+  const menuEmoji = document.getElementById("menuEmoji") as HTMLElement;
+  const menuResult = document.getElementById("menuResult") as HTMLElement;
+  const startBtn = document.getElementById("startBtn");
+  const retryBtn = document.getElementById("retryBtn");
+  const resetBtn = document.getElementById("resetBtn");
 
-  let lastMenu = '';
+  let lastMenu = "";
 
   function showOnly(target: HTMLElement) {
-    [screen1, screen2, screen3].forEach(s => {
-      if (s === target) s.removeAttribute('hidden');
-      else s.setAttribute('hidden', '');
+    [screen1, screen2, screen3].forEach((s) => {
+      if (s === target) s.removeAttribute("hidden");
+      else s.setAttribute("hidden", "");
     });
   }
 
@@ -228,6 +495,19 @@ if (related.length === 0) {
     }
     lastMenu = candidate;
     menuResult.innerText = candidate;
+
+    if (menuImage && menuEmoji) {
+      menuImage.src = `/images/lunch-menu-picker/${candidate}.webp`;
+      menuImage.hidden = false;
+      menuEmoji.hidden = true;
+
+      // 이미지 로드 실패시(혹시 파일이 누락된 경우) 이모지로 폴백
+      menuImage.onerror = () => {
+        menuImage.hidden = true;
+        menuEmoji.hidden = false;
+      };
+    }
+
     showOnly(screen3);
   }
 
@@ -240,7 +520,7 @@ if (related.length === 0) {
     showOnly(screen1);
   }
 
-  startBtn?.addEventListener('click', goToAnimation);
-  retryBtn?.addEventListener('click', goToAnimation);
-  resetBtn?.addEventListener('click', resetApp);
+  startBtn?.addEventListener("click", goToAnimation);
+  retryBtn?.addEventListener("click", goToAnimation);
+  resetBtn?.addEventListener("click", resetApp);
 </script>
