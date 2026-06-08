@@ -1,21 +1,31 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'count-characters-words');
-if (!entry) throw new Error('count-characters-words entry not found');
+const entry = await getEntry("apps", "count-characters-words");
+if (!entry) throw new Error("count-characters-words entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
 }
 ---
 
@@ -39,29 +49,47 @@ if (related.length === 0) {
           id="textInput"
           class="app-textarea"
           placeholder="여기에 텍스트를 입력하거나 붙여넣기 하세요."
-          rows="10"
-        ></textarea>
+          rows="10"></textarea>
 
         <div class="stats-container">
           <div class="live-stats">
             <div class="stat-item">
               <span class="stat-label">글자 수 (공백 포함)</span>
-              <span class="stat-value"><span id="charWithSpaces">0</span><span class="stat-unit">자</span></span>
+              <span class="stat-value"
+                ><span id="charWithSpaces">0</span><span class="stat-unit"
+                  >자</span
+                ></span
+              >
             </div>
             <div class="stat-item">
               <span class="stat-label">글자 수 (공백 제외)</span>
-              <span class="stat-value"><span id="charWithoutSpaces">0</span><span class="stat-unit">자</span></span>
+              <span class="stat-value"
+                ><span id="charWithoutSpaces">0</span><span class="stat-unit"
+                  >자</span
+                ></span
+              >
             </div>
             <div class="stat-item">
               <span class="stat-label">단어 수</span>
-              <span class="stat-value"><span id="wordCount">0</span><span class="stat-unit">개</span></span>
+              <span class="stat-value"
+                ><span id="wordCount">0</span><span class="stat-unit">개</span
+                ></span
+              >
             </div>
             <div class="stat-item">
-              <span class="stat-label">줄 수</span>
-              <span class="stat-value"><span id="lineCount">0</span><span class="stat-unit">줄</span></span>
+              <span class="stat-label">문장 수</span>
+              <span class="stat-value"
+                ><span id="sentenceCount">0</span><span class="stat-unit"
+                  >개</span
+                ></span
+              >
             </div>
           </div>
-          <button type="button" class="app-btn app-btn-secondary clear-btn" id="clearBtn">
+          <button
+            type="button"
+            class="app-btn app-btn-secondary clear-btn"
+            id="clearBtn"
+          >
             지우기
           </button>
         </div>
@@ -149,13 +177,15 @@ if (related.length === 0) {
 </style>
 
 <script>
-  const textInput = document.getElementById('textInput') as HTMLTextAreaElement | null;
-  const clearBtn = document.getElementById('clearBtn');
+  const textInput = document.getElementById(
+    "textInput",
+  ) as HTMLTextAreaElement | null;
+  const clearBtn = document.getElementById("clearBtn");
 
-  const charWithSpaces = document.getElementById('charWithSpaces');
-  const charWithoutSpaces = document.getElementById('charWithoutSpaces');
-  const wordCountEl = document.getElementById('wordCount');
-  const lineCountEl = document.getElementById('lineCount');
+  const charWithSpaces = document.getElementById("charWithSpaces");
+  const charWithoutSpaces = document.getElementById("charWithoutSpaces");
+  const wordCountEl = document.getElementById("wordCount");
+  const sentenceCountEl = document.getElementById("sentenceCount");
 
   function countWords(text: string): number {
     const trimmed = text.trim();
@@ -163,35 +193,40 @@ if (related.length === 0) {
     return trimmed.split(/\s+/).filter(Boolean).length;
   }
 
-  function countLines(text: string): number {
+  function countSentences(text: string): number {
     if (!text) return 0;
-    return text.split(/\r\n|\r|\n/).length;
+    // 마침표(.), 물음표(?), 느낌표(!) 등 문장 종결 부호를 기준으로 문장 수 세기 (연속된 기호는 하나로 취급)
+    const matches = text.match(/[.!?]+/g);
+    return matches ? matches.length : 0;
   }
 
   function updateLiveStats() {
     if (!textInput) return;
     const text = textInput.value;
-    
-    const withSpaces = text.length;
-    const withoutSpaces = text.replace(/\s/g, '').length;
-    const words = countWords(text);
-    const lines = countLines(text);
 
-    if (charWithSpaces) charWithSpaces.textContent = withSpaces.toLocaleString('ko-KR');
-    if (charWithoutSpaces) charWithoutSpaces.textContent = withoutSpaces.toLocaleString('ko-KR');
-    if (wordCountEl) wordCountEl.textContent = words.toLocaleString('ko-KR');
-    if (lineCountEl) lineCountEl.textContent = lines.toLocaleString('ko-KR');
+    const withSpaces = text.length;
+    const withoutSpaces = text.replace(/\s/g, "").length;
+    const words = countWords(text);
+    const sentences = countSentences(text);
+
+    if (charWithSpaces)
+      charWithSpaces.textContent = withSpaces.toLocaleString("ko-KR");
+    if (charWithoutSpaces)
+      charWithoutSpaces.textContent = withoutSpaces.toLocaleString("ko-KR");
+    if (wordCountEl) wordCountEl.textContent = words.toLocaleString("ko-KR");
+    if (sentenceCountEl)
+      sentenceCountEl.textContent = sentences.toLocaleString("ko-KR");
   }
 
   function clearText() {
     if (!textInput) return;
-    textInput.value = '';
+    textInput.value = "";
     updateLiveStats();
     textInput.focus();
   }
 
-  textInput?.addEventListener('input', updateLiveStats);
-  clearBtn?.addEventListener('click', clearText);
+  textInput?.addEventListener("input", updateLiveStats);
+  clearBtn?.addEventListener("click", clearText);
 
   updateLiveStats();
 </script>
