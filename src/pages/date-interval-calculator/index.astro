@@ -46,105 +46,143 @@ const currentDay = new Date().getDate();
   publishedAt={entry.data.publishedAt}
 >
   <Fragment slot="app">
-    <div class="app-calc-layout">
-      <div class="date-card">
-        <div class="date-card-header">
-          <span class="date-badge">시작</span>
-          <h2 class="date-card-title">시작 날짜</h2>
-        </div>
-        <div class="date-inputs">
-          <div class="app-form-group">
-            <label class="app-label" for="startYear">년</label>
-            <input
-              class="app-input"
-              id="startYear"
-              type="number"
-              min="1"
-              max="9999"
-              value={currentYear}
-            />
-          </div>
-          <div class="app-form-group">
-            <label class="app-label" for="startMonth">월</label>
-            <input
-              class="app-input"
-              id="startMonth"
-              type="number"
-              min="1"
-              max="12"
-              value="1"
-            />
-          </div>
-          <div class="app-form-group">
-            <label class="app-label" for="startDay">일</label>
-            <input
-              class="app-input"
-              id="startDay"
-              type="number"
-              min="1"
-              max="31"
-              value="1"
-            />
-          </div>
-        </div>
-      </div>
+    <div class="app-calc-layout" style="max-width:560px">
+      <!-- 입력 화면 -->
+      <section id="screen-input">
+        <h2 class="section-title">날짜 입력</h2>
+        <p class="section-desc">
+          두 날짜를 입력하면 그 사이의 기간(년/월/일)과 총 일수를 계산해
+          드립니다.
+        </p>
 
-      <div class="date-card">
+        <div class="app-spacer-sm"></div>
+
+        <div class="app-form-group">
+          <label
+            class="app-label"
+            style="font-weight: 700; font-size: 1rem; color: var(--color-on-surface);"
+            >시작 날짜</label
+          >
+          <div class="date-inputs">
+            <div class="app-form-group">
+              <label
+                class="app-label"
+                for="startYear"
+                style="font-weight:normal; font-size: 0.85rem;">년</label
+              >
+              <input
+                class="app-input"
+                id="startYear"
+                type="number"
+                min="1"
+                max="9999"
+                value={currentYear}
+              />
+            </div>
+            <div class="app-form-group">
+              <label
+                class="app-label"
+                for="startMonth"
+                style="font-weight:normal; font-size: 0.85rem;">월</label
+              >
+              <input
+                class="app-input"
+                id="startMonth"
+                type="number"
+                min="1"
+                max="12"
+                value="1"
+              />
+            </div>
+            <div class="app-form-group">
+              <label
+                class="app-label"
+                for="startDay"
+                style="font-weight:normal; font-size: 0.85rem;">일</label
+              >
+              <input
+                class="app-input"
+                id="startDay"
+                type="number"
+                min="1"
+                max="31"
+                value="1"
+              />
+            </div>
+          </div>
+        </div>
+
         <div class="app-spacer-xs"></div>
-        <div class="date-card-header">
-          <span class="date-badge">종료</span>
-          <h2 class="date-card-title">종료 날짜</h2>
+
+        <div class="app-form-group">
+          <label
+            class="app-label"
+            style="font-weight: 700; font-size: 1rem; color: var(--color-on-surface);"
+            >종료 날짜</label
+          >
+          <div class="date-inputs">
+            <div class="app-form-group">
+              <label
+                class="app-label"
+                for="endYear"
+                style="font-weight:normal; font-size: 0.85rem;">년</label
+              >
+              <input
+                class="app-input"
+                id="endYear"
+                type="number"
+                min="1"
+                max="9999"
+                value={currentYear}
+              />
+            </div>
+            <div class="app-form-group">
+              <label
+                class="app-label"
+                for="endMonth"
+                style="font-weight:normal; font-size: 0.85rem;">월</label
+              >
+              <input
+                class="app-input"
+                id="endMonth"
+                type="number"
+                min="1"
+                max="12"
+                value={currentMonth}
+              />
+            </div>
+            <div class="app-form-group">
+              <label
+                class="app-label"
+                for="endDay"
+                style="font-weight:normal; font-size: 0.85rem;">일</label
+              >
+              <input
+                class="app-input"
+                id="endDay"
+                type="number"
+                min="1"
+                max="31"
+                value={currentDay}
+              />
+            </div>
+          </div>
         </div>
-        <div class="date-inputs">
-          <div class="app-form-group">
-            <label class="app-label" for="endYear">년</label>
-            <input
-              class="app-input"
-              id="endYear"
-              type="number"
-              min="1"
-              max="9999"
-              value={currentYear}
-            />
-          </div>
-          <div class="app-form-group">
-            <label class="app-label" for="endMonth">월</label>
-            <input
-              class="app-input"
-              id="endMonth"
-              type="number"
-              min="1"
-              max="12"
-              value={currentMonth}
-            />
-          </div>
-          <div class="app-form-group">
-            <label class="app-label" for="endDay">일</label>
-            <input
-              class="app-input"
-              id="endDay"
-              type="number"
-              min="1"
-              max="31"
-              value={currentDay}
-            />
-          </div>
-        </div>
-      </div>
 
-      <div class="action-row">
-        <button id="calcBtn" class="app-btn app-btn-primary" type="button"
-          >날짜 차이 계산</button
+        <p id="errorMsg" class="error-msg" hidden></p>
+
+        <button
+          id="calcBtn"
+          class="app-btn app-btn-primary"
+          type="button"
+          style="margin-top: 1rem;">날짜 차이 계산</button
         >
-        <button id="resetBtn" class="app-btn app-btn-text" type="button"
-          >초기화</button
-        >
-      </div>
+      </section>
 
-      <div id="errorMsg" class="error-msg" hidden></div>
-
-      <div id="resultSection" class="result-section" hidden>
-        <h3 class="result-title">계산 결과</h3>
+      <!-- 결과 화면 -->
+      <section id="screen-result" hidden>
+        <div class="app-spacer-sm"></div>
+        <h2 class="section-title">계산 결과</h2>
 
         <div class="period-info" id="periodInfo"></div>
 
@@ -164,10 +202,18 @@ const currentDay = new Date().getDate();
           </div>
         </div>
 
-        <button id="copyBtn" class="app-btn app-btn-secondary" type="button"
-          >결과 복사</button
+        <div
+          class="action-row"
+          style="flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;"
         >
-      </div>
+          <button id="copyBtn" class="app-btn app-btn-secondary" type="button"
+            >📋 결과 복사</button
+          >
+          <button id="resetBtn" class="app-btn app-btn-primary" type="button"
+            >다시 하기</button
+          >
+        </div>
+      </section>
     </div>
   </Fragment>
 
@@ -179,36 +225,28 @@ const currentDay = new Date().getDate();
 
 <style>
   /* date-interval-calculator 특화 스타일 */
-  .date-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-outline-variant);
-    border-radius: var(--radius-lg);
-    padding: 1.25rem;
-  }
-
-  .date-card-header {
+  #screen-input,
+  #screen-result {
     display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    margin-bottom: 1rem;
+    flex-direction: column;
+  }
+  #screen-result[hidden] {
+    display: none;
   }
 
-  .date-badge {
-    display: inline-block;
-    padding: 0.25rem 0.625rem;
-    border-radius: 999px;
-    font-size: 0.75rem;
+  .section-title {
+    font-size: 1.25rem;
     font-weight: 700;
-    color: #fff;
+    margin: 0 0 0.5rem 0;
+    color: var(--color-on-surface);
     font-family: var(--font-family-gothic);
-    background: var(--color-primary);
   }
 
-  .date-card-title {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--color-on-surface);
+  .section-desc {
+    font-size: 0.95rem;
+    color: var(--color-on-surface-variant);
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
     font-family: var(--font-family-gothic);
   }
 
@@ -227,14 +265,8 @@ const currentDay = new Date().getDate();
     -moz-appearance: textfield;
   }
 
-  .action-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-
   .error-msg {
+    margin-top: 1rem;
     padding: 0.875rem 1rem;
     background: rgba(239, 68, 68, 0.08);
     color: #b91c1c;
@@ -248,31 +280,14 @@ const currentDay = new Date().getDate();
     display: none;
   }
 
-  .result-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.875rem;
-    margin-top: 1rem;
-  }
-  .result-section[hidden] {
-    display: none;
-  }
-
-  .result-title {
-    margin: 0 0 0.25rem 0;
-    font-size: 1.0625rem;
-    font-weight: 700;
-    color: var(--color-on-surface);
-    font-family: var(--font-family-gothic);
-  }
-
   .result-card {
-    padding: 1rem;
+    padding: 1.25rem;
     background: var(--color-surface-container-low);
     border: 1px solid var(--color-outline-variant);
     border-radius: var(--radius-md);
     text-align: center;
     font-family: var(--font-family-gothic);
+    margin-bottom: 0.75rem;
   }
 
   .primary-result {
@@ -349,7 +364,8 @@ const currentDay = new Date().getDate();
 
   function calculate() {
     const errEl = document.getElementById("errorMsg")!;
-    const resultSec = document.getElementById("resultSection")!;
+    const screenInput = document.getElementById("screen-input")!;
+    const screenResult = document.getElementById("screen-result")!;
 
     const sy = parseInt($("startYear").value, 10);
     const sm = parseInt($("startMonth").value, 10);
@@ -361,8 +377,11 @@ const currentDay = new Date().getDate();
     const showError = (msg: string) => {
       errEl.textContent = msg;
       errEl.hidden = false;
-      resultSec.hidden = true;
+      screenResult.hidden = true;
+      screenInput.hidden = false;
     };
+
+    errEl.hidden = true;
 
     if ([sy, sm, sd, ey, em, ed].some((v) => isNaN(v))) {
       showError("모든 날짜 필드를 입력해 주세요.");
@@ -433,23 +452,30 @@ const currentDay = new Date().getDate();
     document.getElementById("periodInfo")!.textContent =
       `${formatDate(sy, sm, sd)} → ${formatDate(ey, em, ed)}`;
 
-    errEl.hidden = true;
-    resultSec.hidden = false;
+    screenInput.hidden = true;
+    screenResult.hidden = false;
 
-    resultSec.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    const targetEl = document.getElementById("screen-result");
+    if (targetEl) {
+      const y = targetEl.getBoundingClientRect().top + window.scrollY - 20;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    }
   }
 
   function resetApp() {
-    const now = new Date();
-    $("startYear").value = String(now.getFullYear());
-    $("startMonth").value = "1";
-    $("startDay").value = "1";
-    $("endYear").value = String(now.getFullYear());
-    $("endMonth").value = String(now.getMonth() + 1);
-    $("endDay").value = String(now.getDate());
+    const screenInput = document.getElementById("screen-input")!;
+    const screenResult = document.getElementById("screen-result")!;
 
-    document.getElementById("errorMsg")!.hidden = true;
-    document.getElementById("resultSection")!.hidden = true;
+    screenInput.hidden = false;
+    screenResult.hidden = true;
+
+    const appContainer = document.querySelector(".app-calc-layout");
+    if (appContainer) {
+      const y = appContainer.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }
 
   async function copyResult() {
