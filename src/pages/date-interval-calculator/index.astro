@@ -249,6 +249,10 @@ const currentDay = new Date().getDate();
     gap: 0.5rem;
   }
 
+  .date-group + .date-group {
+    margin-top: -0.625rem;
+  }
+
   .date-inputs {
     display: grid;
     grid-template-columns: 1.4fr 1fr 1fr;
@@ -458,12 +462,6 @@ const currentDay = new Date().getDate();
 
     screenInput.hidden = true;
     screenResult.hidden = false;
-
-    const targetEl = document.getElementById("screen-result");
-    if (targetEl) {
-      const y = targetEl.getBoundingClientRect().top + window.scrollY - 20;
-      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
-    }
   }
 
   function resetApp() {
@@ -472,14 +470,6 @@ const currentDay = new Date().getDate();
 
     screenInput.hidden = false;
     screenResult.hidden = true;
-
-    const appContainer = document.querySelector(".app-calc-layout");
-    if (appContainer) {
-      const y = appContainer.getBoundingClientRect().top + window.scrollY - 80;
-      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
   }
 
   async function copyResult() {
