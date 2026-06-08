@@ -1,21 +1,31 @@
 ---
-import { getEntry, render, getCollection } from 'astro:content';
-import AppLayout from '../../layouts/AppLayout.astro';
-import RelatedApps from '../../components/RelatedApps.astro';
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
 
-const entry = await getEntry('apps', 'date-interval-calculator');
-if (!entry) throw new Error('date-interval-calculator entry not found');
+const entry = await getEntry("apps", "date-interval-calculator");
+if (!entry) throw new Error("date-interval-calculator entry not found");
 const { Content } = await render(entry);
 
-const allApps = await getCollection('apps');
+const allApps = await getCollection("apps");
 let related = allApps
-  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
-  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
 if (related.length === 0) {
   related = allApps
-    .filter(app => app.data.slug !== entry.data.slug)
+    .filter((app) => app.data.slug !== entry.data.slug)
     .slice(0, 3)
-    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
 }
 
 const currentYear = new Date().getFullYear();
@@ -39,55 +49,104 @@ const currentDay = new Date().getDate();
     <div class="app-calc-layout">
       <div class="date-card">
         <div class="date-card-header">
-          <span class="date-badge start-badge">시작</span>
+          <span class="date-badge">시작</span>
           <h2 class="date-card-title">시작 날짜</h2>
         </div>
         <div class="date-inputs">
           <div class="app-form-group">
             <label class="app-label" for="startYear">년</label>
-            <input class="app-input" id="startYear" type="number" min="1" max="9999" value={currentYear} />
+            <input
+              class="app-input"
+              id="startYear"
+              type="number"
+              min="1"
+              max="9999"
+              value={currentYear}
+            />
           </div>
           <div class="app-form-group">
             <label class="app-label" for="startMonth">월</label>
-            <input class="app-input" id="startMonth" type="number" min="1" max="12" value="1" />
+            <input
+              class="app-input"
+              id="startMonth"
+              type="number"
+              min="1"
+              max="12"
+              value="1"
+            />
           </div>
           <div class="app-form-group">
             <label class="app-label" for="startDay">일</label>
-            <input class="app-input" id="startDay" type="number" min="1" max="31" value="1" />
+            <input
+              class="app-input"
+              id="startDay"
+              type="number"
+              min="1"
+              max="31"
+              value="1"
+            />
           </div>
         </div>
       </div>
 
       <div class="date-card">
+        <div class="app-spacer-xs"></div>
         <div class="date-card-header">
-          <span class="date-badge end-badge">종료</span>
+          <span class="date-badge">종료</span>
           <h2 class="date-card-title">종료 날짜</h2>
         </div>
         <div class="date-inputs">
           <div class="app-form-group">
             <label class="app-label" for="endYear">년</label>
-            <input class="app-input" id="endYear" type="number" min="1" max="9999" value={currentYear} />
+            <input
+              class="app-input"
+              id="endYear"
+              type="number"
+              min="1"
+              max="9999"
+              value={currentYear}
+            />
           </div>
           <div class="app-form-group">
             <label class="app-label" for="endMonth">월</label>
-            <input class="app-input" id="endMonth" type="number" min="1" max="12" value={currentMonth} />
+            <input
+              class="app-input"
+              id="endMonth"
+              type="number"
+              min="1"
+              max="12"
+              value={currentMonth}
+            />
           </div>
           <div class="app-form-group">
             <label class="app-label" for="endDay">일</label>
-            <input class="app-input" id="endDay" type="number" min="1" max="31" value={currentDay} />
+            <input
+              class="app-input"
+              id="endDay"
+              type="number"
+              min="1"
+              max="31"
+              value={currentDay}
+            />
           </div>
         </div>
       </div>
 
       <div class="action-row">
-        <button id="calcBtn" class="app-btn app-btn-primary" type="button">날짜 차이 계산</button>
-        <button id="resetBtn" class="app-btn app-btn-text" type="button">초기화</button>
+        <button id="calcBtn" class="app-btn app-btn-primary" type="button"
+          >날짜 차이 계산</button
+        >
+        <button id="resetBtn" class="app-btn app-btn-text" type="button"
+          >초기화</button
+        >
       </div>
 
       <div id="errorMsg" class="error-msg" hidden></div>
 
       <div id="resultSection" class="result-section" hidden>
         <h3 class="result-title">계산 결과</h3>
+
+        <div class="period-info" id="periodInfo"></div>
 
         <div class="result-card primary-result">
           <div class="result-label">년 · 개월 · 일</div>
@@ -105,9 +164,9 @@ const currentDay = new Date().getDate();
           </div>
         </div>
 
-        <div class="period-info" id="periodInfo"></div>
-
-        <button id="copyBtn" class="app-btn app-btn-secondary" type="button">결과 복사</button>
+        <button id="copyBtn" class="app-btn app-btn-secondary" type="button"
+          >결과 복사</button
+        >
       </div>
     </div>
   </Fragment>
@@ -142,9 +201,8 @@ const currentDay = new Date().getDate();
     font-weight: 700;
     color: #fff;
     font-family: var(--font-family-gothic);
+    background: var(--color-primary);
   }
-  .start-badge { background: var(--color-primary); }
-  .end-badge { background: var(--color-secondary, var(--color-primary)); }
 
   .date-card-title {
     margin: 0;
@@ -165,7 +223,9 @@ const currentDay = new Date().getDate();
     -webkit-appearance: none;
     margin: 0;
   }
-  .app-input[type="number"] { -moz-appearance: textfield; }
+  .app-input[type="number"] {
+    -moz-appearance: textfield;
+  }
 
   .action-row {
     display: flex;
@@ -184,19 +244,19 @@ const currentDay = new Date().getDate();
     font-weight: 500;
     font-family: var(--font-family-gothic);
   }
-  .error-msg[hidden] { display: none; }
+  .error-msg[hidden] {
+    display: none;
+  }
 
   .result-section {
     display: flex;
     flex-direction: column;
     gap: 0.875rem;
-    padding: 1.25rem;
-    background: var(--color-surface);
-    border: 1px solid var(--color-outline-variant);
-    border-radius: var(--radius-lg);
-    margin-top: 0.5rem;
+    margin-top: 1rem;
   }
-  .result-section[hidden] { display: none; }
+  .result-section[hidden] {
+    display: none;
+  }
 
   .result-title {
     margin: 0 0 0.25rem 0;
@@ -216,13 +276,16 @@ const currentDay = new Date().getDate();
   }
 
   .primary-result {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary, var(--color-primary)));
-    border: none;
+    background: var(--color-primary);
     color: var(--color-on-primary);
   }
 
-  .primary-result .result-label { color: rgba(255, 255, 255, 0.85); }
-  .primary-result .result-value { color: var(--color-on-primary); }
+  .primary-result .result-label {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .primary-result .result-value {
+    color: var(--color-on-primary);
+  }
 
   .result-label {
     font-size: 0.8125rem;
@@ -263,7 +326,10 @@ const currentDay = new Date().getDate();
   }
 
   @media (max-width: 380px) {
-    .date-inputs { grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+    .date-inputs {
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.5rem;
+    }
   }
 </style>
 
@@ -282,15 +348,15 @@ const currentDay = new Date().getDate();
   }
 
   function calculate() {
-    const errEl = document.getElementById('errorMsg')!;
-    const resultSec = document.getElementById('resultSection')!;
+    const errEl = document.getElementById("errorMsg")!;
+    const resultSec = document.getElementById("resultSection")!;
 
-    const sy = parseInt($('startYear').value, 10);
-    const sm = parseInt($('startMonth').value, 10);
-    const sd = parseInt($('startDay').value, 10);
-    const ey = parseInt($('endYear').value, 10);
-    const em = parseInt($('endMonth').value, 10);
-    const ed = parseInt($('endDay').value, 10);
+    const sy = parseInt($("startYear").value, 10);
+    const sm = parseInt($("startMonth").value, 10);
+    const sd = parseInt($("startDay").value, 10);
+    const ey = parseInt($("endYear").value, 10);
+    const em = parseInt($("endMonth").value, 10);
+    const ed = parseInt($("endDay").value, 10);
 
     const showError = (msg: string) => {
       errEl.textContent = msg;
@@ -298,18 +364,18 @@ const currentDay = new Date().getDate();
       resultSec.hidden = true;
     };
 
-    if ([sy, sm, sd, ey, em, ed].some(v => isNaN(v))) {
-      showError('모든 날짜 필드를 입력해 주세요.');
+    if ([sy, sm, sd, ey, em, ed].some((v) => isNaN(v))) {
+      showError("모든 날짜 필드를 입력해 주세요.");
       return;
     }
 
     if (sm < 1 || sm > 12 || em < 1 || em > 12) {
-      showError('월은 1부터 12 사이의 값이어야 합니다.');
+      showError("월은 1부터 12 사이의 값이어야 합니다.");
       return;
     }
 
     if (sd < 1 || sd > 31 || ed < 1 || ed > 31) {
-      showError('일은 1부터 31 사이의 값이어야 합니다.');
+      showError("일은 1부터 31 사이의 값이어야 합니다.");
       return;
     }
 
@@ -329,7 +395,7 @@ const currentDay = new Date().getDate();
     const end = new Date(ey, em - 1, ed);
 
     if (end <= start) {
-      showError('종료 날짜는 시작 날짜보다 이후여야 합니다.');
+      showError("종료 날짜는 시작 날짜보다 이후여야 합니다.");
       return;
     }
 
@@ -357,57 +423,59 @@ const currentDay = new Date().getDate();
     if (years > 0) ymdParts.push(`${years}년`);
     if (months > 0) ymdParts.push(`${months}개월`);
     if (days > 0 || ymdParts.length === 0) ymdParts.push(`${days}일`);
-    document.getElementById('resultYMD')!.textContent = ymdParts.join(' ');
+    document.getElementById("resultYMD")!.textContent = ymdParts.join(" ");
 
-    document.getElementById('resultMD')!.textContent = `${totalMonths.toLocaleString()}개월 ${days}일`;
-    document.getElementById('resultDays')!.textContent = `${diffInDays.toLocaleString()}일`;
+    document.getElementById("resultMD")!.textContent =
+      `${totalMonths.toLocaleString()}개월 ${days}일`;
+    document.getElementById("resultDays")!.textContent =
+      `${diffInDays.toLocaleString()}일`;
 
-    document.getElementById('periodInfo')!.textContent =
+    document.getElementById("periodInfo")!.textContent =
       `${formatDate(sy, sm, sd)} → ${formatDate(ey, em, ed)}`;
 
     errEl.hidden = true;
     resultSec.hidden = false;
 
-    resultSec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    resultSec.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   function resetApp() {
     const now = new Date();
-    $('startYear').value = String(now.getFullYear());
-    $('startMonth').value = '1';
-    $('startDay').value = '1';
-    $('endYear').value = String(now.getFullYear());
-    $('endMonth').value = String(now.getMonth() + 1);
-    $('endDay').value = String(now.getDate());
+    $("startYear").value = String(now.getFullYear());
+    $("startMonth").value = "1";
+    $("startDay").value = "1";
+    $("endYear").value = String(now.getFullYear());
+    $("endMonth").value = String(now.getMonth() + 1);
+    $("endDay").value = String(now.getDate());
 
-    document.getElementById('errorMsg')!.hidden = true;
-    document.getElementById('resultSection')!.hidden = true;
+    document.getElementById("errorMsg")!.hidden = true;
+    document.getElementById("resultSection")!.hidden = true;
   }
 
   async function copyResult() {
-    const ymd = document.getElementById('resultYMD')!.textContent || '';
-    const md = document.getElementById('resultMD')!.textContent || '';
-    const days = document.getElementById('resultDays')!.textContent || '';
-    const period = document.getElementById('periodInfo')!.textContent || '';
+    const ymd = document.getElementById("resultYMD")!.textContent || "";
+    const md = document.getElementById("resultMD")!.textContent || "";
+    const days = document.getElementById("resultDays")!.textContent || "";
+    const period = document.getElementById("periodInfo")!.textContent || "";
 
     const text = `[날짜 차이 계산 결과]\n${period}\n\n· ${ymd}\n· 총 ${md}\n· 총 ${days}`;
 
-    const btn = document.getElementById('copyBtn')!;
+    const btn = document.getElementById("copyBtn")!;
     const originalText = btn.textContent;
     try {
       await navigator.clipboard.writeText(text);
-      btn.textContent = '복사 완료 ✓';
+      btn.textContent = "복사 완료 ✓";
     } catch (e) {
       // fallback
-      const ta = document.createElement('textarea');
+      const ta = document.createElement("textarea");
       ta.value = text;
       document.body.appendChild(ta);
       ta.select();
       try {
-        document.execCommand('copy');
-        btn.textContent = '복사 완료 ✓';
+        document.execCommand("copy");
+        btn.textContent = "복사 완료 ✓";
       } catch {
-        btn.textContent = '복사 실패';
+        btn.textContent = "복사 실패";
       }
       document.body.removeChild(ta);
     }
@@ -418,21 +486,21 @@ const currentDay = new Date().getDate();
 
   // 포커스 시 전체 선택 (UX 개선)
   function attachFocusSelect() {
-    document.querySelectorAll<HTMLInputElement>('.app-input').forEach(inp => {
-      inp.addEventListener('focus', () => {
+    document.querySelectorAll<HTMLInputElement>(".app-input").forEach((inp) => {
+      inp.addEventListener("focus", () => {
         inp.select();
       });
     });
   }
 
-  document.getElementById('calcBtn')?.addEventListener('click', calculate);
-  document.getElementById('resetBtn')?.addEventListener('click', resetApp);
-  document.getElementById('copyBtn')?.addEventListener('click', copyResult);
+  document.getElementById("calcBtn")?.addEventListener("click", calculate);
+  document.getElementById("resetBtn")?.addEventListener("click", resetApp);
+  document.getElementById("copyBtn")?.addEventListener("click", copyResult);
 
   // 엔터키로도 계산 가능
-  document.querySelectorAll<HTMLInputElement>('.app-input').forEach(inp => {
-    inp.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+  document.querySelectorAll<HTMLInputElement>(".app-input").forEach((inp) => {
+    inp.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
         e.preventDefault();
         calculate();
       }
