@@ -407,6 +407,7 @@ const daysList = [
           ta.style.opacity = "0";
           document.body.appendChild(ta);
           ta.select();
+          // @ts-ignore: Deprecated but needed as fallback
           document.execCommand("copy");
           document.body.removeChild(ta);
         }

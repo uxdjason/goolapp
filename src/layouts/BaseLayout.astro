@@ -88,7 +88,7 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
       jsonLd={jsonLd ?? websiteJsonLd}
     />
     {showAdsense && (
-      <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`} crossorigin="anonymous"></script>
+      <script async is:inline src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`} crossorigin="anonymous"></script>
     )}
   </head>
   <body class="global-layout">

@@ -492,6 +492,7 @@ const currentDay = new Date().getDate();
       document.body.appendChild(ta);
       ta.select();
       try {
+        // @ts-ignore: Deprecated but needed as fallback
         document.execCommand("copy");
         btn.textContent = "복사 완료 ✓";
       } catch {

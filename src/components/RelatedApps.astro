@@ -11,23 +11,23 @@ if (!apps || apps.length === 3 || apps.length === 0) {
   const allApps = await getCollection('apps');
   const pathParts = Astro.url.pathname.split('/').filter(Boolean);
   const detectedSlug = pathParts[pathParts.length - 1];
-  const currentApp = allApps.find(a => a.data.slug === detectedSlug || a.slug === detectedSlug);
+  const currentApp = allApps.find(a => a.data.slug === detectedSlug || a.id === detectedSlug);
 
   let finalApps: any[] = [];
 
   if (currentApp) {
     if (currentApp.data.relatedSlugs && currentApp.data.relatedSlugs.length > 0) {
-      const manualApps = allApps.filter(a => currentApp.data.relatedSlugs.includes(a.data.slug || a.slug));
+      const manualApps = allApps.filter(a => currentApp.data.relatedSlugs.includes(a.data.slug || a.id));
       finalApps = manualApps.slice(0, 4);
     } else {
       const scores = allApps
-        .filter(app => (app.data.slug || app.slug) !== (currentApp.data.slug || currentApp.slug) && !app.data.draft)
+        .filter(app => (app.data.slug || app.id) !== (currentApp.data.slug || currentApp.id) && !app.data.draft)
         .map(app => {
           let score = 0;
           
           const currentCats = currentApp.data.category || [];
           const appCats = app.data.category || [];
-          const commonCats = appCats.filter((c: string) => currentCats.includes(c));
+          const commonCats = appCats.filter((c: any) => currentCats.includes(c));
           score += commonCats.length * 10;
           
           const cTitle = currentApp.data.title || '';
@@ -53,7 +53,7 @@ if (!apps || apps.length === 3 || apps.length === 0) {
   }
 
   if (finalApps.length === 0) {
-    finalApps = allApps.filter(a => a.slug !== detectedSlug).slice(0, 4);
+    finalApps = allApps.filter(a => (a.data.slug || a.id) !== detectedSlug).slice(0, 4);
   }
 
   apps = finalApps.map(app => ({

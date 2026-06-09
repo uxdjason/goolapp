@@ -387,9 +387,7 @@ if (related.length === 0) {
       return GAN[(year + 6) % 10] + JI[(year + 8) % 12] + "년";
     }
 
-    function getDdi(year: number) {
-      return DDI[(year + 8) % 12];
-    }
+
 
     function getHoroscope(month: number, day: number): string {
       const dateStr = `${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;

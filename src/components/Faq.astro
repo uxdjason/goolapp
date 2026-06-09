@@ -9,7 +9,7 @@ interface Props {
 const { items } = Astro.props;
 ---
 <div class="faq-container">
-  {items.map((item, index) => (
+  {items.map((item) => (
     <details class="faq-item" name="faq-accordion">
       <summary class="faq-q">{item.q}</summary>
       <div class="faq-a"><p>{item.a}</p></div>

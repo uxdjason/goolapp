@@ -1,5 +1,6 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
+// @ts-ignore
 import { z } from 'astro:schema';
 
 const apps = defineCollection({

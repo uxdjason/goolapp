@@ -43,7 +43,7 @@ const catLabel = category ? category.map(c => categoryLabels[c] ?? c).join(', ')
 const currentSlug = Astro.url.pathname.replace(/^\/|\/$/g, '').split('/').pop();
 
 // SoftwareApplication JSON-LD (Google Rich Results 지원)
-const appCategory = category && category.length > 0 ? (categoryLabels[category[0]] ?? category[0]) : '유틸리티';
+
 const canonicalHref = canonicalUrl || `https://goolapp.com/${currentSlug}/`;
 const appJsonLd = JSON.stringify({
   '@context': 'https://schema.org',

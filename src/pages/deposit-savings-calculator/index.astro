@@ -408,7 +408,7 @@ if (related.length === 0) {
 
     // Switch Tabs
     tabBtns.forEach((btn) => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", () => {
         tabBtns.forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         mode = btn.dataset.target;

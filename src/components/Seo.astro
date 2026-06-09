@@ -26,6 +26,8 @@ interface Props {
   updatedAt?: Date;
   /** JSON-LD structured data (직렬화된 JSON 문자열) */
   jsonLd?: string;
+  /** 네이버 서치어드바이저 사이트 소유권 확인 태그 (선택) */
+  naverSiteVerification?: string;
 }
 
 const {
@@ -41,6 +43,7 @@ const {
   publishedAt,
   updatedAt,
   jsonLd,
+  naverSiteVerification,
 } = Astro.props;
 
 // 기본 사이트 정보
@@ -100,4 +103,7 @@ const twitterImageAlt = `${resolvedOgTitle} - ${SITE_NAME}`;
 <meta name="twitter:image:alt" content={twitterImageAlt} />
 
 {/* ── JSON-LD Structured Data ── */}
-{jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
+{jsonLd && <script type="application/ld+json" is:inline set:html={jsonLd} />}
+
+{/* ── Naver Site Verification ── */}
+{naverSiteVerification && <meta name="naver-site-verification" content={naverSiteVerification} />}
