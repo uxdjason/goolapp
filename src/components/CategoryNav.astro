@@ -48,10 +48,11 @@ const categories = [
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     gap: 12px;
     list-style: none;
     padding: 2px 0 4px;
-    min-width: max-content;
+    min-width: auto;
     margin: 0 auto;
   }
 
@@ -97,13 +98,5 @@ const categories = [
     line-height: 1;
   }
 
-  @media (max-width: 768px) {
-    .category-list { 
-      gap: 8px; 
-      flex-wrap: wrap;
-      justify-content: center;
-      min-width: auto;
-    }
-    .cat-btn { padding: 7px 14px; font-size: 12px; }
-  }
+
 </style>
