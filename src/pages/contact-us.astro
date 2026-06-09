@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout
@@ -10,27 +10,55 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <div class="container page-container">
       <h1 class="page-title">사용 문의</h1>
       <p class="page-desc">
-        GoolAPP을 이용하시면서 궁금한 점이나 불편한 사항, 새로운 기능 제안 등 자유롭게 남겨주세요.<br />
-        빠른 시일 내에 확인하여 답변해 드리겠습니다.
+        GoolAPP을 이용하시면서 궁금한 점이나 불편한 사항, 새로운 기능 제안 등
+        자유롭게 메세지를 남겨주세요.
       </p>
 
       <div class="form-wrapper">
-        <form action="mailto:support@goolapp.com" method="POST" enctype="text/plain" class="contact-form">
+        <form
+          id="contact-form"
+          method="POST"
+          class="contact-form"
+        >
+          <!-- formsubmit settings -->
+          <input
+            type="hidden"
+            name="_subject"
+            value="[GoolAPP] 새로운 사용 문의가 접수되었습니다."
+          />
+          <input type="hidden" name="_template" value="table" />
           <div class="form-group">
             <label for="name">이름 (필수)</label>
-            <input type="text" id="name" name="name" required placeholder="홍길동" />
+            <input
+              type="text"
+              id="name"
+              name="name"
+              required
+              placeholder="홍길동"
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="email">이메일 (필수)</label>
-            <input type="email" id="email" name="email" required placeholder="example@email.com" />
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              placeholder="example@email.com"
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="message">문의 내용 (필수)</label>
-            <textarea id="message" name="message" required rows="6" placeholder="문의하실 내용을 자세히 적어주세요."></textarea>
+            <textarea
+              id="message"
+              name="message"
+              required
+              rows="6"
+              placeholder="문의하실 내용을 자세히 적어주세요."></textarea>
           </div>
-          
+
           <button type="submit" class="submit-btn">문의 보내기</button>
         </form>
       </div>
@@ -60,7 +88,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     margin-bottom: var(--space-12);
     line-height: 1.6;
   }
-  
+
   .form-wrapper {
     background: rgba(255, 255, 255, 0.6);
     border: 1px solid rgba(216, 194, 185, 0.5);
@@ -89,7 +117,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-family: inherit;
     font-size: var(--font-size-base);
     color: var(--color-on-surface);
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    transition:
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast);
   }
   .form-group input:focus,
   .form-group textarea:focus {
@@ -97,7 +127,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(139, 79, 50, 0.1);
   }
-
+  .form-group textarea {
+    resize: vertical;
+  }
   .submit-btn {
     display: block;
     width: 100%;
@@ -121,3 +153,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
   }
 </style>
+
+<script>
+  // 이메일 주소 스팸 수집 봇 노출 방지를 위한 액션 동적 할당
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('contact-form') as HTMLFormElement;
+    if (form) {
+      const u = 'ukneoguri';
+      const d = 'gmail.com';
+      form.action = `https://formsubmit.co/${u}@${d}`;
+    }
+  });
+</script>
