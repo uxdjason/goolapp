@@ -125,6 +125,15 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
       
       function applyFilter() {
         const isFavoritesFilter = window.location.hash === '#favorites';
+        const isSearchPage = window.location.pathname === '/search';
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = (urlParams.get('q') || '').toLowerCase();
+        
+        const queryDisplay = document.getElementById('search-query-display');
+        if (queryDisplay && isSearchPage) {
+           queryDisplay.textContent = '검색어: ' + (urlParams.get('q') || '');
+        }
+
         const favs = getFavorites();
         
         // Update nav links active state
@@ -145,9 +154,15 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
         document.querySelectorAll('.app-card').forEach((el) => {
           const card = el as HTMLElement;
           const slug = card.getAttribute('data-slug');
+          const title = card.getAttribute('data-title') || '';
+          const desc = card.getAttribute('data-desc') || '';
           
           let isMatch = false;
-          if (isFavoritesFilter) {
+          if (isSearchPage) {
+            if (searchQuery && (title.toLowerCase().includes(searchQuery) || desc.toLowerCase().includes(searchQuery))) {
+              isMatch = true;
+            }
+          } else if (isFavoritesFilter) {
             if (slug && favs.includes(slug)) {
               isMatch = true;
             }
@@ -168,14 +183,23 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
           }
         });
         
-        const emptyState = document.getElementById('favorites-empty-state');
+        const favEmptyState = document.getElementById('favorites-empty-state');
+        const searchEmptyState = document.getElementById('search-empty-state');
         const loadMore = document.querySelector('.load-more-wrap') as HTMLElement;
         
-        if (emptyState) {
+        if (favEmptyState) {
           if (isFavoritesFilter && visibleCount === 0) {
-            emptyState.style.display = 'block';
+            favEmptyState.style.display = 'block';
           } else {
-            emptyState.style.display = 'none';
+            favEmptyState.style.display = 'none';
+          }
+        }
+
+        if (searchEmptyState) {
+          if (isSearchPage && visibleCount === 0) {
+            searchEmptyState.style.display = 'block';
+          } else {
+            searchEmptyState.style.display = 'none';
           }
         }
         

@@ -2,7 +2,6 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AppCard from '../components/AppCard.astro';
-import CategoryNav from '../components/CategoryNav.astro';
 import SearchBar from '../components/SearchBar.astro';
 
 const allApps = await getCollection('apps', ({ data }) => !data.draft);
@@ -12,25 +11,14 @@ const sortedApps = allApps.sort((a, b) =>
 ---
 
 <BaseLayout
-  title="GoolAPP - 일상의 편리함을 추구하는 유용한 도구들"
-  description="계산기, 단위 변환기, 퀴즈 등 일상에서 바로 꺼내 쓸 수 있는 무료 앱 컬렉션입니다."
-  ogImage="/og/default.webp"
-  ogTitle="GoolAPP — 일상의 편리함을 추구하는 유용한 도구들"
-  ogDescription="예적금 계산기, 출산예정일 계산기 등 일상에서 바로 꺼내 쓸 수 있는 무료 웹앱 컬렉션. 광고 없이 깔끔하게."
-  keywords={['무료 계산기', '예적금 계산기', '출산예정일 계산기', '단위변환기', 'GoolAPP']}
+  title="검색 결과 | GoolAPP"
+  description="GoolAPP 검색 결과입니다."
 >
   <!-- ── Hero ── -->
   <section class="hero-section">
     <div class="hero-container">
-      <!-- 
-        Heading: "일상의 편리함을 추구하는," is black (#1B1C1A)
-        "작지만 유용한 도구들" uses primary color (#8B4F32) — two-tone heading
-        All on one natural wrapping line per design
-      -->
-      <h1 class="hero-title">
-        <span class="hero-title-black">일상의 편리함을 추구하는,<br /></span><span class="hero-title-primary">작지만 유용한 도구들</span>
-      </h1>
-      <p class="hero-subtitle">필요한 앱을 바로 꺼내 쓰세요. 모두 공짜랍니다.</p>
+      <h1 class="hero-title">앱을 찾아봤어요.</h1>
+      <p class="hero-subtitle" id="search-query-display">검색어: </p>
 
       <!-- Search bar -->
       <SearchBar />
@@ -40,7 +28,6 @@ const sortedApps = allApps.sort((a, b) =>
   <!-- ── Apps section ── -->
   <section class="apps-section">
     <div class="container">
-      <CategoryNav activeCategory="all" />
 
       <div class="app-grid">
         {sortedApps.map(app => (
@@ -53,8 +40,8 @@ const sortedApps = allApps.sort((a, b) =>
         ))}
       </div>
 
-      <div id="favorites-empty-state" class="empty-state glass-surface" style="display: none;">
-        <p>등록된 즐겨찾는 앱이 없습니다.</p>
+      <div id="search-empty-state" class="empty-state glass-surface" style="display: none;">
+        <p>검색 결과가 없습니다.</p>
       </div>
 
       <!-- "더 꺼내기" button — from design spec -->
@@ -80,7 +67,6 @@ const sortedApps = allApps.sort((a, b) =>
     align-items: center;
   }
 
-  /* Two-tone heading — 48px, letter-spacing -0.96px */
   .hero-title {
     font-family: var(--font-family-base);
     font-size: 48px;
@@ -88,11 +74,10 @@ const sortedApps = allApps.sort((a, b) =>
     line-height: 1.1;
     letter-spacing: -0.02em;
     text-align: center;
+    color: #1b1c1a;
     margin-bottom: 0;
     max-width: 900px;
   }
-  .hero-title-black   { color: #1b1c1a; }
-  .hero-title-primary { color: var(--color-primary); }
 
   /* Subtitle: 18px, #53433D */
   .hero-subtitle {
