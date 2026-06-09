@@ -5,6 +5,11 @@ interface Props {
 const { position } = Astro.props;
 const showAdsense = import.meta.env.PUBLIC_ADSENSE_ENABLED === 'true';
 const clientId    = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
+
+let slotId = '1234567890';
+if (position === 'top') slotId = import.meta.env.PUBLIC_ADSENSE_SLOT_TOP || slotId;
+if (position === 'middle') slotId = import.meta.env.PUBLIC_ADSENSE_SLOT_MIDDLE || slotId;
+if (position === 'bottom') slotId = import.meta.env.PUBLIC_ADSENSE_SLOT_BOTTOM || slotId;
 ---
 <div class={`ad-unit ad-${position}`} role="complementary" aria-label={`광고 (${position})`}>
   {showAdsense ? (
@@ -12,7 +17,7 @@ const clientId    = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
       <ins class="adsbygoogle"
            style="display:block"
            data-ad-client={clientId}
-           data-ad-slot="1234567890"
+           data-ad-slot={slotId}
            data-ad-format="auto"
            data-full-width-responsive="true"></ins>
       <script is:inline>(adsbygoogle = window.adsbygoogle || []).push({});</script>
