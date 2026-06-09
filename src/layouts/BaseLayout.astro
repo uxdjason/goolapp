@@ -97,6 +97,7 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
     <Footer />
     <script>
       const FAV_KEY = 'goolapp_favorites';
+      let currentDisplayLimit = 9;
       
       function getFavorites() {
         try {
@@ -139,19 +140,31 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
         });
         
         let visibleCount = 0;
+        let matchedCount = 0;
+
         document.querySelectorAll('.app-card').forEach((el) => {
           const card = el as HTMLElement;
           const slug = card.getAttribute('data-slug');
+          
+          let isMatch = false;
           if (isFavoritesFilter) {
             if (slug && favs.includes(slug)) {
+              isMatch = true;
+            }
+          } else {
+            isMatch = true;
+          }
+
+          if (isMatch) {
+            matchedCount++;
+            if (matchedCount <= currentDisplayLimit) {
               card.style.display = '';
               visibleCount++;
             } else {
               card.style.display = 'none';
             }
           } else {
-            card.style.display = '';
-            visibleCount++;
+            card.style.display = 'none';
           }
         });
         
@@ -167,12 +180,17 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
         }
         
         if (loadMore) {
-          if (isFavoritesFilter) {
-             loadMore.style.display = 'none';
-          } else {
+          if (matchedCount > currentDisplayLimit) {
              loadMore.style.display = '';
+          } else {
+             loadMore.style.display = 'none';
           }
         }
+      }
+
+      function handleLoadMore() {
+        currentDisplayLimit += 9;
+        applyFilter();
       }
       
       function handleFavClick(e: Event) {
@@ -203,9 +221,16 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
         updateFavIcons();
         applyFilter();
         document.body.addEventListener('click', handleFavClick);
+        const loadMoreBtn = document.querySelector('.load-more-btn');
+        if (loadMoreBtn) {
+          loadMoreBtn.addEventListener('click', handleLoadMore);
+        }
       });
       
-      window.addEventListener('hashchange', applyFilter);
+      window.addEventListener('hashchange', () => {
+        currentDisplayLimit = 9;
+        applyFilter();
+      });
     </script>
   </body>
 </html>

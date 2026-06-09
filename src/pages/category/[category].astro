@@ -28,9 +28,6 @@ const categoryLabels: Record<string, string> = {
 };
 const label = categoryLabels[category ?? ''] ?? category;
 
-// Logic for "Load More" button
-const initialLimit = 9;
-const showLoadMore = sortedApps.length > initialLimit;
 ---
 
 <BaseLayout
@@ -86,11 +83,9 @@ const showLoadMore = sortedApps.length > initialLimit;
         <p>등록된 즐겨찾는 앱이 없습니다.</p>
       </div>
 
-      {showLoadMore && (
-        <div class="load-more-wrap">
-          <button class="load-more-btn">더 꺼내기</button>
-        </div>
-      )}
+      <div class="load-more-wrap" style="display: none;">
+        <button class="load-more-btn">더 꺼내기</button>
+      </div>
     </div>
   </section>
 </BaseLayout>
