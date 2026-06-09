@@ -128,7 +128,6 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
         const isSearchPage = window.location.pathname.includes('/search');
         const urlParams = new URLSearchParams(window.location.search);
         const searchQuery = (urlParams.get('q') || '').toLowerCase();
-        const searchCategory = urlParams.get('c');
 
         const favs = getFavorites();
         
@@ -152,14 +151,11 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
           const slug = card.getAttribute('data-slug');
           const textContent = card.textContent?.toLowerCase() || '';
           const contentAttr = card.getAttribute('data-content')?.toLowerCase() || '';
-          const appCategory = card.getAttribute('data-category-slugs') || '';
           
           let isMatch = false;
           if (isSearchPage) {
             if (searchQuery && (textContent.includes(searchQuery) || contentAttr.includes(searchQuery))) {
-              if (!searchCategory || appCategory.includes(searchCategory)) {
-                isMatch = true;
-              }
+              isMatch = true;
             }
           } else if (isFavoritesFilter) {
             if (slug && favs.includes(slug)) {
@@ -183,8 +179,7 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
         });
         
         const favEmptyState = document.getElementById('favorites-empty-state');
-        const searchEmptyState = document.getElementById('search-empty-state');
-        const searchCategoryEmptyState = document.getElementById('search-category-empty-state');
+        const searchResultCount = document.getElementById('search-result-count');
         const loadMore = document.querySelector('.load-more-wrap') as HTMLElement;
         
         if (favEmptyState) {
@@ -195,27 +190,11 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
           }
         }
 
-        if (searchCategoryEmptyState && searchEmptyState) {
-          if (isSearchPage && visibleCount === 0) {
-            if (searchCategory) {
-              searchCategoryEmptyState.style.display = 'block';
-              const globalLink = document.getElementById('search-global-link') as HTMLAnchorElement;
-              if (globalLink) {
-                globalLink.href = `/search?q=${encodeURIComponent(urlParams.get('q') || '')}`;
-              }
-            } else {
-              searchEmptyState.style.display = 'block';
-            }
-          } else {
-            searchCategoryEmptyState.style.display = 'none';
-            searchEmptyState.style.display = 'none';
-          }
-        } else if (searchEmptyState) {
-          // Fallback if category empty state is not in DOM
-          if (isSearchPage && visibleCount === 0) {
-            searchEmptyState.style.display = 'block';
-          } else {
-            searchEmptyState.style.display = 'none';
+        if (isSearchPage && searchResultCount) {
+          searchResultCount.style.display = 'block';
+          const countSpan = searchResultCount.querySelector('span');
+          if (countSpan) {
+            countSpan.textContent = `${matchedCount}개의 앱을 찾았어요. `;
           }
         }
         
