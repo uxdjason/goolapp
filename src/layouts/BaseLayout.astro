@@ -125,14 +125,9 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
       
       function applyFilter() {
         const isFavoritesFilter = window.location.hash === '#favorites';
-        const isSearchPage = window.location.pathname === '/search';
+        const isSearchPage = window.location.pathname.includes('/search');
         const urlParams = new URLSearchParams(window.location.search);
         const searchQuery = (urlParams.get('q') || '').toLowerCase();
-        
-        const queryDisplay = document.getElementById('search-query-display');
-        if (queryDisplay && isSearchPage) {
-           queryDisplay.textContent = '검색어: ' + (urlParams.get('q') || '');
-        }
 
         const favs = getFavorites();
         
@@ -154,12 +149,12 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
         document.querySelectorAll('.app-card').forEach((el) => {
           const card = el as HTMLElement;
           const slug = card.getAttribute('data-slug');
-          const title = card.getAttribute('data-title') || '';
-          const desc = card.getAttribute('data-desc') || '';
+          const textContent = card.textContent?.toLowerCase() || '';
+          const contentAttr = card.getAttribute('data-content')?.toLowerCase() || '';
           
           let isMatch = false;
           if (isSearchPage) {
-            if (searchQuery && (title.toLowerCase().includes(searchQuery) || desc.toLowerCase().includes(searchQuery))) {
+            if (searchQuery && (textContent.includes(searchQuery) || contentAttr.includes(searchQuery))) {
               isMatch = true;
             }
           } else if (isFavoritesFilter) {

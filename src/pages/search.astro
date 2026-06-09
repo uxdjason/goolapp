@@ -18,7 +18,6 @@ const sortedApps = allApps.sort((a, b) =>
   <section class="hero-section">
     <div class="hero-container">
       <h1 class="hero-title">앱을 찾아봤어요.</h1>
-      <p class="hero-subtitle" id="search-query-display">검색어: </p>
 
       <!-- Search bar -->
       <SearchBar />
@@ -34,8 +33,9 @@ const sortedApps = allApps.sort((a, b) =>
           <AppCard
             title={app.data.title}
             shortDescription={app.data.shortDescription}
-            slug={app.data.slug}
+            slug={app.slug}
             category={app.data.category}
+            contentSnippet={app.body}
           />
         ))}
       </div>

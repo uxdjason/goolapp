@@ -4,8 +4,9 @@ interface Props {
   shortDescription: string;
   slug: string;
   category: string[];
+  contentSnippet?: string;
 }
-const { title, shortDescription, slug, category } = Astro.props;
+const { title, shortDescription, slug, category, contentSnippet = '' } = Astro.props;
 
 const categoryLabels: Record<string, string> = {
   calculator: '각종 계산기',
@@ -17,7 +18,7 @@ const categoryLabels: Record<string, string> = {
 };
 const catLabel = category.map(c => categoryLabels[c] ?? c).join(', ');
 ---
-<article class="app-card" data-slug={slug} data-title={title} data-desc={shortDescription}>
+<article class="app-card" data-slug={slug} data-title={title} data-desc={shortDescription} data-content={contentSnippet}>
   <!-- Top row: category chip + favourite star -->
   <div class="card-top">
     <span class="cat-chip">

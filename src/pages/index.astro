@@ -47,8 +47,9 @@ const sortedApps = allApps.sort((a, b) =>
           <AppCard
             title={app.data.title}
             shortDescription={app.data.shortDescription}
-            slug={app.data.slug}
+            slug={app.slug}
             category={app.data.category}
+            contentSnippet={app.body}
           />
         ))}
       </div>
