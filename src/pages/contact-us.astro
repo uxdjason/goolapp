@@ -16,7 +16,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
       <div class="form-wrapper">
         <form
-          id="contact-form"
+          action="https://formsubmit.co/b0ca5b100e1e3f9582ec236485cbd26f"
           method="POST"
           class="contact-form"
         >
@@ -153,15 +153,3 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     }
   }
 </style>
-
-<script>
-  // 이메일 주소 스팸 수집 봇 노출 방지를 위한 액션 동적 할당
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('contact-form') as HTMLFormElement;
-    if (form) {
-      const u = 'ukneoguri';
-      const d = 'gmail.com';
-      form.action = `https://formsubmit.co/${u}@${d}`;
-    }
-  });
-</script>
