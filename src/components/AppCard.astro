@@ -17,8 +17,9 @@ const categoryLabels: Record<string, string> = {
   finance:    '금융 재테크',
 };
 const catLabel = category.map(c => categoryLabels[c] ?? c).join(', ');
+const categorySlugs = category.join(',');
 ---
-<article class="app-card" data-slug={slug} data-title={title} data-desc={shortDescription} data-content={contentSnippet}>
+<article class="app-card" data-slug={slug} data-title={title} data-desc={shortDescription} data-content={contentSnippet} data-category-slugs={categorySlugs}>
   <!-- Top row: category chip + favourite star -->
   <div class="card-top">
     <span class="cat-chip">

@@ -43,6 +43,9 @@ const sortedApps = allApps.sort((a, b) =>
       <div id="search-empty-state" class="empty-state glass-surface" style="display: none;">
         <p>검색 결과가 없습니다.</p>
       </div>
+      <div id="search-category-empty-state" class="empty-state glass-surface" style="display: none;">
+        <p>검색어에 맞는 앱이 이 카테고리에는 없어요. <a href="#" id="search-global-link" class="text-primary underline" style="font-weight: 700;">전체 앱 리스트</a>에서 다시 검색해 보세요.</p>
+      </div>
 
       <!-- "더 꺼내기" button — from design spec -->
       <div class="load-more-wrap" style="display: none;">
@@ -75,7 +78,7 @@ const sortedApps = allApps.sort((a, b) =>
     letter-spacing: -0.02em;
     text-align: center;
     color: #1b1c1a;
-    margin-bottom: 0;
+    margin-bottom: 32px;
     max-width: 900px;
   }
 

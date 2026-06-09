@@ -41,7 +41,7 @@ const label = categoryLabels[category ?? ''] ?? category;
       <h1 class="hero-title">{label}</h1>
       
       <!-- Search bar -->
-      <SearchBar placeholder={`${label} 내에서 검색`} />
+      <SearchBar placeholder={`${label} 내에서 검색`} categorySlug={category} />
     </div>
   </section>
 
