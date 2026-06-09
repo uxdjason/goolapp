@@ -1,19 +1,16 @@
 ---
-import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import AppCard from '../components/AppCard.astro';
-import SearchBar from '../components/SearchBar.astro';
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import AppCard from "../components/AppCard.astro";
+import SearchBar from "../components/SearchBar.astro";
 
-const allApps = await getCollection('apps', ({ data }) => !data.draft);
+const allApps = await getCollection("apps", ({ data }) => !data.draft);
 const sortedApps = allApps.sort((a, b) =>
-  a.data.title.localeCompare(b.data.title, 'ko-KR')
+  a.data.title.localeCompare(b.data.title, "ko-KR"),
 );
 ---
 
-<BaseLayout
-  title="검색 결과 | GoolAPP"
-  description="GoolAPP 검색 결과입니다."
->
+<BaseLayout title="검색 결과 | GoolAPP" description="GoolAPP 검색 결과입니다.">
   <!-- ── Hero ── -->
   <section class="hero-section">
     <div class="hero-container">
@@ -22,8 +19,15 @@ const sortedApps = allApps.sort((a, b) =>
       <!-- Search bar -->
       <SearchBar />
 
-      <div id="search-result-count" style="display: none; text-align: center; margin-top: 32px; font-family: var(--font-family-base); font-size: 18px; color: #53433d;">
-        <span></span><a href="/" class="text-primary underline" style="font-weight: 700; text-decoration: underline;">전체 앱 리스트</a>
+      <div
+        id="search-result-count"
+        style="display: none; text-align: center; margin-top: 32px; font-family: var(--font-family-base); font-size: 18px; color: #53433d;"
+      >
+        <span></span><a
+          href="/"
+          class="global-list-link"
+          >전체 앱 리스트</a
+        >
       </div>
     </div>
   </section>
@@ -31,17 +35,18 @@ const sortedApps = allApps.sort((a, b) =>
   <!-- ── Apps section ── -->
   <section class="apps-section">
     <div class="container">
-
       <div class="app-grid">
-        {sortedApps.map(app => (
-          <AppCard
-            title={app.data.title}
-            shortDescription={app.data.shortDescription}
-            slug={app.data.slug}
-            category={app.data.category}
-            contentSnippet={app.body}
-          />
-        ))}
+        {
+          sortedApps.map((app) => (
+            <AppCard
+              title={app.data.title}
+              shortDescription={app.data.shortDescription}
+              slug={app.data.slug}
+              category={app.data.category}
+              contentSnippet={app.body}
+            />
+          ))
+        }
       </div>
 
       <!-- "더 꺼내기" button — from design spec -->
@@ -89,10 +94,10 @@ const sortedApps = allApps.sort((a, b) =>
     color: #53433d;
   }
 
-
-
   /* ── Apps ── */
-  .apps-section { padding-bottom: var(--space-16); }
+  .apps-section {
+    padding-bottom: var(--space-16);
+  }
   .app-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -140,17 +145,39 @@ const sortedApps = allApps.sort((a, b) =>
 
   /* Tablet */
   @media (max-width: 1024px) {
-    .app-grid { grid-template-columns: repeat(2, 1fr); }
+    .app-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   /* Mobile */
   @media (max-width: 768px) {
-    .hero-section { padding: 60px 0 40px; }
+    .hero-section {
+      padding: 60px 0 40px;
+    }
     .hero-title {
       font-size: 1.75rem;
       line-height: 1.33;
     }
-    .hero-subtitle { font-size: 16px; margin-top: 24px; }
-    .app-grid { grid-template-columns: 1fr; gap: 16px; }
+    .hero-subtitle {
+      font-size: 16px;
+      margin-top: 24px;
+    }
+    .app-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+
+  .global-list-link {
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: none; /* remove any global transition */
+  }
+  .global-list-link:hover {
+    text-decoration: underline;
+    color: var(--color-primary);
+    opacity: 1 !important;
   }
 </style>

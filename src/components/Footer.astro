@@ -5,10 +5,10 @@ const currentYear = new Date().getFullYear();
 <footer class="global-footer">
   <div class="footer-inner">
     <!-- Left: logo icon + "GoolAPP" text -->
-    <div class="footer-logo-row">
-      <img src="/logo.png" alt="" class="footer-logo-icon" width="40" height="40" aria-hidden="true" />
-      <span class="footer-logo-text">GoolAPP</span>
-    </div>
+    <a href="/" class="logo-link" aria-label="GoolAPP 홈으로">
+      <img src="/logo.png" alt="" class="logo-icon" width="40" height="40" aria-hidden="true" />
+      <span class="logo-text">GoolAPP</span>
+    </a>
 
     <!-- Center: copyright -->
     <p class="footer-copyright">© {currentYear}-{currentYear + 1} GoolAPP 굴랩. All rights reserved.</p>
@@ -16,8 +16,8 @@ const currentYear = new Date().getFullYear();
     <!-- Right: nav links -->
     <nav class="footer-nav" aria-label="하단 링크">
       <ul>
-        <li><a href="#">사용 문의</a></li>
-        <li><a href="/privacy">개인정보 처리방침</a></li>
+        <li><a href="/contact-us">사용 문의</a></li>
+        <li><a href="/privacy-policy">개인정보 처리방침</a></li>
       </ul>
     </nav>
   </div>
@@ -42,22 +42,24 @@ const currentYear = new Date().getFullYear();
     min-height: 120px;
   }
 
-  .footer-logo-row {
+  .logo-link {
     display: flex;
     align-items: center;
     gap: 16px;
+    text-decoration: none;
   }
-  .footer-logo-icon {
+  .logo-icon {
     width: 40px;
     height: 40px;
     object-fit: contain;
   }
-  .footer-logo-text {
+  .logo-text {
     /* from design: 24px bold, color #350F00 */
     font-family: var(--font-family-base);
     font-weight: 700;
     font-size: 24px;
     line-height: 31px;
+    letter-spacing: -0.6px;
     color: #350f00;
   }
 
@@ -101,7 +103,7 @@ const currentYear = new Date().getFullYear();
       gap: 0;
       padding: 32px 16px;
     }
-    .footer-logo-row {
+    .logo-link {
       order: 1;
       margin-bottom: 24px;
       justify-content: center;
