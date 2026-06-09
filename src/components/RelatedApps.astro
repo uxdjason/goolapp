@@ -1,15 +1,73 @@
 ---
+import { getCollection } from 'astro:content';
 import AppCard from './AppCard.astro';
 
 interface Props {
-  apps: { title: string; shortDescription: string; slug: string; category: string; }[];
+  apps?: { title: string; shortDescription: string; slug: string; category: string[]; }[];
 }
-const { apps } = Astro.props;
+let { apps } = Astro.props;
+
+if (!apps || apps.length === 3 || apps.length === 0) {
+  const allApps = await getCollection('apps');
+  const pathParts = Astro.url.pathname.split('/').filter(Boolean);
+  const detectedSlug = pathParts[pathParts.length - 1];
+  const currentApp = allApps.find(a => a.data.slug === detectedSlug || a.slug === detectedSlug);
+
+  let finalApps: any[] = [];
+
+  if (currentApp) {
+    if (currentApp.data.relatedSlugs && currentApp.data.relatedSlugs.length > 0) {
+      const manualApps = allApps.filter(a => currentApp.data.relatedSlugs.includes(a.data.slug || a.slug));
+      finalApps = manualApps.slice(0, 4);
+    } else {
+      const scores = allApps
+        .filter(app => (app.data.slug || app.slug) !== (currentApp.data.slug || currentApp.slug) && !app.data.draft)
+        .map(app => {
+          let score = 0;
+          
+          const currentCats = currentApp.data.category || [];
+          const appCats = app.data.category || [];
+          const commonCats = appCats.filter((c: string) => currentCats.includes(c));
+          score += commonCats.length * 10;
+          
+          const cTitle = currentApp.data.title || '';
+          const aTitle = app.data.title || '';
+          const cWords = cTitle.split(' ');
+          const aWords = aTitle.split(' ');
+          const commonWords = aWords.filter((w: string) => cWords.includes(w) && w.length > 1);
+          score += commonWords.length * 5;
+
+          const cDesc = currentApp.data.description || '';
+          const aDesc = app.data.description || '';
+          const cDescWords = cDesc.split(' ');
+          const aDescWords = aDesc.split(' ');
+          const commonDescWords = aDescWords.filter((w: string) => cDescWords.includes(w) && w.length > 2);
+          score += commonDescWords.length * 1;
+
+          return { app, score };
+        });
+      
+      scores.sort((a, b) => b.score - a.score);
+      finalApps = scores.slice(0, 4).map(s => s.app);
+    }
+  }
+
+  if (finalApps.length === 0) {
+    finalApps = allApps.filter(a => a.slug !== detectedSlug).slice(0, 4);
+  }
+
+  apps = finalApps.map(app => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug || app.slug,
+    category: app.data.category
+  }));
+}
 ---
 <div class="related-apps">
-  <h2>관련 유틸리티</h2>
+  <h2>이런 앱들도 있어요:</h2>
   <div class="related-grid">
-    {apps.map(app => (
+    {(apps || []).map(app => (
       <AppCard {...app} />
     ))}
   </div>
