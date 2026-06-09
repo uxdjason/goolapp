@@ -61,6 +61,7 @@ const showAdsense    = adsenseEnabled && Boolean(adsenseClient);
 // 색인 정책: production hostname이 정식 도메인이 아닐 경우 noindex로 강제.
 // (PUBLIC_ADSENSE_ENABLED와 동일한 환경 신호로 판단해도 무방)
 const isLiveDomain = adsenseEnabled; // production에서만 true 주입되므로 동일 신호 활용
+const naverVerification = import.meta.env.PUBLIC_NAVER_SITE_VERIFICATION;
 const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
 ---
 <!doctype html>
@@ -83,6 +84,7 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
       ogDescription={ogDescription}
       canonicalUrl={canonicalUrl}
       keywords={keywords}
+      naverSiteVerification={naverVerification}
       publishedAt={publishedAt}
       updatedAt={updatedAt}
       jsonLd={jsonLd ?? websiteJsonLd}
