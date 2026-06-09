@@ -4,7 +4,7 @@ slug: country-capital-quiz
 description: 나라 수도 맞추기 퀴즈로 지리 상식을 테스트하세요. 사지선다형 문제에서 즉시 정답을 확인하고 점수를 받으세요. 무료 온라인
   퀴즈로 세계 수도를 쉽게 학습하세요.
 shortDescription: 나라 수도 맞추기 퀴즈로 지리 상식을 테스트하세요.
-category: quiz
+category: ['quiz']
 primaryKeyword: 나라 수도 맞추기 퀴즈
 secondaryKeywords:
 - 사지선다 퀴즈

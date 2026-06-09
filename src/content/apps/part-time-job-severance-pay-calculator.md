@@ -4,7 +4,7 @@ slug: part-time-job-severance-pay-calculator
 description: 아르바이트 퇴직금을 입사일, 퇴사일, 3개월 급여로 즉시 계산하세요. 2025년 최저임금 기준 자동 적용, 1년 이상 근무자
   대상 법정 퇴직금 예상액 제공.
 shortDescription: 아르바이트 퇴직금을 입사일, 퇴사일, 3개월 급여로 즉시 계산하세요.
-category: tool
+category: ['calculator', 'finance']
 primaryKeyword: 아르바이트 퇴직금 계산기
 secondaryKeywords:
 - 퇴직금 계산

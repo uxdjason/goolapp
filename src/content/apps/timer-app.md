@@ -3,7 +3,7 @@ title: "타이머"
 description: "웹 브라우저에서 바로 사용할 수 있는 무료 타이머 및 스톱워치 앱입니다. 공부, 요리, 운동 등 시간 관리가 필요한 모든 순간에 활용해 보세요."
 shortDescription: "웹 브라우저에서 바로 사용할 수 있는 간편한 카운트다운 타이머 및 스톱워치입니다."
 slug: "timer-app"
-category: "datetime"
+category: ['datetime']
 primaryKeyword: "타이머"
 relatedSlugs: ["time-interval-calculator", "date-time-interval-calculator"]
 secondaryKeywords: ["온라인 타이머", "스톱워치", "카운트다운", "공부 타이머"]

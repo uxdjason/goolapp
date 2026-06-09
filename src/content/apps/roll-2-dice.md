@@ -4,7 +4,7 @@ slug: roll-2-dice
 description: 실물 주사위 없이 온라인에서 주사위 2개를 한 번에 굴릴 수 있는 무료 앱입니다. 3D 애니메이션으로 사실감 있게 주사위를
   굴려보세요. 게임, 보드게임, 운세 등 다양한 용도로 활용 가능합니다.
 shortDescription: 실물 주사위 없이 온라인에서 주사위 2개를 한 번에 굴릴 수 있는 무료 앱입니다.
-category: tool
+category: ['fun', 'tool']
 primaryKeyword: 주사위 2개 굴리기
 secondaryKeywords:
 - 온라인 주사위

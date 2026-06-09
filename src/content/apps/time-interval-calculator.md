@@ -4,7 +4,7 @@ slug: time-interval-calculator
 description: 시간 차이 계산기로 시작과 종료 시간을 입력하여 시간·분·초 단위 정확한 시간 차이를 빠르게 계산하세요. 근무 시간, 프로젝트
   마감까지 남은 시간, 두 사건 간격을 정확히 알아보세요.
 shortDescription: 시간 차이 계산기로 시작과 종료 시간을 입력하여 시간·분·초 단위 정확한 시간 차이를 빠르게 계산하세요.
-category: tool
+category: ['datetime', 'calculator']
 primaryKeyword: 시간 차이 계산기
 secondaryKeywords:
 - 시간 계산

@@ -4,7 +4,7 @@ slug: date-time-interval-calculator
 description: 두 날짜와 시간의 정확한 차이를 년·개월·일·시간·분·초로 계산해보세요. 계약서 작성, 프로젝트 관리 등 업무에서 필요한 정밀한
   시간 차이 계산 도구입니다.
 shortDescription: 두 날짜와 시간의 정확한 차이를 년·개월·일·시간·분·초로 계산해보세요.
-category: tool
+category: ['datetime', 'calculator']
 primaryKeyword: 날짜 시간 차이 계산기
 secondaryKeywords:
 - 시간 간격 계산

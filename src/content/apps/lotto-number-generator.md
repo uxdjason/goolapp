@@ -4,7 +4,7 @@ slug: lotto-number-generator
 description: 로또 번호 생성기로 45개 숫자 중 6개를 자동으로 추출해 로또번호를 만들어보세요. 1세트 또는 5세트를 한 번에 생성하고
   복사할 수 있습니다. 당첨 운을 시험해보세요.
 shortDescription: 로또 번호 생성기로 45개 숫자 중 6개를 자동으로 추출해 로또번호를 만들어보세요.
-category: tool
+category: ['fun', 'tool']
 primaryKeyword: 로또 번호 생성기
 secondaryKeywords:
 - 로또번호 추천

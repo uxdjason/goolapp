@@ -3,7 +3,7 @@ title: "예적금 이자 계산기"
 description: "정기예금과 정기적금의 단리, 복리 이자를 세전/세후 기준으로 정확하게 계산해주는 무료 계산기입니다. 원금, 월납입금, 이자율, 개월 수를 입력하여 수령액을 즉시 확인해보세요."
 shortDescription: "정기예금과 정기적금의 단리, 복리 이자를 세전/세후 기준으로 정확하게 계산해주는 무료 계산기입니다."
 slug: "deposit-savings-calculator"
-category: "finance"
+category: ['finance', 'calculator']
 primaryKeyword: "예적금 이자 계산기"
 relatedSlugs: ["loan-interest-calculator", "part-time-job-severance-pay-calculator"]
 secondaryKeywords: ["정기예금 이자 계산", "적금 이자 계산기", "단리 복리 차이", "세후 이자율 계산"]

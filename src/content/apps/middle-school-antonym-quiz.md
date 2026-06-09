@@ -4,7 +4,7 @@ slug: middle-school-antonym-quiz
 description: 중학교 수준의 영단어 반의어 퀴즈를 무료로 풀어보세요. 사지선다형 문제로 반의어를 맞추며 자연스럽게 어휘력을 늘릴 수 있습니다.
   즉시 정답 피드백으로 효율적인 학습이 가능합니다.
 shortDescription: 중학교 수준의 영단어 반의어 퀴즈를 무료로 풀어보세요.
-category: quiz
+category: ['quiz']
 primaryKeyword: 중학교 영단어 반의어
 secondaryKeywords:
 - 반의어 맞추기 퀴즈

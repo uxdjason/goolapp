@@ -4,7 +4,7 @@ slug: country-flag-quiz
 description: 237개 국가를 대상으로 나라 이름을 보고 정답 국기를 4개 선택지 중 고르는 무료 퀴즈 앱. 즉시 피드백과 점수 계산으로
   세계 지리 상식을 재미있게 테스트하세요.
 shortDescription: 237개 국가를 대상으로 나라 이름을 보고 정답 국기를 4개 선택지 중 고르는 무료 퀴즈 앱.
-category: quiz
+category: ['quiz']
 primaryKeyword: 나라 국기 맞추기 퀴즈
 secondaryKeywords:
 - 국기 퀴즈

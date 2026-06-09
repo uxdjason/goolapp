@@ -4,7 +4,7 @@ slug: flag-country-quiz
 description: 238개 나라의 국기를 보고 4지선다로 정답을 맞추는 무료 국기 퀴즈. 즉시 정답 여부를 확인하고 최종 점수까지 한 번에 획득하세요.
   지금 시작해보세요!
 shortDescription: 238개 나라의 국기를 보고 4지선다로 정답을 맞추는 무료 국기 퀴즈.
-category: quiz
+category: ['quiz']
 primaryKeyword: 국기 나라 맞추기 퀴즈
 secondaryKeywords:
 - 국기 맞추기

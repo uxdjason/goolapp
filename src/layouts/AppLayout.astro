@@ -6,7 +6,7 @@ interface Props {
   title: string;
   description: string;
   shortDescription: string;
-  category?: string;
+  category?: string[];
   keywords?: string[];
   ogImage?: string;
   ogTitle?: string;
@@ -37,13 +37,13 @@ const categoryLabels: Record<string, string> = {
   fun:        '심심풀이 Fun',
   finance:    '금융 재테크',
 };
-const catLabel = category ? (categoryLabels[category] ?? category) : '';
+const catLabel = category ? category.map(c => categoryLabels[c] ?? c).join(', ') : '';
 
 // Ensure slug is always available even for explicitly created pages (not dynamic [slug].astro)
 const currentSlug = Astro.url.pathname.replace(/^\/|\/$/g, '').split('/').pop();
 
 // SoftwareApplication JSON-LD (Google Rich Results 지원)
-const appCategory = category ? (categoryLabels[category] ?? category) : '유틸리티';
+const appCategory = category && category.length > 0 ? (categoryLabels[category[0]] ?? category[0]) : '유틸리티';
 const canonicalHref = canonicalUrl || `https://goolapp.com/${currentSlug}/`;
 const appJsonLd = JSON.stringify({
   '@context': 'https://schema.org',

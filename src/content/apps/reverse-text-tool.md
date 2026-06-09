@@ -4,7 +4,7 @@ slug: reverse-text-tool
 description: 텍스트를 글자 또는 단어 단위로 반대로 뒤집어 주는 간단한 온라인 도구입니다. 암호 만들기, 비밀 메시지 작성, 텍스트 장난에
   활용하세요. 클립보드 복사 기능 지원.
 shortDescription: 텍스트를 글자 또는 단어 단위로 반대로 뒤집어 주는 간단한 온라인 도구입니다.
-category: tool
+category: ['tool']
 primaryKeyword: 텍스트 반대로 뒤집기
 secondaryKeywords:
 - 텍스트 역순 변환

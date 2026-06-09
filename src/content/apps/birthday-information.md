@@ -4,7 +4,7 @@ slug: birthday-information
 description: 생일 관련 정보 찾기로 양력 생일을 입력하면 음력 날짜, 태어난 요일, 띠, 간지, 별자리는 물론 같은 별자리 유명인까지 알아볼
   수 있습니다. 결과를 바로 복사하세요.
 shortDescription: 양력 생일을 입력하면 음력, 띠, 간지, 별자리, 같은 별자리 유명인까지 한 번에 확인할 수 있습니다.
-category: tool
+category: ['datetime', 'tool']
 primaryKeyword: 생일 관련 정보 찾기
 secondaryKeywords:
 - 생일 계산

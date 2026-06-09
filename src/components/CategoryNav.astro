@@ -9,10 +9,10 @@ const categories = [
   { id: 'favorites',  label: '즐겨찾는 앱', href: '/#favorites',          star: true  },
   { id: 'calculator', label: '계산기',     href: '/category/calculator', star: false },
   { id: 'datetime',   label: '날짜/시간',  href: '/category/datetime',   star: false },
-  { id: 'finance',    label: '금융재테크', href: '/category/finance',  star: false },
-  { id: 'quiz',       label: '퀴즈',       href: '/category/quiz',       star: false },
+  { id: 'finance',    label: '금융 재테크', href: '/category/finance',  star: false },
   { id: 'tool',       label: '유틸리티',   href: '/category/tool',       star: false },
-  { id: 'fun',        label: 'Fun',        href: '/category/fun',        star: false },
+  { id: 'quiz',       label: '퀴즈',       href: '/category/quiz',       star: false },
+  { id: 'fun',        label: 'FUN',        href: '/category/fun',        star: false },
 ];
 ---
 <nav class="category-nav" aria-label="카테고리 필터">
@@ -98,7 +98,11 @@ const categories = [
   }
 
   @media (max-width: 768px) {
-    .category-list { gap: 8px; }
+    .category-list { 
+      gap: 8px; 
+      flex-wrap: wrap;
+      justify-content: center;
+    }
     .cat-btn { padding: 7px 14px; font-size: 12px; }
   }
 </style>

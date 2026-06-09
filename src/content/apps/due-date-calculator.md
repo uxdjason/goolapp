@@ -3,7 +3,7 @@ title: "출산예정일 계산기"
 slug: "due-date-calculator"
 description: "출산예정일 계산기로 마지막 생리 시작일과 생리 주기를 입력하면 정확한 예정일을 바로 확인할 수 있습니다. 임신 주수, 태아 발달 단계, 예상 별자리까지 한눈에 알아보세요."
 shortDescription: "마지막 생리일 기반 출산예정일 계산 및 임신 타임라인 안내"
-category: "datetime"
+category: ['datetime', 'calculator']
 primaryKeyword: "출산예정일 계산기"
 secondaryKeywords:
   - "출산예정일 계산"

@@ -9,9 +9,9 @@ import Faq from '../../components/Faq.astro';
 import RelatedApps from '../../components/RelatedApps.astro';
 
 const dummyApps = [
-  { slug: 'app1', title: '간단 계산기', shortDescription: '일상적인 사칙연산을 빠르게 수행합니다.', category: 'calculator' },
-  { slug: 'app2', title: 'MBTI 테스트', shortDescription: '나의 숨겨진 성향을 알아보세요.', category: 'quiz' },
-  { slug: 'app3', title: '단위 변환기', shortDescription: '길이, 무게, 온도 등 다양한 단위를 변환합니다.', category: 'converter' },
+  { slug: 'app1', title: '간단 계산기', shortDescription: '일상적인 사칙연산을 빠르게 수행합니다.', category: ['calculator'] },
+  { slug: 'app2', title: 'MBTI 테스트', shortDescription: '나의 숨겨진 성향을 알아보세요.', category: ['quiz'] },
+  { slug: 'app3', title: '단위 변환기', shortDescription: '길이, 무게, 온도 등 다양한 단위를 변환합니다.', category: ['tool'] },
 ];
 
 const dummyFaqs = [

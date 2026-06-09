@@ -4,7 +4,7 @@ slug: roll-dice-online
 description: 실물 주사위가 없을 때 온라인에서 무료로 주사위를 굴려보세요. 3D 애니메이션으로 1부터 6까지 결과를 확인할 수 있는 간단하고
   편리한 주사위 도구입니다.
 shortDescription: 실물 주사위가 없을 때 온라인에서 무료로 주사위를 굴려보세요.
-category: tool
+category: ['fun', 'tool']
 primaryKeyword: 온라인 주사위 굴리기
 secondaryKeywords:
 - 3D 주사위

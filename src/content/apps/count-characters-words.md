@@ -4,7 +4,7 @@ slug: count-characters-words
 description: 스마트폰에서 텍스트의 글자 수와 단어 수를 빠르게 세는 무료 웹앱입니다. 공백 포함/비포함 글자 수를 동시에 확인하고 단어
   수를 정확히 계산해보세요.
 shortDescription: 스마트폰에서 텍스트의 글자 수와 단어 수를 빠르게 세는 무료 웹앱입니다.
-category: tool
+category: ['tool']
 primaryKeyword: 글자 수 단어 수 세기
 secondaryKeywords:
 - 텍스트 글자 수 계산

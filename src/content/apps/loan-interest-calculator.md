@@ -4,7 +4,7 @@ slug: loan-interest-calculator
 description: 대출 이자 계산기로 원금, 기간, 금리를 입력하면 월 상환액과 총 이자를 빠르게 계산할 수 있습니다. 원리금 균등분할상환,
   원금 균등분할상환 두 가지 방식 지원. 대출 계획 수립 시 유용한 참고 도구입니다.
 shortDescription: 대출 이자 계산기로 원금, 기간, 금리를 입력하면 월 상환액과 총 이자를 빠르게 계산할 수 있습니다.
-category: tool
+category: ['finance', 'calculator']
 primaryKeyword: 대출 이자 계산기
 secondaryKeywords:
 - 대출 계산기

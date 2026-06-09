@@ -4,7 +4,7 @@ slug: grade-point-calculator
 description: 4.5/4.3 만점 기준 학점 계산기로 과목별 성적을 입력하면 GPA 평점을 즉시 계산합니다. S/U/P 성적도 반영되며 클립보드
   복사 기능을 지원합니다.
 shortDescription: 4.5/4.3 만점 기준 학점 계산기로 과목별 성적을 입력하면 GPA 평점을 즉시 계산합니다.
-category: tool
+category: ['calculator', 'tool']
 primaryKeyword: 학점 계산기
 secondaryKeywords:
 - GPA 계산

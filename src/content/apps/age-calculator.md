@@ -4,7 +4,7 @@ slug: age-calculator
 description: 한국 나이와 만 나이를 생년월일로 간단히 계산하세요. 한국 나이 계산기로 자신과 가족의 정확한 나이를 빠르게 알아보고 생존
   기간까지 확인해보세요.
 shortDescription: 한국 나이와 만 나이를 생년월일로 간단히 계산하세요.
-category: tool
+category: ['datetime', 'calculator']
 primaryKeyword: 나이 계산기
 secondaryKeywords:
 - 한국 나이 계산

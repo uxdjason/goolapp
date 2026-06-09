@@ -4,7 +4,7 @@ slug: korean-history-figure-quiz
 description: 삼국시대부터 조선시대까지 한국사 인물을 맞추는 사지선다형 퀴즈입니다. 100문제를 랜덤으로 풀면서 역사 상식을 테스트하고 점수를
   획득하세요. 지금 시작하기
 shortDescription: 삼국시대부터 조선시대까지 한국사 인물을 맞추는 사지선다형 퀴즈입니다.
-category: quiz
+category: ['quiz']
 primaryKeyword: 한국사 인물 퀴즈
 secondaryKeywords:
 - 한국 역사 문제

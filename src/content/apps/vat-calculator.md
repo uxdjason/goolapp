@@ -4,7 +4,7 @@ slug: vat-calculator
 description: 한국 기준 10% 부가세 계산기입니다. 소비자가격, 공급가액, 부가세액 중 하나를 입력하면 나머지를 자동 계산해줍니다. 빠르고
   정확한 부가세 계산을 지금 시작하세요.
 shortDescription: 한국 기준 10% 부가세 계산기입니다.
-category: tool
+category: ['finance', 'calculator']
 primaryKeyword: 부가세 계산기
 secondaryKeywords:
 - 10% 부가세 계산

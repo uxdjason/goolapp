@@ -9,7 +9,7 @@ const apps = defineCollection({
     slug: z.string(),
     description: z.string().max(160),
     shortDescription: z.string().max(80),
-    category: z.enum(['calculator', 'quiz', 'datetime', 'tool', 'fun', 'finance']),
+    category: z.array(z.enum(['calculator', 'quiz', 'datetime', 'tool', 'fun', 'finance'])),
     primaryKeyword: z.string(),
     secondaryKeywords: z.array(z.string()).default([]),
     publishedAt: z.date(),

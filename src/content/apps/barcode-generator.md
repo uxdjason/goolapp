@@ -4,7 +4,7 @@ slug: barcode-generator
 description: 무료 바코드 생성기로 영문, 숫자, 특수문자를 입력하여 CODE128 바코드를 즉시 생성하세요. 물류 관리와 자료 정리에 최적화된
   초간편 온라인 도구입니다.
 shortDescription: 무료 바코드 생성기로 영문, 숫자, 특수문자를 입력하여 CODE128 바코드를 즉시 생성하세요.
-category: tool
+category: ['tool']
 primaryKeyword: 바코드 생성기
 secondaryKeywords:
 - 무료 바코드 만들기

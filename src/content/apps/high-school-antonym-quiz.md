@@ -4,7 +4,7 @@ slug: high-school-antonym-quiz
 description: 고등학교 수준의 영단어 반의어 맞추기 퀴즈로 어휘력을 키워보세요. 사지선다형 문제에서 즉시 정답을 확인하며 자연스럽게 영어
   실력을 높일 수 있습니다.
 shortDescription: 고등학교 수준의 영단어 반의어 맞추기 퀴즈로 어휘력을 키워보세요.
-category: quiz
+category: ['quiz']
 primaryKeyword: 영단어 반의어 맞추기
 secondaryKeywords:
 - 고등학교 영단어 퀴즈

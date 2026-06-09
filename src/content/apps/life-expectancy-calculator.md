@@ -4,7 +4,7 @@ slug: life-expectancy-calculator
 description: 라이프스타일, 가족력, 성별, 건강상태 등 27가지 질문으로 예상 수명을 정확히 계산하는 무료 온라인 계산기입니다. 현재 나이
   기준 남은 인생을 년/월/일로 확인하세요.
 shortDescription: 라이프스타일, 가족력, 성별, 건강상태 등 27가지 질문으로 예상 수명을 정확히 계산하는 무료 온라인 계산기입니다.
-category: tool
+category: ['fun', 'calculator']
 primaryKeyword: 예상 수명 계산기
 secondaryKeywords:
 - 수명 예측

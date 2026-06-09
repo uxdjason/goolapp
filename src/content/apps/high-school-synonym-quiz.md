@@ -4,7 +4,7 @@ slug: high-school-synonym-quiz
 description: 고등학교 수준의 영단어 동의어를 사지선다로 맞추는 무료 퀴즈입니다. 자투리 시간에 즐기며 어휘 실력을 키워보세요. 즉각적인
   정답 피드백과 최종 점수로 학습 효과를 확인할 수 있습니다.
 shortDescription: 고등학교 수준의 영단어 동의어를 사지선다로 맞추는 무료 퀴즈입니다.
-category: quiz
+category: ['quiz']
 primaryKeyword: 고등학교 영단어 동의어 맞추기
 secondaryKeywords:
 - 영단어 동의어 퀴즈

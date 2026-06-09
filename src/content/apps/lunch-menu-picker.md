@@ -4,7 +4,7 @@ slug: lunch-menu-picker
 description: 점심 메뉴 고르기 앱으로 간단하게 오늘의 점심을 결정하세요. 200가지 이상의 메뉴 중 무작위로 추천받고, 마음에 안 들면
   계속 새로운 메뉴 추천을 받을 수 있습니다. 결정장애 해결 앱!
 shortDescription: 점심 메뉴 고르기 앱으로 간단하게 오늘의 점심을 결정하세요.
-category: tool
+category: ['tool', 'fun']
 primaryKeyword: 점심 메뉴 추천 앱
 secondaryKeywords:
 - 점심 메뉴 고르기

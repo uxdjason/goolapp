@@ -4,7 +4,7 @@ slug: four-character-idiom-quiz
 description: 사자성어 퀴즈로 한자 어휘와 사자성어 의미를 쉽게 배워보세요. 4지선다형 랜덤 퀴즈로 즉시 피드백을 받고 점수를 확인할 수
   있습니다. 무료로 지금 시작하세요.
 shortDescription: 사자성어 퀴즈로 한자 어휘와 사자성어 의미를 쉽게 배워보세요.
-category: quiz
+category: ['quiz']
 primaryKeyword: 사자성어 퀴즈
 secondaryKeywords:
 - 한자 어휘력 테스트

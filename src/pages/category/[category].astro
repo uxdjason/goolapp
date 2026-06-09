@@ -11,7 +11,7 @@ export async function getStaticPaths() {
 
 const { category } = Astro.params;
 const allApps = await getCollection('apps', ({ data }) =>
-  !data.draft && data.category === category
+  !data.draft && data.category.includes(category as any)
 );
 const sortedApps = allApps.sort((a, b) =>
   b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()

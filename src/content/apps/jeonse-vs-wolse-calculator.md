@@ -4,7 +4,7 @@ slug: jeonse-vs-wolse-calculator
 description: 전세 보증금과 월세 비용을 정확하게 비교하세요. 대출 이자까지 반영한 실질 월 부담액을 계산하고 2년 합산 절약액까지 한눈에
   파악할 수 있는 무료 계산기입니다.
 shortDescription: 전세 보증금과 월세 비용을 정확하게 비교하세요.
-category: tool
+category: ['finance', 'calculator']
 primaryKeyword: 전월세 비교 계산기
 secondaryKeywords:
 - 전세 vs 월세

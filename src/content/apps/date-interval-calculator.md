@@ -4,7 +4,7 @@ slug: date-interval-calculator
 description: 두 날짜의 차이를 빠르게 계산하세요. 년 개월 일, 총 개월 수, 총 일수로 정확히 표시됩니다. 업무와 일정 관리에 필수적인
   날짜 차이 계산기입니다.
 shortDescription: 두 날짜의 차이를 빠르게 계산하세요.
-category: tool
+category: ['datetime', 'calculator']
 primaryKeyword: 날짜 차이 계산기
 secondaryKeywords:
 - 날짜 계산

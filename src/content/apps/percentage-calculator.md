@@ -4,7 +4,7 @@ slug: percentage-calculator
 description: 부동산, 사업 목적의 퍼센트 계산을 쉽게 해결하세요. 전체 대비 부분 비율, 전체의 N% 값, 부분값으로 전체 역산까지 한
   번에 계산하는 무료 퍼센트 계산기입니다.
 shortDescription: 부동산, 사업 목적의 퍼센트 계산을 쉽게 해결하세요.
-category: tool
+category: ['calculator']
 primaryKeyword: 퍼센트 계산기
 secondaryKeywords:
 - 퍼센트 계산

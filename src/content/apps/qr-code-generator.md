@@ -4,7 +4,7 @@ slug: qr-code-generator
 description: QR 코드 생성기로 URL, 링크, 텍스트를 간단하게 QR 코드로 변환하세요. 생성된 QR 코드를 PNG로 저장하고 공유할
   수 있습니다. 무료로 지금 바로 시작하세요.
 shortDescription: QR 코드 생성기로 URL, 링크, 텍스트를 간단하게 QR 코드로 변환하세요.
-category: tool
+category: ['tool']
 primaryKeyword: QR 코드 생성기
 secondaryKeywords:
 - QR 코드 만들기

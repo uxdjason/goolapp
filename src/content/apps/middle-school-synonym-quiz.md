@@ -4,7 +4,7 @@ slug: middle-school-synonym-quiz
 description: 중학교 수준의 영단어 동의어를 4지선다 퀴즈로 배우세요. 자투리 시간에 가볍게 즐기며 어휘 실력을 키우는 무료 영어 학습 앱입니다.
   즉시 정답 확인 및 성과 점수 제공.
 shortDescription: 중학교 수준의 영단어 동의어를 4지선다 퀴즈로 배우세요.
-category: quiz
+category: ['quiz']
 primaryKeyword: 중학교 영단어 동의어 퀴즈
 secondaryKeywords:
 - 영단어 동의어 맞추기

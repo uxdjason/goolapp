@@ -4,7 +4,7 @@ slug: anniversary-calculator
 description: 기념일 계산기로 사귀는 날짜부터 100일, 500일, 1000일 등 주요 기념일을 한 번에 계산하세요. 연인, 부부, 친구
   기념일 계산이 간편합니다.
 shortDescription: 기념일 계산기로 사귀는 날짜부터 100일, 500일, 1000일 등 주요 기념일을 한 번에 계산하세요.
-category: tool
+category: ['datetime', 'calculator']
 primaryKeyword: 기념일 계산기
 secondaryKeywords:
 - 100일 계산

@@ -4,7 +4,7 @@ slug: capital-country-quiz
 description: 수도 나라 맞추기 퀴즈로 세계 지리를 배워보세요. 도시명을 보고 정답 나라를 사지선다로 선택하는 무료 온라인 학습 게임입니다.
   즉시 채점과 점수 확인이 가능합니다.
 shortDescription: 수도 나라 맞추기 퀴즈로 세계 지리를 배워보세요.
-category: quiz
+category: ['quiz']
 primaryKeyword: 수도 나라 맞추기 퀴즈
 secondaryKeywords:
 - 지리 퀴즈

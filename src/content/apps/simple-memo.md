@@ -4,7 +4,7 @@ slug: simple-memo
 description: 개인정보 유출 걱정 없는 보안 메모장입니다. 메모가 브라우저 로컬저장소에만 저장되어 외부 서버에 전송되지 않습니다. 지금 바로
   안전하게 메모를 작성하세요.
 shortDescription: 개인정보 유출 걱정 없는 보안 메모장입니다. 메모가 브라우저 로컬저장소에만 저장됩니다.
-category: tool
+category: ['tool']
 primaryKeyword: 보안 메모장
 secondaryKeywords:
 - 로컬저장소 메모
