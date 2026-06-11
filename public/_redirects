@@ -1,0 +1,5 @@
+# Legacy WordPress Tag Pages -> Homepage Redirect
+/tag/* / 301
+
+# Legacy WordPress author pages (Optional catch-all)
+/author/* / 301
