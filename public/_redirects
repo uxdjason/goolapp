@@ -1,5 +1,11 @@
+# Redirect HTTP and WWW to HTTPS non-WWW
+http://www.goolapp.com/* https://goolapp.com/:splat 301
+https://www.goolapp.com/* https://goolapp.com/:splat 301
+http://goolapp.com/* https://goolapp.com/:splat 301
+
 # Legacy WordPress Tag Pages -> Homepage Redirect
 /tag/* / 301
 
 # Legacy WordPress author pages (Optional catch-all)
 /author/* / 301
+
