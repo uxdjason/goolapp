@@ -1,0 +1,677 @@
+---
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
+
+const entry = await getEntry("apps", "blood-type-compatibility");
+if (!entry) throw new Error("blood-type-compatibility entry not found");
+const { Content } = await render(entry);
+
+const allApps = await getCollection("apps");
+let related = allApps
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
+if (related.length === 0) {
+  related = allApps
+    .filter((app) => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="app-container">
+      <section class="input-section">
+        <div class="blood-picker">
+          <h3 class="picker-title">나의 혈액형</h3>
+          <div class="blood-options" data-target="type1">
+            <button type="button" class="blood-btn" data-value="A">A형</button>
+            <button type="button" class="blood-btn" data-value="B">B형</button>
+            <button type="button" class="blood-btn" data-value="O">O형</button>
+            <button type="button" class="blood-btn" data-value="AB">AB형</button
+            >
+          </div>
+        </div>
+
+        <div class="vs-divider">
+          <span>💕</span>
+        </div>
+
+        <div class="blood-picker">
+          <h3 class="picker-title">상대방의 혈액형</h3>
+          <div class="blood-options" data-target="type2">
+            <button type="button" class="blood-btn" data-value="A">A형</button>
+            <button type="button" class="blood-btn" data-value="B">B형</button>
+            <button type="button" class="blood-btn" data-value="O">O형</button>
+            <button type="button" class="blood-btn" data-value="AB">AB형</button
+            >
+          </div>
+        </div>
+
+        <button type="button" id="calcBtn" class="calc-btn" disabled>
+          궁합 보기
+        </button>
+      </section>
+
+      <section class="result-section" id="resultSection" hidden>
+        <div class="result-header">
+          <div class="pair-display">
+            <span class="pair-blood" id="pairType1">-</span>
+            <span class="pair-heart">❤</span>
+            <span class="pair-blood" id="pairType2">-</span>
+          </div>
+          <div class="grade-badge" id="gradeBadge">-</div>
+          <div class="total-score">
+            <span class="score-label">종합 연애 궁합</span>
+            <span class="score-number" id="totalScore">0</span>
+            <span class="score-unit">점</span>
+          </div>
+          <p class="summary-text" id="summaryText">-</p>
+        </div>
+
+        <div class="detail-cards">
+          <div class="detail-card comm">
+            <div class="detail-icon">💬</div>
+            <div class="detail-title">대화 및 소통</div>
+            <div class="detail-score" id="commScore">0점</div>
+            <div class="detail-bar">
+              <div class="detail-bar-fill" id="commBar"></div>
+            </div>
+            <p class="detail-comment" id="commComment">-</p>
+          </div>
+
+          <div class="detail-card friend">
+            <div class="detail-icon">🤝</div>
+            <div class="detail-title">우정 및 편안함</div>
+            <div class="detail-score" id="friendScore">0점</div>
+            <div class="detail-bar">
+              <div class="detail-bar-fill" id="friendBar"></div>
+            </div>
+            <p class="detail-comment" id="friendComment">-</p>
+          </div>
+
+          <div class="detail-card work">
+            <div class="detail-icon">💼</div>
+            <div class="detail-title">업무 및 책임감</div>
+            <div class="detail-score" id="workScore">0점</div>
+            <div class="detail-bar">
+              <div class="detail-bar-fill" id="workBar"></div>
+            </div>
+            <p class="detail-comment" id="workComment">-</p>
+          </div>
+
+          <div class="detail-card life">
+            <div class="detail-icon">🌱</div>
+            <div class="detail-title">라이프스타일</div>
+            <div class="detail-score" id="lifeScore">0점</div>
+            <div class="detail-bar">
+              <div class="detail-bar-fill" id="lifeBar"></div>
+            </div>
+            <p class="detail-comment" id="lifeComment">-</p>
+          </div>
+        </div>
+
+        <button type="button" id="resetBtn" class="reset-btn">
+          다시 해보기
+        </button>
+      </section>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .blood-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .picker-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text, #111827);
+  }
+
+  .blood-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+
+  .blood-btn {
+    padding: 0.85rem 0.5rem;
+    background: #fff;
+    border: 2px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text, #111827);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  .blood-btn:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-primary, #6366f1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  .blood-btn.active {
+    background: var(--color-primary, #6366f1);
+    color: #fff;
+    border-color: var(--color-primary, #6366f1);
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+  }
+
+  .vs-divider {
+    text-align: center;
+    font-size: 1.5rem;
+    color: var(--color-text-muted, #6b7280);
+  }
+
+  .calc-btn {
+    padding: 1rem;
+    background: var(--color-primary, #6366f1);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .calc-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(99, 102, 241, 0.3);
+  }
+
+  .calc-btn:disabled {
+    background: #d1d5db;
+    color: #6b7280;
+    cursor: not-allowed;
+  }
+
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .result-section[hidden] {
+    display: none;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .result-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border, #e5e7eb);
+  }
+
+  .pair-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .pair-blood {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3rem;
+    height: 3rem;
+    padding: 0 0.75rem;
+    background: var(--color-primary, #6366f1);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 1.1rem;
+  }
+
+  .pair-heart {
+    font-size: 1.5rem;
+    color: #ef4444;
+  }
+
+  .grade-badge {
+    display: inline-block;
+    align-self: center;
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .grade-badge.grade-best {
+    background: #fce7f3;
+    color: #be185d;
+  }
+  .grade-badge.grade-good {
+    background: #dcfce7;
+    color: #166534;
+  }
+  .grade-badge.grade-normal {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  .grade-badge.grade-warn {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .total-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+  }
+
+  .score-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text-muted, #6b7280);
+  }
+
+  .score-number {
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--color-primary, #6366f1);
+    line-height: 1;
+  }
+
+  .score-unit {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-muted, #6b7280);
+    display: inline-block;
+    transform: translateY(-0.5rem);
+  }
+
+  .summary-text {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--color-text, #111827);
+    line-height: 1.6;
+    padding: 0 0.5rem;
+  }
+
+  .detail-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .detail-card {
+    background: #f9fafb;
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 10px;
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto auto;
+    gap: 0.4rem 0.85rem;
+    align-items: center;
+  }
+
+  .detail-icon {
+    grid-row: 1 / 3;
+    font-size: 1.75rem;
+  }
+
+  .detail-title {
+    font-weight: 700;
+    color: var(--color-text, #111827);
+  }
+
+  .detail-score {
+    font-weight: 700;
+    color: var(--color-primary, #6366f1);
+  }
+
+  .detail-bar {
+    grid-column: 2 / 4;
+    grid-row: 2;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .detail-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--color-primary, #6366f1);
+    border-radius: 999px;
+    transition: width 0.6s ease;
+  }
+
+  .detail-card.comm .detail-bar-fill {
+    background: #f59e0b;
+  }
+  .detail-card.friend .detail-bar-fill {
+    background: #10b981;
+  }
+  .detail-card.work .detail-bar-fill {
+    background: #3b82f6;
+  }
+  .detail-card.life .detail-bar-fill {
+    background: #8b5cf6;
+  }
+
+  .detail-comment {
+    grid-column: 1 / 4;
+    grid-row: 3;
+    margin: 0.3rem 0 0;
+    font-size: 0.9rem;
+    color: var(--color-text-muted, #4b5563);
+    line-height: 1.5;
+  }
+
+  .reset-btn {
+    padding: 0.85rem;
+    background: #fff;
+    border: 2px solid var(--color-border, #e5e7eb);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text, #111827);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .reset-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+  }
+
+  @media (max-width: 480px) {
+    .score-number {
+      font-size: 3rem;
+    }
+    .pair-blood {
+      min-width: 2.5rem;
+      height: 2.5rem;
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<script>
+  const compatibilityTable: Record<
+    string,
+    { comm: number; friend: number; work: number; life: number }
+  > = {
+    "A-A": { comm: 70, friend: 80, work: 70, life: 75 },
+    "A-B": { comm: 55, friend: 60, work: 50, life: 60 },
+    "A-O": { comm: 90, friend: 85, work: 80, life: 85 },
+    "A-AB": { comm: 75, friend: 75, work: 75, life: 65 },
+    "B-B": { comm: 65, friend: 70, work: 60, life: 75 },
+    "B-O": { comm: 65, friend: 65, work: 55, life: 60 },
+    "B-AB": { comm: 80, friend: 80, work: 75, life: 85 },
+    "O-O": { comm: 90, friend: 90, work: 85, life: 90 },
+    "O-AB": { comm: 70, friend: 80, work: 70, life: 75 },
+    "AB-AB": { comm: 75, friend: 75, work: 80, life: 70 },
+  };
+
+  const commentMap: Record<
+    string,
+    {
+      comm: string;
+      friend: string;
+      work: string;
+      life: string;
+      summary: string;
+    }
+  > = {
+    "A-A": {
+      comm: "서로의 감정을 잘 읽어 대화가 부드럽지만, 가끔 속마음을 숨길 때가 있어요.",
+      friend: "조심스럽지만 오래가는 우정을 쌓을 수 있는 편안한 관계예요.",
+      work: "꼼꼼함은 최고지만 결단력이 필요할 때 서로 미룰 수 있어요.",
+      life: "안정적이고 평온한 일상을 즐기는 스타일이 잘 맞아요.",
+      summary: "비슷한 성향으로 편안하지만, 가끔은 과감함이 필요한 조합이에요.",
+    },
+    "A-B": {
+      comm: "대화의 흐름과 관심사가 달라 오해가 생기기 쉬워요.",
+      friend: "서로 다른 매력에 끌리지만 템포를 맞추는 노력이 필요해요.",
+      work: "스타일이 달라 협업에 시간이 걸릴 수 있어요.",
+      life: "안정을 추구하는 A형과 자유로운 B형, 서로 존중이 필요해요.",
+      summary: "정반대의 성향이라 노력이 필요한 조합이에요.",
+    },
+    "A-O": {
+      comm: "O형의 솔직함이 A형의 마음을 편안하게 열어줘요.",
+      friend: "서로 부족한 부분을 채워주는 완벽한 친구예요.",
+      work: "체계적인 A형과 추진력 있는 O형이 훌륭한 팀워크를 보여줘요.",
+      life: "역할 분담이 자연스럽게 이루어지는 안정적인 라이프스타일이에요.",
+      summary: "서로의 장점이 잘 맞아떨어지는 훌륭한 조합이에요.",
+    },
+    "A-AB": {
+      comm: "지적이고 차분한 대화가 잘 통하는 편이에요.",
+      friend: "적당한 거리를 유지하며 서로 존중하는 친구 사이예요.",
+      work: "분석력과 꼼꼼함이 시너지를 내는 좋은 파트너예요.",
+      life: "서로의 개인 시간을 존중하며 갈등이 적은 편이에요.",
+      summary: "차분하고 지적인 매력이 오가는 조합이에요.",
+    },
+    "B-B": {
+      comm: "코드가 맞을 땐 밤새 대화하지만, 관심사가 다르면 각자 놀아요.",
+      friend: "함께 즐기기엔 최고! 다만 마이페이스는 주의하세요.",
+      work: "창의력은 좋지만 마무리가 아쉬울 수 있어요.",
+      life: "틀에 얽매이지 않고 자유롭게 살아가는 모습이 닮았어요.",
+      summary: "개성이 강한 두 사람, 서로 배려하면 가장 즐거운 관계예요.",
+    },
+    "B-O": {
+      comm: "티키타카가 잘 맞고 함께 있으면 웃음이 끊이지 않아요.",
+      friend: "어디서나 눈에 띄고 함께 놀기 좋은 재밌는 조합이에요.",
+      work: "O형이 방향을 잡고 B형이 아이디어를 내면 좋아요.",
+      life: "활기차고 외향적인 에너지가 넘치는 활동적인 커플이에요.",
+      summary: "조율만 잘 되면 재밌는 관계로 발전할 수 있어요.",
+    },
+    "B-AB": {
+      comm: "독특한 생각과 아이디어를 나누는 흥미로운 대화가 이어져요.",
+      friend: "창의적이고 톡톡 튀는 우정을 나눌 수 있어요.",
+      work: "틀을 깨는 독창적인 결과물을 만들어낼 수 있어요.",
+      life: "서로의 독특한 취향을 가장 잘 이해해주는 관계예요.",
+      summary: "개성 넘치는 두 사람이 만나 특별한 케미를 만들어요.",
+    },
+    "O-O": {
+      comm: "서로 너무 솔직해서 가끔은 불꽃 튀는 토론이 벌어지기도 해요.",
+      friend: "의리와 신뢰로 뭉친 뜨겁고 든든한 우정이에요.",
+      work: "추진력 최고! 목표를 향해 함께 달려가요.",
+      life: "스케일이 크고 적극적으로 삶을 즐기는 멋진 파트너예요.",
+      summary: "뜨겁고 강렬한 에너지가 오가는 최고의 조합이에요.",
+    },
+    "O-AB": {
+      comm: "감성적인 O형과 이성적인 AB형, 대화의 접근 방식이 달라요.",
+      friend: "서로 자신에게 없는 매력을 보며 배울 점이 많은 관계예요.",
+      work: "실행력(O)과 전략(AB)이 잘 어우러지는 팀이에요.",
+      life: "라이프스타일의 차이를 대화로 잘 조율해야 해요.",
+      summary: "서로 다른 매력이 잘 어울리는 조합이에요.",
+    },
+    "AB-AB": {
+      comm: "말하지 않아도 서로의 생각을 잘 읽는 텔레파시가 통하곤 해요.",
+      friend: "지적인 교류가 즐거운 친구 관계예요.",
+      work: "전략적 사고가 뛰어나고 감정에 치우치지 않는 파트너예요.",
+      life: "프라이버시를 완벽히 존중하는 쿨하고 세련된 라이프를 즐겨요.",
+      summary: "서로를 잘 이해하는 지적인 조합이에요.",
+    },
+  };
+
+  const orderMap: Record<string, number> = { A: 1, B: 2, O: 3, AB: 4 };
+  function getKey(t1: string, t2: string): string {
+    const sorted = [t1, t2].sort((a, b) => orderMap[a] - orderMap[b]);
+    return sorted[0] + "-" + sorted[1];
+  }
+
+  function getGrade(total: number): { text: string; className: string } {
+    if (total >= 85) return { text: "💖 최고의 궁합", className: "grade-best" };
+    if (total >= 70) return { text: "😊 좋은 궁합", className: "grade-good" };
+    if (total >= 55)
+      return { text: "🙂 보통의 궁합", className: "grade-normal" };
+    return { text: "⚠ 주의가 필요한 궁합", className: "grade-warn" };
+  }
+
+  const state: { type1: string | null; type2: string | null } = {
+    type1: null,
+    type2: null,
+  };
+
+  const groups = document.querySelectorAll<HTMLElement>(".blood-options");
+  const calcBtn = document.getElementById("calcBtn") as HTMLButtonElement;
+  const resultSection = document.getElementById("resultSection") as HTMLElement;
+  const resetBtn = document.getElementById("resetBtn") as HTMLButtonElement;
+
+  groups.forEach((group) => {
+    const target = group.dataset.target as "type1" | "type2";
+    group.querySelectorAll<HTMLButtonElement>(".blood-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        group
+          .querySelectorAll(".blood-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        state[target] = btn.dataset.value || null;
+        updateCalcBtn();
+        // 사용자가 선택을 변경하면 이전 결과를 숨깁니다
+        resultSection.hidden = true;
+      });
+    });
+  });
+
+  function updateCalcBtn() {
+    calcBtn.disabled = !(state.type1 && state.type2);
+  }
+
+  calcBtn.addEventListener("click", () => {
+    if (!state.type1 || !state.type2) return;
+    const key = getKey(state.type1, state.type2);
+    const scores = compatibilityTable[key];
+    const comments = commentMap[key];
+    if (!scores || !comments) return;
+
+    const total = Math.round(
+      (scores.comm + scores.friend + scores.work + scores.life) / 4,
+    );
+    const grade = getGrade(total);
+
+    (document.getElementById("pairType1") as HTMLElement).textContent =
+      state.type1 + "형";
+    (document.getElementById("pairType2") as HTMLElement).textContent =
+      state.type2 + "형";
+    (document.getElementById("totalScore") as HTMLElement).textContent =
+      String(total);
+
+    const gradeBadge = document.getElementById("gradeBadge") as HTMLElement;
+    gradeBadge.textContent = grade.text;
+    gradeBadge.className = "grade-badge " + grade.className;
+
+    (document.getElementById("summaryText") as HTMLElement).textContent =
+      comments.summary;
+
+    (document.getElementById("commScore") as HTMLElement).textContent =
+      scores.comm + "점";
+    (document.getElementById("friendScore") as HTMLElement).textContent =
+      scores.friend + "점";
+    (document.getElementById("workScore") as HTMLElement).textContent =
+      scores.work + "점";
+    (document.getElementById("lifeScore") as HTMLElement).textContent =
+      scores.life + "점";
+
+    (document.getElementById("commComment") as HTMLElement).textContent =
+      comments.comm;
+    (document.getElementById("friendComment") as HTMLElement).textContent =
+      comments.friend;
+    (document.getElementById("workComment") as HTMLElement).textContent =
+      comments.work;
+    (document.getElementById("lifeComment") as HTMLElement).textContent =
+      comments.life;
+
+    resultSection.hidden = false;
+
+    requestAnimationFrame(() => {
+      (document.getElementById("commBar") as HTMLElement).style.width =
+        scores.comm + "%";
+      (document.getElementById("friendBar") as HTMLElement).style.width =
+        scores.friend + "%";
+      (document.getElementById("workBar") as HTMLElement).style.width =
+        scores.work + "%";
+      (document.getElementById("lifeBar") as HTMLElement).style.width =
+        scores.life + "%";
+    });
+
+    resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  resetBtn.addEventListener("click", () => {
+    state.type1 = null;
+    state.type2 = null;
+    document
+      .querySelectorAll(".blood-btn")
+      .forEach((b) => b.classList.remove("active"));
+    updateCalcBtn();
+    resultSection.hidden = true;
+    ["commBar", "friendBar", "workBar", "lifeBar"].forEach((id) => {
+      (document.getElementById(id) as HTMLElement).style.width = "0%";
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+</script>

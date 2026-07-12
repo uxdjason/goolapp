@@ -65,7 +65,7 @@ def generate_app(slug: str) -> None:
         "slug": slug,
         "description": seo_meta.get("description", ""),
         "shortDescription": short_src,
-        "category": cat,
+        "category": [cat],
         "primaryKeyword": seo_meta.get("primaryKeyword", ""),
         "secondaryKeywords": list(seo_meta.get("secondaryKeywords", [])),
         "publishedAt": datetime.datetime.utcnow().date(),
