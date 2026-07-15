@@ -31,6 +31,22 @@ def slugify(text: str) -> str:
     return text.lower().strip().replace(" ", "-")
 
 
+def _repair_json(s: str) -> str:
+    """잘린 JSON을 닫아서 파싱 가능하게 복구 시도."""
+    s = s.strip()
+    # 열린 배열/객체를 닫아줌
+    open_braces  = s.count('{') - s.count('}')
+    open_brackets = s.count('[') - s.count(']')
+    # 마지막 완전하지 않은 키-값 쌍 제거 (콤마로 끝나는 경우)
+    while s.endswith(','):
+        s = s.rstrip().rstrip(',')
+    for _ in range(open_brackets):
+        s += ']'
+    for _ in range(open_braces):
+        s += '}'
+    return s
+
+
 def step1_generate_spec(keyword: str, slug: str) -> dict:
     """키워드로부터 앱 사양 JSON 생성."""
     print(f"\n[Step 1] 앱 사양 생성: '{keyword}'")
@@ -47,20 +63,28 @@ JSON만 반환, 설명 없이.
 - inputs: 사용자가 입력하는 값 목록 (배열)
 - outputs: 앱이 계산/출력하는 값 목록 (배열)
 - features: 주요 기능 목록 3~5개 (배열)
-- js_logic_summary: 핵심 계산 로직 의사코드 요약"""
+- js_logic_summary: 핵심 계산 로직 의사코드 요약 (간결하게, 200자 이내)"""
 
+    print(f"  → AI 호출 중 (앱 사양 JSON 생성)...")
     text = ai_client.call(
         task="semantic_analysis",
         system=SYSTEM,
         user=f"키워드: {keyword}\nslug: {slug}",
-        max_tokens=1024,
+        max_tokens=2048,
         log_label=f"new_app:spec:{slug}",
     )
     cleaned = text.strip()
     if cleaned.startswith("```json"): cleaned = cleaned[7:]
     elif cleaned.startswith("```"): cleaned = cleaned[3:]
     if cleaned.endswith("```"): cleaned = cleaned[:-3]
-    spec = json.loads(cleaned.strip())
+    cleaned = cleaned.strip()
+    try:
+        spec = json.loads(cleaned)
+    except json.JSONDecodeError:
+        print(f"  ⚠ JSON 파싱 실패 — 자동 복구 시도 중...")
+        repaired = _repair_json(cleaned)
+        spec = json.loads(repaired)
+        print(f"  ✓ JSON 자동 복구 성공")
 
     # spec을 legacy-extracts 형식으로 감싸서 기존 스크립트 재사용 가능하게
     wrapped = {
@@ -101,6 +125,7 @@ JSON만 반환, 설명 없이.
 def step2_generate_seo(slug: str) -> dict:
     """SEO 메타데이터 생성."""
     print(f"\n[Step 2] SEO 메타 생성...")
+    print(f"  → AI 호출 중 (SEO 메타데이터 작성)...")
     from scripts.seo_meta_generator import generate_seo_meta
     seo = generate_seo_meta(slug)
     out_dir = pathlib.Path("references/seo_meta")
@@ -113,6 +138,7 @@ def step2_generate_seo(slug: str) -> dict:
 def step3_generate_longform(slug: str) -> str:
     """롱폼 콘텐츠 생성."""
     print(f"\n[Step 3] 롱폼 콘텐츠 생성...")
+    print(f"  → AI 호출 중 (한국어 롱폼 본문 작성, 시간이 걸릴 수 있습니다)...")
     from scripts.longform_writer import generate_longform
     longform = generate_longform(slug)
     out_dir = pathlib.Path("references/longform")
@@ -125,6 +151,7 @@ def step3_generate_longform(slug: str) -> str:
 def step4_generate_astro(slug: str) -> None:
     """Astro 앱 컴포넌트 생성."""
     print(f"\n[Step 4] Astro 컴포넌트 생성...")
+    print(f"  → AI 호출 중 (Astro/JS 코드 생성, 가장 오래 걸립니다)...")
     from scripts.app_generator import generate_app
     generate_app(slug)
     print(f"  ✓ Astro 컴포넌트 생성 완료")
@@ -133,10 +160,10 @@ def step4_generate_astro(slug: str) -> None:
 def step5_build_check() -> bool:
     """npm run build로 빌드 검증."""
     print(f"\n[Step 5] 빌드 검증 (npm run build)...")
+    print(f"  → 빌드 실행 중 (수십 초 소요)...")
     result = subprocess.run(
         "npm run build", shell=True,
         capture_output=True, text=True, cwd=str(root_dir),
-        env={**__import__("os").environ, "PATH": f"C:\\Program Files\\nodejs;{__import__('os').environ.get('PATH', '')}"}
     )
     if result.returncode == 0 or "Completed in" in result.stdout:
         print(f"  ✓ 빌드 성공")
@@ -151,6 +178,7 @@ def step5_build_check() -> bool:
 def step6_generate_blog(slug: str) -> None:
     """네이버 블로그 초안 생성."""
     print(f"\n[Step 6] 네이버 블로그 초안 생성...")
+    print(f"  → AI 호출 중 (블로그 포스팅 초안 작성)...")
     from scripts.blog_writer import generate_blog_post
     post = generate_blog_post(slug)
     today = datetime.date.today().isoformat()

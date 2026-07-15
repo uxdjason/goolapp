@@ -1,0 +1,696 @@
+---
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
+
+const entry = await getEntry("apps", "comprehensive-property-tax-calculator");
+if (!entry)
+  throw new Error("comprehensive-property-tax-calculator entry not found");
+const { Content } = await render(entry);
+
+const allApps = await getCollection("apps");
+let related = allApps
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
+if (related.length === 0) {
+  related = allApps
+    .filter((app) => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="calculator">
+      <div class="form-section">
+        <div class="field-group">
+          <label class="field-label">부동산 유형</label>
+          <div class="tab-group" role="tablist">
+            <button type="button" class="tab-btn active" data-type="house"
+              >주택</button
+            >
+            <button type="button" class="tab-btn" data-type="land">토지</button>
+          </div>
+        </div>
+
+        <div class="field-group" id="ownership-group">
+          <label class="field-label">주택 수</label>
+          <div class="tab-group" role="tablist">
+            <button
+              type="button"
+              class="tab-btn owner-btn active"
+              data-owner="single">1주택자</button
+            >
+            <button type="button" class="tab-btn owner-btn" data-owner="multi"
+              >다주택자</button
+            >
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="price">공시가격 합산액 (원)</label>
+          <input
+            type="number"
+            id="price"
+            class="field-input"
+            placeholder="예: 1500000000"
+            min="0"
+            step="1000000"
+          />
+          <div class="hint" id="price-hint">
+            숫자로 입력하면 우리말로 표시합니다.
+          </div>
+        </div>
+
+        <div class="field-group" id="adjusted-group">
+          <label class="field-label">조정대상지역 여부</label>
+          <div class="tab-group" role="tablist">
+            <button
+              type="button"
+              class="tab-btn adjusted-btn active"
+              data-adjusted="no">비조정지역</button
+            >
+            <button
+              type="button"
+              class="tab-btn adjusted-btn"
+              data-adjusted="yes">조정대상지역</button
+            >
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" for="holding">보유기간 (년)</label>
+            <input
+              type="number"
+              id="holding"
+              class="field-input"
+              placeholder="0"
+              min="0"
+              max="50"
+              value="0"
+            />
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="age">연령 (만 나이)</label>
+            <input
+              type="number"
+              id="age"
+              class="field-input"
+              placeholder="0"
+              min="0"
+              max="120"
+              value="0"
+            />
+          </div>
+        </div>
+
+        <button type="button" id="calc-btn" class="btn-primary"
+          >종합부동산세(종부세) 계산하기</button
+        >
+        <button type="button" id="reset-btn" class="btn-text">초기화</button>
+      </div>
+
+      <section class="result-section" id="result-section" hidden>
+        <h2 class="result-title">계산 결과</h2>
+
+        <div class="result-summary">
+          <div class="summary-label">최종 납부세액 합계</div>
+          <div class="summary-value" id="total-tax">0원</div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-row">
+            <span class="result-label">공제금액</span>
+            <span class="result-value" id="deduction">-</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">공정시장가액비율</span>
+            <span class="result-value" id="fair-ratio">-</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">과세표준</span>
+            <span class="result-value" id="tax-base">-</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">산출세액 (종부세)</span>
+            <span class="result-value" id="raw-tax">-</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">고령자·장기보유 공제</span>
+            <span class="result-value" id="senior-discount">-</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">종합부동산세액</span>
+            <span class="result-value" id="final-tax">-</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">농어촌특별세 (종부세의 20%)</span>
+            <span class="result-value" id="farm-tax">-</span>
+          </div>
+        </div>
+
+        <div class="notice" id="notice"></div>
+      </section>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .calculator {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    .field-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .field-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .field-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-background);
+    color: var(--color-text);
+    transition: border-color 0.15s ease;
+    box-sizing: border-box;
+  }
+
+  .field-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .hint {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .tab-group {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--color-background);
+    padding: 0.25rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    background: transparent;
+    color: var(--color-text-muted);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .tab-btn:hover {
+    color: var(--color-text);
+  }
+
+  .tab-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      opacity 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+
+  .btn-text {
+    width: 100%;
+    padding: 0.6rem;
+    background: transparent;
+    color: var(--color-text-muted);
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  .btn-text:hover {
+    color: var(--color-text);
+  }
+
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .result-section[hidden] {
+    display: none;
+  }
+
+  .result-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .result-summary {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 1.25rem;
+    border-radius: var(--radius-md);
+    text-align: center;
+  }
+
+  .summary-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 0.3rem;
+  }
+
+  .summary-value {
+    font-size: 1.7rem;
+    font-weight: 800;
+  }
+
+  .result-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 0;
+    border-bottom: 1px dashed var(--color-border);
+    font-size: 0.95rem;
+  }
+
+  .result-row:last-child {
+    border-bottom: none;
+  }
+
+  .result-label {
+    color: var(--color-text-muted);
+  }
+
+  .result-value {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .notice {
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+</style>
+
+<script>
+  (function () {
+    const state = {
+      type: "house", // 'house' | 'land'
+      owner: "single", // 'single' | 'multi'
+      adjusted: "no", // 'yes' | 'no'
+    };
+
+    const priceInput = document.getElementById("price") as HTMLInputElement;
+    const priceHint = document.getElementById("price-hint") as HTMLElement;
+    const holdingInput = document.getElementById("holding") as HTMLInputElement;
+    const ageInput = document.getElementById("age") as HTMLInputElement;
+    const calcBtn = document.getElementById("calc-btn") as HTMLButtonElement;
+    const resetBtn = document.getElementById("reset-btn") as HTMLButtonElement;
+    const resultSection = document.getElementById(
+      "result-section",
+    ) as HTMLElement;
+    const ownershipGroup = document.getElementById(
+      "ownership-group",
+    ) as HTMLElement;
+    const adjustedGroup = document.getElementById(
+      "adjusted-group",
+    ) as HTMLElement;
+
+    const hideResult = () => {
+      if (!resultSection.hidden) resultSection.hidden = true;
+    };
+
+    // 부동산 유형 탭
+    document
+      .querySelectorAll<HTMLButtonElement>(".tab-btn[data-type]")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".tab-btn[data-type]")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          state.type = btn.dataset.type as "house" | "land";
+          // 토지는 주택 수/조정대상지역 무관
+          ownershipGroup.style.display = state.type === "house" ? "" : "none";
+          adjustedGroup.style.display = state.type === "house" ? "" : "none";
+          hideResult();
+        });
+      });
+
+    // 주택 수 탭
+    document
+      .querySelectorAll<HTMLButtonElement>(".owner-btn")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".owner-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          state.owner = btn.dataset.owner as "single" | "multi";
+          hideResult();
+        });
+      });
+
+    // 조정대상지역 탭
+    document
+      .querySelectorAll<HTMLButtonElement>(".adjusted-btn")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".adjusted-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          state.adjusted = btn.dataset.adjusted as "yes" | "no";
+          hideResult();
+        });
+      });
+
+    // 입력값 변경 시 결과 영역 숨기기
+    [priceInput, holdingInput, ageInput].forEach((inp) => {
+      inp.addEventListener("input", hideResult);
+    });
+
+    // 포커스 시 0이면 비우기
+    [holdingInput, ageInput].forEach((inp) => {
+      inp.addEventListener("focus", () => {
+        if (inp.value === "0") inp.value = "";
+      });
+      inp.addEventListener("blur", () => {
+        if (inp.value === "") inp.value = "0";
+      });
+    });
+
+    // 공시가격 억 단위 표시
+    priceInput.addEventListener("input", () => {
+      const v = Number(priceInput.value);
+      if (isNaN(v) || v <= 0) {
+        priceHint.textContent = "숫자로 입력하면 우리말로 표시합니다.";
+        return;
+      }
+      priceHint.textContent = formatKRW(v);
+    });
+
+    function formatKRW(n: number): string {
+      if (n === 0) return "0원";
+      const eok = Math.floor(n / 100000000);
+      const man = Math.floor((n % 100000000) / 10000);
+      const parts: string[] = [];
+      if (eok > 0) parts.push(eok.toLocaleString() + "억");
+      if (man > 0) parts.push(man.toLocaleString() + "만");
+      if (parts.length === 0) parts.push(n.toLocaleString());
+      return parts.join(" ") + "원";
+    }
+
+    // 종부세 계산 로직 (2026년 현행 기준 근사)
+    function calculateTax() {
+      const price = Number(priceInput.value) || 0;
+      const holding = Number(holdingInput.value) || 0;
+      const age = Number(ageInput.value) || 0;
+
+      if (price <= 0) {
+        alert("공시가격을 입력해주세요.");
+        return;
+      }
+
+      // 공제금액
+      let deduction = 0;
+      if (state.type === "house") {
+        deduction = state.owner === "single" ? 1_200_000_000 : 900_000_000; // 1주택 12억, 다주택 9억
+      } else {
+        deduction = 500_000_000; // 종합합산토지 5억
+      }
+
+      // 공정시장가액비율
+      const fairRatio = state.type === "house" ? 0.6 : 1.0;
+
+      // 과세표준
+      const taxBase = Math.max(0, (price - deduction) * fairRatio);
+
+      // 세율 (2026년 현행 기준)
+      let rawTax = 0;
+      if (state.type === "house") {
+        const isMultiAdj = state.owner === "multi" && state.adjusted === "yes";
+        if (isMultiAdj) {
+          // 다주택 + 조정대상지역 중과세율
+          rawTax = calcHouseTaxMultiAdjusted(taxBase);
+        } else {
+          // 일반세율
+          rawTax = calcHouseTaxGeneral(taxBase);
+        }
+      } else {
+        // 토지 (종합합산)
+        rawTax = calcLandTax(taxBase);
+      }
+
+      // 고령자 공제 (1주택자만)
+      // 만60세이상 20% / 만65세이상 30% / 만70세이상 40%
+      let seniorRate = 0;
+      if (state.type === "house" && state.owner === "single") {
+        if (age >= 70) seniorRate = 0.4;
+        else if (age >= 65) seniorRate = 0.3;
+        else if (age >= 60) seniorRate = 0.2;
+      }
+
+      // 장기보유공제 (1주택자만)
+      // 5년이상 20% / 10년이상 40% / 15년이상 50%
+      let holdRate = 0;
+      if (state.type === "house" && state.owner === "single") {
+        if (holding >= 15) holdRate = 0.5;
+        else if (holding >= 10) holdRate = 0.4;
+        else if (holding >= 5) holdRate = 0.2;
+      }
+
+      // 합산공제율 최대 80%
+      const totalDiscountRate = Math.min(0.8, seniorRate + holdRate);
+      const seniorDiscount = Math.floor(rawTax * totalDiscountRate);
+      const finalTax = Math.max(0, rawTax - seniorDiscount);
+
+      // 농특세 (종부세의 20%)
+      const farmTax = Math.floor(finalTax * 0.2);
+      const totalTax = finalTax + farmTax;
+
+      // 결과 표시
+      showResult({
+        deduction,
+        fairRatio,
+        taxBase,
+        rawTax,
+        seniorDiscount,
+        totalDiscountRate,
+        finalTax,
+        farmTax,
+        totalTax,
+      });
+    }
+
+    function calcHouseTaxGeneral(base: number): number {
+      // 2주택 이하 또는 비조정 일반세율 (누진공제 방식)
+      // 3억이하 0.5%, 6억이하 0.7%(-60만), 12억이하 1.0%(-240만),
+      // 25억이하 1.3%(-600만), 50억이하 1.5%(-1100만), 94억이하 2.0%(-3600만), 초과 2.7%(-1.02억)
+      if (base <= 300_000_000) return base * 0.005;
+      if (base <= 600_000_000) return base * 0.007 - 600_000;
+      if (base <= 1_200_000_000) return base * 0.01 - 2_400_000;
+      if (base <= 2_500_000_000) return base * 0.013 - 6_000_000;
+      if (base <= 5_000_000_000) return base * 0.015 - 11_000_000;
+      if (base <= 9_400_000_000) return base * 0.02 - 36_000_000;
+      return base * 0.027 - 102_000_000;
+    }
+
+    function calcHouseTaxMultiAdjusted(base: number): number {
+      // 3주택 이상 or 조정지역 2주택 중과세율
+      // 3억이하 0.5%, 6억이하 0.7%(-60만), 12억이하 1.0%(-240만),
+      // 25억이하 2.0%(-1200만), 50억이하 3.0%(-3700만), 94억이하 4.0%(-8700만), 초과 5.0%(-1.81억)
+      if (base <= 300_000_000) return base * 0.005;
+      if (base <= 600_000_000) return base * 0.007 - 600_000;
+      if (base <= 1_200_000_000) return base * 0.01 - 2_400_000;
+      if (base <= 2_500_000_000) return base * 0.02 - 12_000_000;
+      if (base <= 5_000_000_000) return base * 0.03 - 37_000_000;
+      if (base <= 9_400_000_000) return base * 0.04 - 87_000_000;
+      return base * 0.05 - 181_000_000;
+    }
+
+    function calcLandTax(base: number): number {
+      // 종합합산토지: 15억이하 1.0%, 45억이하 2.0%(-1500만), 초과 3.0%(-6000만)
+      if (base <= 1_500_000_000) return base * 0.01;
+      if (base <= 4_500_000_000) return base * 0.02 - 15_000_000;
+      return base * 0.03 - 60_000_000;
+    }
+
+    function showResult(r: {
+      deduction: number;
+      fairRatio: number;
+      taxBase: number;
+      rawTax: number;
+      seniorDiscount: number;
+      totalDiscountRate: number;
+      finalTax: number;
+      farmTax: number;
+      totalTax: number;
+    }) {
+      (document.getElementById("deduction") as HTMLElement).textContent =
+        formatKRW(r.deduction);
+      (document.getElementById("fair-ratio") as HTMLElement).textContent =
+        (r.fairRatio * 100).toFixed(0) + "%";
+      (document.getElementById("tax-base") as HTMLElement).textContent =
+        formatKRW(Math.floor(r.taxBase));
+      (document.getElementById("raw-tax") as HTMLElement).textContent =
+        formatKRW(Math.floor(r.rawTax));
+      (document.getElementById("senior-discount") as HTMLElement).textContent =
+        formatKRW(r.seniorDiscount) +
+        " (" +
+        (r.totalDiscountRate * 100).toFixed(0) +
+        "%)";
+      (document.getElementById("final-tax") as HTMLElement).textContent =
+        formatKRW(Math.floor(r.finalTax));
+      (document.getElementById("farm-tax") as HTMLElement).textContent =
+        formatKRW(r.farmTax);
+      (document.getElementById("total-tax") as HTMLElement).textContent =
+        formatKRW(r.totalTax);
+
+      const notice = document.getElementById("notice") as HTMLElement;
+      const messages: string[] = [];
+      if (r.taxBase === 0) {
+        messages.push(
+          "공시가격이 공제금액보다 낮아 종합부동산세 납부 대상이 아닙니다.",
+        );
+      }
+      messages.push(
+        "※ 본 계산기는 참고용으로 제공되며, 실제 세액은 국세청 공식 산정 기준에 따라 다를 수 있습니다.",
+      );
+      messages.push(
+        "※ 2026년 7월 기준 세율과 공제 기준을 적용합니다. 세부담 상한(직전년도 세액의 150%)은 반영되지 않았습니다.",
+      );
+      notice.innerHTML = messages.map((m) => "<div>" + m + "</div>").join("");
+
+      resultSection.hidden = false;
+      resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function reset() {
+      priceInput.value = "";
+      holdingInput.value = "0";
+      ageInput.value = "0";
+      priceHint.textContent = "숫자로 입력하면 우리말로 표시합니다.";
+      resultSection.hidden = true;
+
+      // 상태 초기화
+      state.type = "house";
+      state.owner = "single";
+      state.adjusted = "no";
+      document.querySelectorAll(".tab-btn[data-type]").forEach((b) => {
+        b.classList.toggle(
+          "active",
+          (b as HTMLElement).dataset.type === "house",
+        );
+      });
+      document.querySelectorAll(".owner-btn").forEach((b) => {
+        b.classList.toggle(
+          "active",
+          (b as HTMLElement).dataset.owner === "single",
+        );
+      });
+      document.querySelectorAll(".adjusted-btn").forEach((b) => {
+        b.classList.toggle(
+          "active",
+          (b as HTMLElement).dataset.adjusted === "no",
+        );
+      });
+      ownershipGroup.style.display = "";
+      adjustedGroup.style.display = "";
+    }
+
+    calcBtn.addEventListener("click", calculateTax);
+    resetBtn.addEventListener("click", reset);
+  })();
+</script>
