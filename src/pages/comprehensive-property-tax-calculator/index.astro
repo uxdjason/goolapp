@@ -127,6 +127,7 @@ if (related.length === 0) {
           </div>
         </div>
 
+        <div id="err-msg" class="error-msg" hidden></div>
         <button type="button" id="calc-btn" class="btn-primary"
           >종합부동산세(종부세) 계산하기</button
         >
@@ -308,6 +309,22 @@ if (related.length === 0) {
     color: var(--color-text);
   }
 
+  .error-msg {
+    color: var(--color-danger, #ef4444);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background-color: #fee2e2;
+    border: 1px solid #f87171;
+    border-radius: var(--radius-sm);
+  }
+
+  .error-msg[hidden] {
+    display: none;
+  }
+
   .result-section {
     display: flex;
     flex-direction: column;
@@ -406,9 +423,25 @@ if (related.length === 0) {
     const adjustedGroup = document.getElementById(
       "adjusted-group",
     ) as HTMLElement;
+    const errMsg = document.getElementById("err-msg") as HTMLElement;
+
+    function showError(msg: string) {
+      if (errMsg) {
+        errMsg.textContent = msg;
+        errMsg.hidden = false;
+      }
+    }
+
+    function clearError() {
+      if (errMsg) {
+        errMsg.textContent = "";
+        errMsg.hidden = true;
+      }
+    }
 
     const hideResult = () => {
       if (resultSection && !resultSection.hidden) resultSection.hidden = true;
+      clearError();
     };
 
     // 부동산 유형 탭
@@ -503,9 +536,10 @@ if (related.length === 0) {
       const age = Number(ageInput.value) || 0;
 
       if (price <= 0) {
-        alert("공시가격을 입력해주세요.");
+        showError("공시가격을 입력해주세요.");
         return;
       }
+      clearError();
 
       // 공제금액
       let deduction = 0;
@@ -669,6 +703,8 @@ if (related.length === 0) {
       ageInput.value = "0";
       priceHint.textContent = "숫자로 입력하면 우리말로 표시합니다.";
       if (resultSection) resultSection.hidden = true;
+      clearError();
+      window.scrollTo({ top: 0, behavior: "smooth" });
 
       // 상태 초기화
       state.type = "house";
