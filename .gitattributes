@@ -1,0 +1,39 @@
+# 모든 텍스트 파일은 저장소에 LF로 저장, 체크아웃 시에도 LF 유지
+# (Windows 환경에서 작업해도 CRLF가 커밋되지 않도록 강제)
+* text=auto eol=lf
+
+# 명시적으로 텍스트로 처리할 파일 확장자
+*.astro    text eol=lf
+*.ts       text eol=lf
+*.js       text eol=lf
+*.mjs      text eol=lf
+*.cjs      text eol=lf
+*.jsx      text eol=lf
+*.tsx      text eol=lf
+*.css      text eol=lf
+*.html     text eol=lf
+*.json     text eol=lf
+*.yaml     text eol=lf
+*.yml      text eol=lf
+*.md       text eol=lf
+*.txt      text eol=lf
+*.py       text eol=lf
+*.sh       text eol=lf
+*.env      text eol=lf
+*.toml     text eol=lf
+
+# 바이너리 파일 — 변환 제외
+*.png      binary
+*.jpg      binary
+*.jpeg     binary
+*.webp     binary
+*.gif      binary
+*.ico      binary
+*.svg      binary
+*.woff     binary
+*.woff2    binary
+*.ttf      binary
+*.otf      binary
+*.eot      binary
+*.pdf      binary
+*.zip      binary
