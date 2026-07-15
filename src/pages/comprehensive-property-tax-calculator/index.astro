@@ -384,7 +384,7 @@ if (related.length === 0) {
 </style>
 
 <script>
-  (function () {
+  document.addEventListener("DOMContentLoaded", function () {
     const state = {
       type: "house", // 'house' | 'land'
       owner: "single", // 'single' | 'multi'
@@ -408,7 +408,7 @@ if (related.length === 0) {
     ) as HTMLElement;
 
     const hideResult = () => {
-      if (!resultSection.hidden) resultSection.hidden = true;
+      if (resultSection && !resultSection.hidden) resultSection.hidden = true;
     };
 
     // 부동산 유형 탭
@@ -422,8 +422,8 @@ if (related.length === 0) {
           btn.classList.add("active");
           state.type = btn.dataset.type as "house" | "land";
           // 토지는 주택 수/조정대상지역 무관
-          ownershipGroup.style.display = state.type === "house" ? "" : "none";
-          adjustedGroup.style.display = state.type === "house" ? "" : "none";
+          if (ownershipGroup) ownershipGroup.style.display = state.type === "house" ? "" : "none";
+          if (adjustedGroup) adjustedGroup.style.display = state.type === "house" ? "" : "none";
           hideResult();
         });
       });
@@ -458,28 +458,32 @@ if (related.length === 0) {
 
     // 입력값 변경 시 결과 영역 숨기기
     [priceInput, holdingInput, ageInput].forEach((inp) => {
-      inp.addEventListener("input", hideResult);
+      if (inp) inp.addEventListener("input", hideResult);
     });
 
     // 포커스 시 0이면 비우기
     [holdingInput, ageInput].forEach((inp) => {
-      inp.addEventListener("focus", () => {
-        if (inp.value === "0") inp.value = "";
-      });
-      inp.addEventListener("blur", () => {
-        if (inp.value === "") inp.value = "0";
-      });
+      if (inp) {
+        inp.addEventListener("focus", () => {
+          if (inp.value === "0") inp.value = "";
+        });
+        inp.addEventListener("blur", () => {
+          if (inp.value === "") inp.value = "0";
+        });
+      }
     });
 
     // 공시가격 억 단위 표시
-    priceInput.addEventListener("input", () => {
-      const v = Number(priceInput.value);
-      if (isNaN(v) || v <= 0) {
-        priceHint.textContent = "숫자로 입력하면 우리말로 표시합니다.";
-        return;
-      }
-      priceHint.textContent = formatKRW(v);
-    });
+    if (priceInput) {
+      priceInput.addEventListener("input", () => {
+        const v = Number(priceInput.value);
+        if (isNaN(v) || v <= 0) {
+          priceHint.textContent = "숫자로 입력하면 우리말로 표시합니다.";
+          return;
+        }
+        priceHint.textContent = formatKRW(v);
+      });
+    }
 
     function formatKRW(n: number): string {
       if (n === 0) return "0원";
@@ -526,7 +530,7 @@ if (related.length === 0) {
           rawTax = calcHouseTaxMultiAdjusted(taxBase);
         } else {
           // 일반세율
-          rawTax = calcHouseTaxGeneral(taxBase);
+          rawTax = calcHouseTaxNormal(taxBase);
         }
       } else {
         // 토지 (종합합산)
@@ -574,7 +578,7 @@ if (related.length === 0) {
       });
     }
 
-    function calcHouseTaxGeneral(base: number): number {
+    function calcHouseTaxNormal(base: number): number {
       // 2주택 이하 또는 비조정 일반세율 (누진공제 방식)
       // 3억이하 0.5%, 6억이하 0.7%(-60만), 12억이하 1.0%(-240만),
       // 25억이하 1.3%(-600만), 50억이하 1.5%(-1100만), 94억이하 2.0%(-3600만), 초과 2.7%(-1.02억)
@@ -651,10 +655,12 @@ if (related.length === 0) {
       messages.push(
         "※ 2026년 7월 기준 세율과 공제 기준을 적용합니다. 세부담 상한(직전년도 세액의 150%)은 반영되지 않았습니다.",
       );
-      notice.innerHTML = messages.map((m) => "<div>" + m + "</div>").join("");
+      if (notice) notice.innerHTML = messages.map((m) => "<div>" + m + "</div>").join("");
 
-      resultSection.hidden = false;
-      resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (resultSection) {
+        resultSection.hidden = false;
+        resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
 
     function reset() {
@@ -662,7 +668,7 @@ if (related.length === 0) {
       holdingInput.value = "0";
       ageInput.value = "0";
       priceHint.textContent = "숫자로 입력하면 우리말로 표시합니다.";
-      resultSection.hidden = true;
+      if (resultSection) resultSection.hidden = true;
 
       // 상태 초기화
       state.type = "house";
@@ -686,11 +692,11 @@ if (related.length === 0) {
           (b as HTMLElement).dataset.adjusted === "no",
         );
       });
-      ownershipGroup.style.display = "";
-      adjustedGroup.style.display = "";
+      if (ownershipGroup) ownershipGroup.style.display = "";
+      if (adjustedGroup) adjustedGroup.style.display = "";
     }
 
-    calcBtn.addEventListener("click", calculateTax);
-    resetBtn.addEventListener("click", reset);
-  })();
+    if (calcBtn) calcBtn.addEventListener("click", calculateTax);
+    if (resetBtn) resetBtn.addEventListener("click", reset);
+  });
 </script>
