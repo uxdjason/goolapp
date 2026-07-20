@@ -4,8 +4,7 @@ slug: blood-type-compatibility
 description: 혈액형 궁합 테스트로 두 사람의 연애, 우정, 업무 관계를 분석해보세요. A/B/O/AB형 조합별 상세 점수와 궁합 등급을
   즉시 확인할 수 있습니다.
 shortDescription: 혈액형 궁합 테스트로 두 사람의 연애, 우정, 업무 관계를 분석해보세요.
-category:
-- fun
+category: ['fun']
 primaryKeyword: 혈액형 궁합
 secondaryKeywords:
 - 혈액형 궁합 테스트

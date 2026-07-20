@@ -15,6 +15,7 @@ import json
 import pathlib
 import subprocess
 import sys
+import time
 import datetime
 
 root_dir = pathlib.Path(__file__).resolve().parent.parent
@@ -49,7 +50,7 @@ def _repair_json(s: str) -> str:
 
 def step1_generate_spec(keyword: str, slug: str) -> dict:
     """키워드로부터 앱 사양 JSON 생성."""
-    print(f"\n[Step 1] 앱 사양 생성: '{keyword}'")
+    print(f"\n[Step 1/6] 앱 사양 생성: '{keyword}'", flush=True)
 
     SYSTEM = """너는 한국어 저관여 웹앱 기획자다.
 입력 키워드로부터 GoolAPP에 추가할 앱의 사양을 JSON으로 반환한다.
@@ -124,8 +125,8 @@ JSON만 반환, 설명 없이.
 
 def step2_generate_seo(slug: str) -> dict:
     """SEO 메타데이터 생성."""
-    print(f"\n[Step 2] SEO 메타 생성...")
-    print(f"  → AI 호출 중 (SEO 메타데이터 작성)...")
+    print(f"\n[Step 2/6] SEO 메타 생성...", flush=True)
+    print(f"  → AI 호출 중 (SEO 메타데이터 작성)...", flush=True)
     from scripts.seo_meta_generator import generate_seo_meta
     seo = generate_seo_meta(slug)
     out_dir = pathlib.Path("references/seo_meta")
@@ -137,8 +138,8 @@ def step2_generate_seo(slug: str) -> dict:
 
 def step3_generate_longform(slug: str) -> str:
     """롱폼 콘텐츠 생성."""
-    print(f"\n[Step 3] 롱폼 콘텐츠 생성...")
-    print(f"  → AI 호출 중 (한국어 롱폼 본문 작성, 시간이 걸릴 수 있습니다)...")
+    print(f"\n[Step 3/6] 롱폼 콘텐츠 생성...", flush=True)
+    print(f"  → AI 호출 중 (한국어 롱폼 본문 작성, 시간이 걸릴 수 있습니다)...", flush=True)
     from scripts.longform_writer import generate_longform
     longform = generate_longform(slug)
     out_dir = pathlib.Path("references/longform")
@@ -150,8 +151,8 @@ def step3_generate_longform(slug: str) -> str:
 
 def step4_generate_astro(slug: str) -> None:
     """Astro 앱 컴포넌트 생성."""
-    print(f"\n[Step 4] Astro 컴포넌트 생성...")
-    print(f"  → AI 호출 중 (Astro/JS 코드 생성, 가장 오래 걸립니다)...")
+    print(f"\n[Step 4/6] Astro 컴포넌트 생성...", flush=True)
+    print(f"  → AI 호출 중 (Astro/JS 코드 생성, 가장 오래 걸립니다)...", flush=True)
     from scripts.app_generator import generate_app
     generate_app(slug)
     print(f"  ✓ Astro 컴포넌트 생성 완료")
@@ -159,8 +160,8 @@ def step4_generate_astro(slug: str) -> None:
 
 def step5_build_check() -> bool:
     """npm run build로 빌드 검증."""
-    print(f"\n[Step 5] 빌드 검증 (npm run build)...")
-    print(f"  → 빌드 실행 중 (수십 초 소요)...")
+    print(f"\n[Step 5/6] 빌드 검증 (npm run build)...", flush=True)
+    print(f"  → 빌드 실행 중 (수십 초 소요)...", flush=True)
     result = subprocess.run(
         "npm run build", shell=True,
         capture_output=True, text=True, cwd=str(root_dir),
@@ -177,8 +178,8 @@ def step5_build_check() -> bool:
 
 def step6_generate_blog(slug: str) -> None:
     """네이버 블로그 초안 생성."""
-    print(f"\n[Step 6] 네이버 블로그 초안 생성...")
-    print(f"  → AI 호출 중 (블로그 포스팅 초안 작성)...")
+    print(f"\n[Step 6/6] 네이버 블로그 초안 생성...", flush=True)
+    print(f"  → AI 호출 중 (블로그 포스팅 초안 작성)...", flush=True)
     from scripts.blog_writer import generate_blog_post
     post = generate_blog_post(slug)
     today = datetime.date.today().isoformat()
@@ -190,34 +191,53 @@ def step6_generate_blog(slug: str) -> None:
 
 
 def run(keyword: str, slug: str) -> None:
+    pipeline_start = time.time()
     print("=" * 60)
     print(f"GoolAPP Phase 4 -- New App Pipeline Start")
     print(f"  키워드: {keyword}")
     print(f"  Slug  : {slug}")
     print("=" * 60)
 
+    def elapsed() -> str:
+        secs = int(time.time() - pipeline_start)
+        m, s = divmod(secs, 60)
+        return f"{m}분 {s:02d}초 경과" if m else f"{s}초 경과"
+
+    def step_done(label: str) -> None:
+        print(f"  ✓ {label} 완료 [{elapsed()}]", flush=True)
+
     # Step 1: 앱 사양 생성
     step1_generate_spec(keyword, slug)
+    step_done("Step 1: 앱 사양")
 
     # Step 2: SEO 메타
     step2_generate_seo(slug)
+    step_done("Step 2: SEO 메타")
 
     # Step 3: 롱폼 콘텐츠
     step3_generate_longform(slug)
+    step_done("Step 3: 롱폼 콘텐츠")
 
     # Step 4: Astro 컴포넌트
     step4_generate_astro(slug)
+    step_done("Step 4: Astro 컴포넌트")
 
     # Step 5: 빌드 검증
     build_ok = step5_build_check()
+    step_done("Step 5: 빌드 검증")
 
     # Step 6: 블로그 초안 (빌드 성공 여부와 무관하게 생성)
     step6_generate_blog(slug)
+    step_done("Step 6: 블로그 초안")
+
+    total_secs = int(time.time() - pipeline_start)
+    total_m, total_s = divmod(total_secs, 60)
+    total_label = f"{total_m}분 {total_s:02d}초" if total_m else f"{total_s}초"
 
     # 최종 요약
     print("\n" + "=" * 60)
     if build_ok:
-        print(f"✅ 파이프라인 완료!")
+        print(f"✅ 파이프라인 완료! (총 소요: {total_label})")
         print(f"   앱 페이지 : src/pages/{slug}/index.astro")
         print(f"   콘텐츠    : src/content/apps/{slug}.md")
         print(f"   블로그 초안: references/naver-blog-posting/{datetime.date.today().isoformat()}-{slug}.md")
@@ -227,7 +247,7 @@ def run(keyword: str, slug: str) -> None:
         print(f"   3. 블로그 초안 검토 후 네이버 업로드")
         print(f"   4. git add . && git commit -m 'feat: {keyword} 앱 추가' && git push")
     else:
-        print(f"⚠️  빌드 실패 — 생성된 파일을 확인하고 수동 수정이 필요합니다.")
+        print(f"⚠️  빌드 실패 — 생성된 파일을 확인하고 수동 수정이 필요합니다. (총 소요: {total_label})")
         print(f"   앱 페이지 : src/pages/{slug}/index.astro")
     print("=" * 60)
 

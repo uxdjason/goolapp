@@ -1,0 +1,501 @@
+---
+import { getEntry, render, getCollection } from 'astro:content';
+import AppLayout from '../../layouts/AppLayout.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+
+const entry = await getEntry('apps', 'ip-address-detector');
+if (!entry) throw new Error('ip-address-detector entry not found');
+const { Content } = await render(entry);
+
+const allApps = await getCollection('apps');
+let related = allApps
+  .filter(app => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+if (related.length === 0) {
+  related = allApps
+    .filter(app => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map(app => ({ title: app.data.title, shortDescription: app.data.shortDescription, slug: app.data.slug, category: app.data.category }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="ip-app">
+      <!-- 종 대기 화면: 버튼 클릭 전 -->
+      <div id="idle-screen" class="idle-screen">
+        <div class="idle-icon" aria-hidden="true">🔍</div>
+        <p class="idle-desc">버튼을 누르면 현재 나의 공인 IP 주소와 접속 정보를 확인합니다.</p>
+        <button id="detect-btn" class="detect-btn" type="button">IP 주소 알아보기</button>
+      </div>
+
+      <!-- 조회 결과 화면: 버튼 클릭 후 -->
+      <div id="result-screen" class="result-screen" hidden>
+        <div class="ip-hero">
+          <div class="ip-label">현재 접속 중인 공인 IP 주소</div>
+          <div class="ip-value-wrap">
+            <div id="ip-value" class="ip-value">감지 중...</div>
+            <button id="copy-btn" class="copy-btn" type="button" aria-label="IP 주소 복사" disabled>
+              <span class="copy-icon" aria-hidden="true">📋</span>
+              <span id="copy-text">복사</span>
+            </button>
+          </div>
+          <div id="ip-version" class="ip-version"></div>
+        </div>
+
+        <div id="err-msg" class="error-msg" hidden></div>
+
+        <div id="info-grid" class="info-grid" hidden>
+          <div class="info-card">
+            <div class="info-label">IPv4</div>
+            <div id="info-ipv4" class="info-value">-</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">IPv6</div>
+            <div id="info-ipv6" class="info-value">-</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">국가</div>
+            <div id="info-country" class="info-value">-</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">지역 / 도시</div>
+            <div id="info-region" class="info-value">-</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">ISP (인터넷 서비스 제공자)</div>
+            <div id="info-isp" class="info-value">-</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">타임존</div>
+            <div id="info-timezone" class="info-value">-</div>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button id="refresh-btn" class="refresh-btn" type="button">
+            <span aria-hidden="true">🔄</span> 다시 조회하기
+          </button>
+        </div>
+
+        <div class="privacy-note">
+          <strong>안내:</strong> IP 주소 및 위치 정보는 브라우저에서 외부 IP 조회 API로 직접 요청됩니다. 어때한 정보도 서버에 저장되지 않습니다.
+        </div>
+      </div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .ip-app {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+  }
+
+  .ip-hero {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 2rem 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .ip-label {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.02em;
+  }
+
+  .ip-value-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .ip-value {
+    font-size: clamp(1.5rem, 5vw, 2.25rem);
+    font-weight: 700;
+    font-family: inherit;
+    word-break: break-all;
+    letter-spacing: 0.02em;
+  }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.2s ease, transform 0.1s ease;
+  }
+
+  .copy-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.35);
+  }
+
+  .copy-btn:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  .copy-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .ip-version {
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    opacity: 0.85;
+  }
+
+  .error-msg {
+    background: #fee;
+    color: #c33;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    border-left: 4px solid #c33;
+    font-size: 0.95rem;
+  }
+  .error-msg[hidden] {
+    display: none;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+  .info-grid[hidden] {
+    display: none;
+  }
+
+  .info-card {
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+  }
+
+  .info-card:hover {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+  }
+
+  .info-label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #6b7280);
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .info-value {
+    font-size: 1rem;
+    color: var(--color-text, #111827);
+    font-weight: 600;
+    word-break: break-all;
+    font-family: inherit;
+  }
+
+  .action-row {
+    display: flex;
+    justify-content: center;
+  }
+
+  .refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+  }
+
+  .refresh-btn:hover {
+    opacity: 0.9;
+  }
+
+  .refresh-btn:active {
+    transform: scale(0.98);
+  }
+
+  .refresh-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .privacy-note {
+    background: #f3f4f6;
+    color: #4b5563;
+    padding: 0.9rem 1.1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  /* 아이들 / 결과 화면 */
+  .idle-screen,
+  .result-screen {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .result-screen[hidden] {
+    display: none;
+  }
+
+  .idle-screen {
+    align-items: center;
+    padding: 2.5rem 1rem;
+    gap: 1.25rem;
+    text-align: center;
+  }
+
+  .idle-icon {
+    font-size: 3rem;
+  }
+
+  .idle-desc {
+    margin: 0;
+    color: var(--color-text-muted, #6b7280);
+    font-size: 0.95rem;
+    max-width: 320px;
+    line-height: 1.6;
+  }
+
+  .detect-btn {
+    padding: 0.9rem 2rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+    font-family: inherit;
+  }
+  .detect-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  .detect-btn:active {
+    transform: scale(0.98);
+  }
+
+  @media (max-width: 480px) {
+    .ip-hero {
+      padding: 1.5rem 1rem;
+    }
+    .info-card {
+      padding: 0.85rem 1rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const ipValue = document.getElementById("ip-value");
+    const ipVersion = document.getElementById("ip-version");
+    const infoGrid = document.getElementById("info-grid");
+    const infoIpv4 = document.getElementById("info-ipv4");
+    const infoIpv6 = document.getElementById("info-ipv6");
+    const infoCountry = document.getElementById("info-country");
+    const infoRegion = document.getElementById("info-region");
+    const infoIsp = document.getElementById("info-isp");
+    const infoTimezone = document.getElementById("info-timezone");
+    const errMsg = document.getElementById("err-msg");
+    const refreshBtn = document.getElementById("refresh-btn");
+    const copyBtn = document.getElementById("copy-btn");
+    const copyText = document.getElementById("copy-text");
+    const detectBtn = document.getElementById("detect-btn");
+    const idleScreen = document.getElementById("idle-screen");
+    const resultScreen = document.getElementById("result-screen");
+
+    function showError(msg) {
+      if (!errMsg) return;
+      errMsg.textContent = msg;
+      errMsg.hidden = false;
+    }
+
+    function hideError() {
+      if (!errMsg) return;
+      errMsg.hidden = true;
+      errMsg.textContent = "";
+    }
+
+    function setLoading(loading) {
+      if (refreshBtn) refreshBtn.disabled = loading;
+      if (copyBtn) copyBtn.disabled = loading;
+      if (loading && ipValue) {
+        ipValue.textContent = "감지 중...";
+        if (ipVersion) ipVersion.textContent = "";
+      }
+    }
+
+    async function fetchIPv6() {
+      try {
+        const res = await fetch("https://api64.ipify.org?format=json");
+        if (!res.ok) return null;
+        const data = await res.json();
+        const ip = data && data.ip ? String(data.ip) : null;
+        if (ip && ip.includes(":")) return ip;
+        return null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function loadIPInfo() {
+      hideError();
+      setLoading(true);
+
+      // 아이들 화면 숨기고 결과 화면 표시
+      if (idleScreen) idleScreen.hidden = true;
+      if (resultScreen) resultScreen.hidden = false;
+
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        if (!res.ok) throw new Error("primary_failed");
+        const data = await res.json();
+
+        if (data && data.error) throw new Error("primary_failed");
+
+        const ip = data.ip || "-";
+        const version = data.version || "";
+        const city = data.city || "";
+        const region = data.region || "";
+        const countryName = data.country_name || "";
+        const org = data.org || "-";
+        const timezone = data.timezone || "-";
+
+        if (ipValue) ipValue.textContent = ip;
+        if (ipVersion) ipVersion.textContent = version ? "프로토콜: " + version : "";
+
+        if (version === "IPv4") {
+          if (infoIpv4) infoIpv4.textContent = ip;
+          const v6 = await fetchIPv6();
+          if (infoIpv6) infoIpv6.textContent = v6 || "감지되지 않음";
+        } else if (version === "IPv6") {
+          if (infoIpv6) infoIpv6.textContent = ip;
+          if (infoIpv4) infoIpv4.textContent = "감지되지 않음";
+        } else {
+          if (infoIpv4) infoIpv4.textContent = ip;
+          if (infoIpv6) infoIpv6.textContent = "-";
+        }
+
+        if (infoCountry) infoCountry.textContent = countryName || "-";
+        const regionText = [region, city].filter(Boolean).join(" / ") || "-";
+        if (infoRegion) infoRegion.textContent = regionText;
+        if (infoIsp) infoIsp.textContent = org;
+        if (infoTimezone) infoTimezone.textContent = timezone;
+
+        if (infoGrid) infoGrid.hidden = false;
+        if (copyBtn) copyBtn.disabled = false;
+      } catch (primaryErr) {
+        try {
+          const res2 = await fetch("https://api.ipify.org?format=json");
+          if (!res2.ok) throw new Error("fallback_failed");
+          const data2 = await res2.json();
+          const ip = data2.ip || "-";
+
+          if (ipValue) ipValue.textContent = ip;
+          if (ipVersion) ipVersion.textContent = "";
+
+          if (ip.includes(":")) {
+            if (infoIpv6) infoIpv6.textContent = ip;
+            if (infoIpv4) infoIpv4.textContent = "감지되지 않음";
+          } else {
+            if (infoIpv4) infoIpv4.textContent = ip;
+            if (infoIpv6) infoIpv6.textContent = "감지되지 않음";
+          }
+
+          if (infoCountry) infoCountry.textContent = "정보 없음";
+          if (infoRegion) infoRegion.textContent = "정보 없음";
+          if (infoIsp) infoIsp.textContent = "정보 없음";
+          if (infoTimezone) infoTimezone.textContent = "정보 없음";
+
+          if (infoGrid) infoGrid.hidden = false;
+          if (copyBtn) copyBtn.disabled = false;
+
+          showError("상세 위치 정보를 불러오지 못했습니다. IP 주소만 표시합니다.");
+        } catch (fallbackErr) {
+          if (ipValue) ipValue.textContent = "조회 실패";
+          if (ipVersion) ipVersion.textContent = "";
+          showError("IP 주소를 불러오지 못했습니다. 네트워크 상태를 확인한 후 다시 시도해주세요.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function copyIP() {
+      if (!ipValue || !copyText) return;
+      const text = ipValue.textContent || "";
+      if (!text || text === "감지 중..." || text === "조회 실패") return;
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        const originalText = copyText.textContent;
+        copyText.textContent = "복사됨!";
+        setTimeout(() => {
+          if (copyText) copyText.textContent = originalText || "복사";
+        }, 1500);
+      } catch (e) {
+        showError("클립보드 복사에 실패했습니다.");
+      }
+    }
+
+    if (detectBtn) detectBtn.addEventListener("click", loadIPInfo);
+    if (refreshBtn) refreshBtn.addEventListener("click", loadIPInfo);
+    if (copyBtn) copyBtn.addEventListener("click", copyIP);
+
+    // 자동 조회 제거 — 버튼 클릭 시만 실행
+  });
+</script>

@@ -5,14 +5,14 @@ interface Props {
 const { activeCategory = 'all' } = Astro.props;
 
 const categories = [
-  { id: 'all',        label: '모든 앱',    href: '/',                    star: false },
-  { id: 'favorites',  label: '즐겨찾는 앱', href: '/#favorites',          star: true  },
-  { id: 'calculator', label: '계산기',     href: '/category/calculator', star: false },
-  { id: 'datetime',   label: '날짜/시간',  href: '/category/datetime',   star: false },
-  { id: 'finance',    label: '금융 재테크', href: '/category/finance',  star: false },
-  { id: 'tool',       label: '유틸리티',   href: '/category/tool',       star: false },
-  { id: 'quiz',       label: '퀴즈',       href: '/category/quiz',       star: false },
-  { id: 'fun',        label: 'FUN',        href: '/category/fun',        star: false },
+  { id: 'all',        label: '모든 앱',    href: '/',                     star: false },
+  { id: 'favorites',  label: '즐겨찾는 앱', href: '/#favorites',           star: true  },
+  { id: 'calculator', label: '계산기',     href: '/category/calculator/', star: false },
+  { id: 'datetime',   label: '날짜/시간',  href: '/category/datetime/',   star: false },
+  { id: 'finance',    label: '금융 재테크', href: '/category/finance/',    star: false },
+  { id: 'tool',       label: '유틸리티',   href: '/category/tool/',       star: false },
+  { id: 'quiz',       label: '퀴즈',       href: '/category/quiz/',       star: false },
+  { id: 'fun',        label: 'FUN',        href: '/category/fun/',        star: false },
 ];
 ---
 <nav class="category-nav" aria-label="카테고리 필터">

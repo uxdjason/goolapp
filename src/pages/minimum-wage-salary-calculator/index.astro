@@ -1,0 +1,713 @@
+---
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
+
+const entry = await getEntry("apps", "minimum-wage-salary-calculator");
+if (!entry) throw new Error("minimum-wage-salary-calculator entry not found");
+const { Content } = await render(entry);
+
+const allApps = await getCollection("apps");
+let related = allApps
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
+if (related.length === 0) {
+  related = allApps
+    .filter((app) => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="calc-wrap">
+      <div class="year-tabs" role="tablist" aria-label="적용 연도 선택">
+        <button
+          type="button"
+          class="year-tab active"
+          data-year="2025"
+          role="tab"
+          aria-selected="true"
+        >
+          2025년
+          <span class="year-tab-sub">시급 10,030원</span>
+        </button>
+        <button
+          type="button"
+          class="year-tab"
+          data-year="2026"
+          role="tab"
+          aria-selected="false"
+        >
+          2026년
+          <span class="year-tab-sub">시급 10,700원</span>
+        </button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="dailyHours"
+            >하루 근무 시간 <span class="unit">(시간)</span></label
+          >
+          <input
+            type="number"
+            id="dailyHours"
+            min="1"
+            max="24"
+            step="0.5"
+            value="8"
+            inputmode="decimal"
+          />
+        </div>
+
+        <div class="form-row">
+          <label for="workDays"
+            >주간 근무 일수 <span class="unit">(일)</span></label
+          >
+          <input
+            type="number"
+            id="workDays"
+            min="1"
+            max="7"
+            step="1"
+            value="5"
+            inputmode="numeric"
+          />
+          <p class="hint">5일 이상 근무 시 주휴수당이 자동 포함됩니다.</p>
+        </div>
+
+        <div class="form-row">
+          <label for="weeksPerMonth"
+            >한 달 근무 주수 <span class="unit">(주)</span></label
+          >
+          <input
+            type="number"
+            id="weeksPerMonth"
+            min="1"
+            max="6"
+            step="0.001"
+            value="4.345"
+            inputmode="decimal"
+          />
+          <p class="hint">평균 4.345주가 표준입니다.</p>
+        </div>
+
+        <div class="form-row toggle-row">
+          <label class="toggle-label">
+            <input type="checkbox" id="nonTaxable" />
+            <span>비과세 근로 (세금 미공제 기준으로 계산)</span>
+          </label>
+        </div>
+      </div>
+
+      <button type="button" id="calcBtn" class="btn-primary"
+        >급여 계산하기</button
+      >
+      <div id="errMsg" class="error-msg" hidden></div>
+
+      <section id="resultSection" class="result-section" hidden>
+        <h2
+          class="result-title"
+          style="text-align: center; margin-bottom:1rem;"
+        >
+          계산 결과
+        </h2>
+
+        <div class="result-cards">
+          <div class="result-card">
+            <span class="card-label">적용 시급</span>
+            <span class="card-value" id="rHourly">-</span>
+          </div>
+          <div class="result-card">
+            <span class="card-label">주휴수당 포함 시급</span>
+            <span class="card-value" id="rHourlyHoliday">-</span>
+          </div>
+          <div class="result-card highlight">
+            <span class="card-label">월 예상 급여</span>
+            <span class="card-value" id="rMonthly">-</span>
+          </div>
+          <div class="result-card highlight">
+            <span class="card-label">연 예상 급여</span>
+            <span class="card-value" id="rYearly">-</span>
+          </div>
+        </div>
+
+        <div class="detail-box">
+          <div class="detail-row">
+            <span>주간 근무 시간</span><span id="dWeekly">-</span>
+          </div>
+          <div class="detail-row">
+            <span>주휴수당 시간</span><span id="dHoliday">-</span>
+          </div>
+          <div class="detail-row">
+            <span>월 총 근무 시간</span><span id="dMonthly">-</span>
+          </div>
+          <div class="detail-row">
+            <span>비과세 여부</span><span id="dNonTax">-</span>
+          </div>
+        </div>
+
+        <div id="diffBox" class="diff-box" hidden>
+          <h3 class="diff-title">전년 대비 인상 비교</h3>
+          <div class="diff-content">
+            <div class="diff-item">
+              <span class="diff-label">월 급여 인상액</span>
+              <span class="diff-value" id="diffMonthly">-</span>
+            </div>
+            <div class="diff-item">
+              <span class="diff-label">연 급여 인상액</span>
+              <span class="diff-value" id="diffYearly">-</span>
+            </div>
+            <div class="diff-item">
+              <span class="diff-label">인상률</span>
+              <span class="diff-value" id="diffRate">-</span>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" id="resetBtn" class="btn-reset">↩ 다시 하기</button>
+      </section>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .calc-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .year-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    background: var(--color-bg-alt, #f3f4f6);
+    padding: 0.35rem;
+    border-radius: 12px;
+  }
+
+  .year-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.8rem 0.6rem;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text, #374151);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .year-tab-sub {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--color-text-muted, #6b7280);
+  }
+
+  .year-tab.active {
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .year-tab.active .year-tab-sub {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .form-row label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text, #374151);
+  }
+
+  .unit {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted, #6b7280);
+  }
+
+  .form-row input[type="number"] {
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    font-size: 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .form-row input[type="number"]:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .hint {
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #6b7280);
+    margin: 0;
+  }
+
+  .toggle-row {
+    padding: 0.5rem 0;
+  }
+
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .toggle-label input[type="checkbox"] {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 0.95rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--color-primary);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition:
+      transform 0.1s ease,
+      box-shadow 0.15s ease,
+      opacity 0.15s ease;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .error-msg {
+    padding: 0.75rem 0.9rem;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+  .error-msg[hidden] {
+    display: none;
+  }
+
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .result-section[hidden] {
+    display: none;
+  }
+
+  .result-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text, #111827);
+  }
+
+  .result-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
+  .result-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.9rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+  }
+
+  .result-card.highlight {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .card-label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #6b7280);
+    font-weight: 500;
+  }
+
+  .result-card.highlight .card-label {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .card-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text, #111827);
+  }
+
+  .result-card.highlight .card-value {
+    color: #fff;
+    font-size: 1.2rem;
+  }
+
+  .detail-box {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0.9rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.55rem 0;
+    font-size: 0.9rem;
+    border-bottom: 1px dashed #e5e7eb;
+  }
+
+  .detail-row:last-child {
+    border-bottom: none;
+  }
+
+  .detail-row span:first-child {
+    color: var(--color-text-muted, #6b7280);
+  }
+
+  .detail-row span:last-child {
+    font-weight: 600;
+    color: var(--color-text, #111827);
+  }
+
+  .diff-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.9rem 1rem;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 10px;
+  }
+  .diff-box[hidden] {
+    display: none;
+  }
+
+  .diff-title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #065f46;
+  }
+
+  .diff-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .diff-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+
+  .diff-label {
+    color: #047857;
+  }
+
+  .diff-value {
+    font-weight: 700;
+    color: #065f46;
+  }
+
+  @media (min-width: 480px) {
+    .result-cards {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .btn-reset {
+    padding: 0.75rem 1.2rem;
+    background: transparent;
+    color: var(--color-text-muted, #6b7280);
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      color 0.15s ease,
+      border-color 0.15s ease;
+    align-self: center;
+  }
+  .btn-reset:hover {
+    background: #f9fafb;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const WAGE = { 2025: 10030, 2026: 10700 };
+    let currentYear = 2025;
+
+    const tabs = document.querySelectorAll(".year-tab");
+    const dailyHoursEl = document.getElementById("dailyHours");
+    const workDaysEl = document.getElementById("workDays");
+    const weeksPerMonthEl = document.getElementById("weeksPerMonth");
+    const nonTaxableEl = document.getElementById("nonTaxable");
+    const calcBtn = document.getElementById("calcBtn");
+    const errMsg = document.getElementById("errMsg");
+    const resultSection = document.getElementById("resultSection");
+
+    const rHourly = document.getElementById("rHourly");
+    const rHourlyHoliday = document.getElementById("rHourlyHoliday");
+    const rMonthly = document.getElementById("rMonthly");
+    const rYearly = document.getElementById("rYearly");
+
+    const dWeekly = document.getElementById("dWeekly");
+    const dHoliday = document.getElementById("dHoliday");
+    const dMonthly = document.getElementById("dMonthly");
+    const dNonTax = document.getElementById("dNonTax");
+
+    const diffBox = document.getElementById("diffBox");
+    const diffMonthly = document.getElementById("diffMonthly");
+    const diffYearly = document.getElementById("diffYearly");
+    const diffRate = document.getElementById("diffRate");
+
+    function fmt(n) {
+      return Math.round(n).toLocaleString("ko-KR") + "원";
+    }
+
+    function showError(msg) {
+      if (!errMsg) return;
+      errMsg.textContent = msg;
+      errMsg.hidden = false;
+    }
+
+    function hideError() {
+      if (!errMsg) return;
+      errMsg.hidden = true;
+      errMsg.textContent = "";
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        tabs.forEach(function (t) {
+          t.classList.remove("active");
+          t.setAttribute("aria-selected", "false");
+        });
+        tab.classList.add("active");
+        tab.setAttribute("aria-selected", "true");
+        currentYear = Number(tab.getAttribute("data-year"));
+      });
+    });
+
+    // 포커스 시 값 임시 제거 UX
+    [dailyHoursEl, workDaysEl, weeksPerMonthEl].forEach(function (el) {
+      if (!el) return;
+      let prev = "";
+      el.addEventListener("focus", function () {
+        prev = el.value;
+        el.dataset.prev = prev;
+        el.value = "";
+      });
+      el.addEventListener("blur", function () {
+        if (el.value === "") {
+          el.value = el.dataset.prev || "";
+        }
+      });
+    });
+
+    function calcFor(year, dailyHours, workDays, weeksPerMonth) {
+      const hourly = WAGE[year];
+      const weeklyHours = dailyHours * workDays;
+      const holidayHours = workDays >= 5 ? dailyHours : 0;
+      const monthlyHours = (weeklyHours + holidayHours) * weeksPerMonth;
+      const monthlySalary = hourly * monthlyHours;
+      const yearlySalary = monthlySalary * 12;
+      const hourlyWithHoliday =
+        weeklyHours > 0
+          ? (hourly * (weeklyHours + holidayHours)) / weeklyHours
+          : hourly;
+      return {
+        hourly: hourly,
+        hourlyWithHoliday: hourlyWithHoliday,
+        weeklyHours: weeklyHours,
+        holidayHours: holidayHours,
+        monthlyHours: monthlyHours,
+        monthlySalary: monthlySalary,
+        yearlySalary: yearlySalary,
+      };
+    }
+
+    function calculate() {
+      hideError();
+
+      const dailyHours = parseFloat(dailyHoursEl.value);
+      const workDays = parseInt(workDaysEl.value, 10);
+      const weeksPerMonth = parseFloat(weeksPerMonthEl.value);
+      const nonTaxable = nonTaxableEl.checked;
+
+      if (isNaN(dailyHours) || dailyHours <= 0 || dailyHours > 24) {
+        showError("일일 근무 시간을 1~24 사이로 입력해주세요.");
+        return;
+      }
+      if (isNaN(workDays) || workDays <= 0 || workDays > 7) {
+        showError("주간 근무 일수를 1~7 사이로 입력해주세요.");
+        return;
+      }
+      if (isNaN(weeksPerMonth) || weeksPerMonth <= 0 || weeksPerMonth > 6) {
+        showError("한 달 근무 주수는 1~6 사이로 입력해주세요.");
+        return;
+      }
+
+      const cur = calcFor(currentYear, dailyHours, workDays, weeksPerMonth);
+
+      rHourly.textContent = fmt(cur.hourly);
+      rHourlyHoliday.textContent = fmt(cur.hourlyWithHoliday);
+      rMonthly.textContent = fmt(cur.monthlySalary);
+      rYearly.textContent = fmt(cur.yearlySalary);
+
+      dWeekly.textContent = cur.weeklyHours.toFixed(1) + "시간";
+      dHoliday.textContent =
+        cur.holidayHours > 0
+          ? cur.holidayHours.toFixed(1) + "시간 (포함)"
+          : "미적용";
+      dMonthly.textContent = cur.monthlyHours.toFixed(1) + "시간";
+      dNonTax.textContent = nonTaxable
+        ? "비과세 (세금 미공제)"
+        : "과세 대상 (세전 기준)";
+
+      // 전년 대비 비교 (2026년 선택 시)
+      if (currentYear === 2026) {
+        const prev = calcFor(2025, dailyHours, workDays, weeksPerMonth);
+        const monthDiff = cur.monthlySalary - prev.monthlySalary;
+        const yearDiff = cur.yearlySalary - prev.yearlySalary;
+        const rate =
+          prev.monthlySalary > 0 ? (monthDiff / prev.monthlySalary) * 100 : 0;
+        diffMonthly.textContent = "+" + fmt(monthDiff);
+        diffYearly.textContent = "+" + fmt(yearDiff);
+        diffRate.textContent = "+" + rate.toFixed(2) + "%";
+        diffBox.hidden = false;
+      } else {
+        diffBox.hidden = true;
+      }
+
+      resultSection.hidden = false;
+      resultSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    const resetBtn = document.getElementById("resetBtn");
+
+    // 결과 섹션 숨기기
+    function hideResult() {
+      if (resultSection) resultSection.hidden = true;
+    }
+
+    // 입력값 전체 초기화
+    function resetAll() {
+      // 1) 스크롤 먼저 — 레이아웃 변경 전 위치 계산
+      window.scrollTo({ top: 250, behavior: "smooth" });
+      // 2) 스크롤 완료 후 입력값 초기화 & 결과 숨김
+      setTimeout(function () {
+        if (dailyHoursEl) dailyHoursEl.value = "8";
+        if (workDaysEl) workDaysEl.value = "5";
+        if (weeksPerMonthEl) weeksPerMonthEl.value = "4.345";
+        if (nonTaxableEl) nonTaxableEl.checked = false;
+        // 탭을 2025년으로 초기화
+        tabs.forEach(function (t) {
+          t.classList.remove("active");
+          t.setAttribute("aria-selected", "false");
+        });
+        const firstTab = document.querySelector(".year-tab[data-year='2025']");
+        if (firstTab) {
+          firstTab.classList.add("active");
+          firstTab.setAttribute("aria-selected", "true");
+        }
+        currentYear = 2025;
+        hideError();
+        hideResult();
+      }, 400);
+    }
+
+    if (resetBtn) resetBtn.addEventListener("click", resetAll);
+
+    // 입력 필드가 수동으로 변경되면 결과 자동 숨김
+    [dailyHoursEl, workDaysEl, weeksPerMonthEl].forEach(function (el) {
+      if (el) el.addEventListener("input", hideResult);
+    });
+    if (nonTaxableEl) nonTaxableEl.addEventListener("change", hideResult);
+    tabs.forEach(function (tab) {
+      tab.addEventListener("click", hideResult);
+    });
+
+    if (calcBtn) calcBtn.addEventListener("click", calculate);
+  });
+</script>

@@ -4,8 +4,7 @@ slug: comprehensive-property-tax-calculator
 description: 종합부동산세 계산기로 주택·토지의 공시가격을 입력하면 공제금액과 세율을 자동 적용하여 최종 납부세액을 즉시 산출합니다. 고령자·장기보유공제
   포함.
 shortDescription: 종합부동산세 계산기로 주택·토지의 공시가격을 입력하면 공제금액과 세율을 자동 적용하여 최종 납부세액을 즉시 산출합니다.
-category:
-- finance
+category: ['finance', 'calculator']
 primaryKeyword: 종합부동산세 계산기
 secondaryKeywords:
 - 부동산세금 계산

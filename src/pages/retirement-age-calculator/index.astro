@@ -1,0 +1,567 @@
+---
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
+
+const entry = await getEntry("apps", "retirement-age-calculator");
+if (!entry) throw new Error("retirement-age-calculator entry not found");
+const { Content } = await render(entry);
+
+const allApps = await getCollection("apps");
+let related = allApps
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
+if (related.length === 0) {
+  related = allApps
+    .filter((app) => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="calc-wrap">
+      <div class="form-card">
+        <div class="form-group">
+          <label for="birthDate">생년월일</label>
+          <input type="date" id="birthDate" />
+        </div>
+
+        <div class="form-group">
+          <label for="jobType">직종 / 고용형태</label>
+          <select id="jobType">
+            <option value="60">일반직 근로자 (정년 60세)</option>
+            <option value="60">공무원 (정년 60세)</option>
+            <option value="62">교원 / 초중고 교사 (정년 62세)</option>
+            <option value="65">대학교수 (정년 65세)</option>
+            <option value="45">군인 - 소령 (계급정년 45세)</option>
+            <option value="53">군인 - 중령 (계급정년 53세)</option>
+            <option value="56">군인 - 대령 (계급정년 56세)</option>
+            <option value="63">헌법재판관 / 판사 (정년 63세)</option>
+            <option value="65">검사 / 대법관 (정년 65세)</option>
+            <option value="70">대법원장 (정년 70세)</option>
+            <option value="custom">직접 입력</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="customAgeGroup" hidden>
+          <label for="customAge">정년 나이 (직접 입력)</label>
+          <input
+            type="number"
+            id="customAge"
+            min="30"
+            max="80"
+            placeholder="예: 60"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="hireDate"
+            >입사일 <span class="optional">(선택)</span></label
+          >
+          <input type="date" id="hireDate" />
+        </div>
+
+        <button type="button" id="calcBtn" class="btn-primary"
+          >퇴직일 계산하기</button
+        >
+
+        <div id="errMsg" class="error-msg" hidden></div>
+      </div>
+
+      <div id="resultSection" class="result-section" hidden>
+        <div class="result-header">
+          <h2>계산 결과</h2>
+        </div>
+
+        <div class="result-highlight">
+          <div class="highlight-label">정년 퇴직 예정일</div>
+          <div class="highlight-value" id="retirementDate">-</div>
+          <div class="highlight-sub" id="retirementAgeText">-</div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="result-label">현재 나이 (만 나이)</div>
+            <div class="result-value" id="currentAge">-</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">퇴직까지 남은 기간</div>
+            <div class="result-value" id="remainYM">-</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">남은 일수</div>
+            <div class="result-value" id="remainDays">-</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">남은 개월수</div>
+            <div class="result-value" id="remainMonths">-</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">남은 연수</div>
+            <div class="result-value" id="remainYears">-</div>
+          </div>
+          <div class="result-item" id="tenureItem" hidden>
+            <div class="result-label">근속 기간</div>
+            <div class="result-value" id="tenure">-</div>
+          </div>
+        </div>
+
+        <div id="statusMsg" class="status-msg"></div>
+
+        <button type="button" id="resetBtn" class="btn-reset">↩ 다시 입력하기</button>
+      </div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .calc-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .form-group[hidden] {
+    display: none;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+
+  .optional {
+    font-weight: 400;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--color-background);
+    color: var(--color-text);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  .btn-primary {
+    padding: 0.9rem 1.2rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      opacity 0.15s ease,
+      transform 0.15s ease;
+  }
+  .btn-primary:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+
+  .error-msg {
+    color: #dc2626;
+    background: #fee2e2;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+  .error-msg[hidden] {
+    display: none;
+  }
+
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .result-section[hidden] {
+    display: none;
+  }
+
+  .result-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--color-text);
+  }
+
+  .result-highlight {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+  }
+
+  .highlight-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+  }
+
+  .highlight-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .highlight-sub {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    opacity: 0.95;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .result-item {
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .result-item[hidden] {
+    display: none;
+  }
+
+  .result-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.35rem;
+  }
+
+  .result-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .status-msg {
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+  }
+
+  .status-msg.past {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-msg.future {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  .btn-reset {
+    padding: 0.75rem 1.2rem;
+    background: transparent;
+    color: var(--color-text-muted);
+    border: 1.5px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      color 0.15s ease,
+      border-color 0.15s ease;
+    align-self: center;
+  }
+  .btn-reset:hover {
+    background: var(--color-surface);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const birthDateEl = document.getElementById(
+      "birthDate",
+    ) as HTMLInputElement | null;
+    const jobTypeEl = document.getElementById(
+      "jobType",
+    ) as HTMLSelectElement | null;
+    const customAgeGroup = document.getElementById(
+      "customAgeGroup",
+    ) as HTMLDivElement | null;
+    const customAgeEl = document.getElementById(
+      "customAge",
+    ) as HTMLInputElement | null;
+    const hireDateEl = document.getElementById(
+      "hireDate",
+    ) as HTMLInputElement | null;
+    const calcBtn = document.getElementById("calcBtn");
+    const errMsg = document.getElementById("errMsg");
+
+    const resultSection = document.getElementById("resultSection");
+    const retirementDateEl = document.getElementById("retirementDate");
+    const retirementAgeTextEl = document.getElementById("retirementAgeText");
+    const currentAgeEl = document.getElementById("currentAge");
+    const remainYMEl = document.getElementById("remainYM");
+    const remainDaysEl = document.getElementById("remainDays");
+    const remainMonthsEl = document.getElementById("remainMonths");
+    const remainYearsEl = document.getElementById("remainYears");
+    const tenureItem = document.getElementById("tenureItem");
+    const tenureEl = document.getElementById("tenure");
+    const statusMsg = document.getElementById("statusMsg");
+
+    if (jobTypeEl) {
+      jobTypeEl.addEventListener("change", function () {
+        if (!customAgeGroup) return;
+        if (jobTypeEl.value === "custom") {
+          customAgeGroup.hidden = false;
+        } else {
+          customAgeGroup.hidden = true;
+        }
+      });
+    }
+
+    function showError(msg: string) {
+      if (!errMsg) return;
+      errMsg.textContent = msg;
+      errMsg.hidden = false;
+    }
+
+    function hideError() {
+      if (!errMsg) return;
+      errMsg.hidden = true;
+      errMsg.textContent = "";
+    }
+
+    function formatDateKR(d: Date): string {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      const dayName = ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
+      return `${y}년 ${m}월 ${day}일 (${dayName})`;
+    }
+
+    function diffYMD(from: Date, to: Date) {
+      let years = to.getFullYear() - from.getFullYear();
+      let months = to.getMonth() - from.getMonth();
+      let days = to.getDate() - from.getDate();
+
+      if (days < 0) {
+        months -= 1;
+        const prevMonth = new Date(to.getFullYear(), to.getMonth(), 0);
+        days += prevMonth.getDate();
+      }
+      if (months < 0) {
+        years -= 1;
+        months += 12;
+      }
+      return { years, months, days };
+    }
+
+    function calc() {
+      hideError();
+      if (!birthDateEl || !birthDateEl.value) {
+        showError("생년월일을 입력해주세요.");
+        return;
+      }
+
+      const birth = new Date(birthDateEl.value + "T00:00:00");
+      if (isNaN(birth.getTime())) {
+        showError("올바른 생년월일을 입력해주세요.");
+        return;
+      }
+
+      let retirementAge: number;
+      if (jobTypeEl && jobTypeEl.value === "custom") {
+        if (!customAgeEl || !customAgeEl.value) {
+          showError("정년 나이를 직접 입력해주세요.");
+          return;
+        }
+        retirementAge = parseInt(customAgeEl.value, 10);
+        if (isNaN(retirementAge) || retirementAge < 30 || retirementAge > 80) {
+          showError("정년 나이는 30~80세 사이로 입력해주세요.");
+          return;
+        }
+      } else {
+        retirementAge = parseInt(jobTypeEl ? jobTypeEl.value : "60", 10);
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (birth > today) {
+        showError("생년월일이 오늘보다 미래입니다. 다시 확인해주세요.");
+        return;
+      }
+
+      // 정년 퇴직일 = 생년월일 + retirementAge년
+      const retirement = new Date(
+        birth.getFullYear() + retirementAge,
+        birth.getMonth(),
+        birth.getDate(),
+      );
+
+      // 현재 만 나이
+      let ageYears = today.getFullYear() - birth.getFullYear();
+      const hasHadBirthday =
+        today.getMonth() > birth.getMonth() ||
+        (today.getMonth() === birth.getMonth() &&
+          today.getDate() >= birth.getDate());
+      if (!hasHadBirthday) ageYears -= 1;
+
+      // 남은 시간
+      const msPerDay = 1000 * 60 * 60 * 24;
+      const diffMs = retirement.getTime() - today.getTime();
+      const daysLeft = Math.round(diffMs / msPerDay);
+
+      if (retirementDateEl)
+        retirementDateEl.textContent = formatDateKR(retirement);
+      if (retirementAgeTextEl)
+        retirementAgeTextEl.textContent = `정년 ${retirementAge}세 기준`;
+      if (currentAgeEl) currentAgeEl.textContent = `만 ${ageYears}세`;
+
+      if (daysLeft >= 0) {
+        const ymd = diffYMD(today, retirement);
+        const totalMonths = ymd.years * 12 + ymd.months;
+        const totalYears = (daysLeft / 365.25).toFixed(1);
+
+        if (remainYMEl)
+          remainYMEl.textContent = `${ymd.years}년 ${ymd.months}개월 ${ymd.days}일`;
+        if (remainDaysEl)
+          remainDaysEl.textContent = `${daysLeft.toLocaleString()}일`;
+        if (remainMonthsEl) remainMonthsEl.textContent = `${totalMonths}개월`;
+        if (remainYearsEl) remainYearsEl.textContent = `${totalYears}년`;
+
+        if (statusMsg) {
+          statusMsg.textContent = `정년 퇴직까지 ${ymd.years}년 ${ymd.months}개월 남았습니다.`;
+          statusMsg.className = "status-msg future";
+        }
+      } else {
+        const past = diffYMD(retirement, today);
+        const daysPast = Math.abs(daysLeft);
+        if (remainYMEl)
+          remainYMEl.textContent = `${past.years}년 ${past.months}개월 초과`;
+        if (remainDaysEl)
+          remainDaysEl.textContent = `${daysPast.toLocaleString()}일 경과`;
+        if (remainMonthsEl)
+          remainMonthsEl.textContent = `${past.years * 12 + past.months}개월 경과`;
+        if (remainYearsEl)
+          remainYearsEl.textContent = `${(daysPast / 365.25).toFixed(1)}년 경과`;
+
+        if (statusMsg) {
+          statusMsg.textContent = `이미 정년 퇴직 예정일이 ${past.years}년 ${past.months}개월 지났습니다.`;
+          statusMsg.className = "status-msg past";
+        }
+      }
+
+      // 근속 기간
+      if (hireDateEl && hireDateEl.value) {
+        const hire = new Date(hireDateEl.value + "T00:00:00");
+        if (!isNaN(hire.getTime()) && hire <= today) {
+          const tenure = diffYMD(hire, today);
+          if (tenureEl)
+            tenureEl.textContent = `${tenure.years}년 ${tenure.months}개월 ${tenure.days}일`;
+          if (tenureItem) tenureItem.hidden = false;
+        } else {
+          if (tenureItem) tenureItem.hidden = true;
+        }
+      } else {
+        if (tenureItem) tenureItem.hidden = true;
+      }
+
+      if (resultSection) resultSection.hidden = false;
+    }
+
+    const resetBtn = document.getElementById("resetBtn");
+    const calcWrap = document.querySelector(".calc-wrap") as HTMLElement | null;
+
+    // 결과 섹션 숨기기 (초기화)
+    function hideResult() {
+      if (resultSection) resultSection.hidden = true;
+    }
+
+    // 입력값 전체 초기화
+    function resetAll() {
+      // 1) 스크롤 먼저 — 페이지 최상단으로 이동
+      window.scrollTo({ top: 250, behavior: "smooth" });
+      // 2) smooth scroll 완료 후 입력값 초기화 & 결과 숨김
+      setTimeout(() => {
+        if (birthDateEl) birthDateEl.value = "";
+        if (jobTypeEl) {
+          jobTypeEl.selectedIndex = 0;
+          if (customAgeGroup) customAgeGroup.hidden = true;
+        }
+        if (customAgeEl) customAgeEl.value = "";
+        if (hireDateEl) hireDateEl.value = "";
+        hideError();
+        hideResult();
+      }, 400);
+    }
+
+    if (resetBtn) resetBtn.addEventListener("click", resetAll);
+
+    // 입력 필드가 수동으로 변경되면 결과 자동 초기화
+    const watchedInputs = [birthDateEl, hireDateEl, customAgeEl];
+    watchedInputs.forEach((el) => {
+      if (el) el.addEventListener("input", hideResult);
+    });
+    if (jobTypeEl) jobTypeEl.addEventListener("change", hideResult);
+
+    if (calcBtn) calcBtn.addEventListener("click", calc);
+  });
+</script>

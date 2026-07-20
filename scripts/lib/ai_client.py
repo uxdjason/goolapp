@@ -43,17 +43,27 @@ def call(
     last_err: Exception | None = None
     for step, (provider, model) in enumerate(chain):
         for attempt in range(2):  # 모델당 최대 2회
+            attempt_label = f" (재시도 {attempt})" if attempt > 0 else ""
+            fallback_label = f" [fallback #{step}]" if step > 0 else ""
+            print(f"    ⏳ AI 호출 중: {provider}/{model}{fallback_label}{attempt_label} ...", flush=True)
             t0 = time.time()
             try:
                 text = _dispatch(provider, model, system, user, max_tokens)
                 if validator and not validator(text):
                     raise AICallError(f"validator failed [{provider}/{model}]")
-                _log(task, log_label, provider, model, step, attempt, "ok", time.time() - t0, len(text))
+                elapsed = time.time() - t0
+                print(f"    ✅ 완료: {provider}/{model} ({elapsed:.1f}초, {len(text)}자)", flush=True)
+                _log(task, log_label, provider, model, step, attempt, "ok", elapsed, len(text))
                 return text
             except Exception as e:
+                elapsed = time.time() - t0
+                print(f"    ❌ 실패: {provider}/{model} ({elapsed:.1f}초) — {e}", flush=True)
                 last_err = e
-                _log(task, log_label, provider, model, step, attempt, f"err:{e}", time.time() - t0, 0)
-                time.sleep(min(2 ** attempt, 8))
+                _log(task, log_label, provider, model, step, attempt, f"err:{e}", elapsed, 0)
+                wait = min(2 ** attempt, 8)
+                if wait > 0:
+                    print(f"    ⏸  {wait}초 대기 후 재시도...", flush=True)
+                time.sleep(wait)
     raise AICallError(f"All providers exhausted for task={task}. Last error: {last_err}")
 
 def _dispatch(provider: str, model: str, system: str, user: str, max_tokens: int) -> str:
