@@ -1,0 +1,524 @@
+---
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
+
+const entry = await getEntry("apps", "shoe-size-converter");
+if (!entry) throw new Error("shoe-size-converter entry not found");
+const { Content } = await render(entry);
+
+const allApps = await getCollection("apps");
+let related = allApps
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
+if (related.length === 0) {
+  related = allApps
+    .filter((app) => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="converter">
+      <div class="field">
+        <label class="field-label">성별</label>
+        <div class="tab-group" role="tablist" id="gender-tabs">
+          <button type="button" class="tab-btn active" data-gender="men"
+            >남성</button
+          >
+          <button type="button" class="tab-btn" data-gender="women">여성</button
+          >
+          <button type="button" class="tab-btn" data-gender="kids">아동</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">기준 단위</label>
+        <div class="tab-group" role="tablist" id="unit-tabs">
+          <button type="button" class="tab-btn active" data-unit="KR"
+            >한국 (mm)</button
+          >
+          <button type="button" class="tab-btn" data-unit="US">미국 (US)</button
+          >
+          <button type="button" class="tab-btn" data-unit="UK">영국 (UK)</button
+          >
+          <button type="button" class="tab-btn" data-unit="EU">유럽 (EU)</button
+          >
+          <button type="button" class="tab-btn" data-unit="CM"
+            >발 길이 (cm)</button
+          >
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="size-input">사이즈 입력</label>
+        <input
+          type="number"
+          id="size-input"
+          class="size-input"
+          step="0.1"
+          placeholder="예: 260"
+        />
+        <div id="err-msg" class="error-msg" hidden></div>
+      </div>
+
+      <button type="button" id="convert-btn" class="convert-btn"
+        >변환하기</button
+      >
+
+      <div
+        id="result-section"
+        class="result-section"
+        style="margin-top:1em;"
+        hidden
+      >
+        <h3 class="result-title">변환 결과</h3>
+        <div class="result-grid">
+          <div class="result-card">
+            <span class="result-label">한국 (KR)</span>
+            <span class="result-value" id="out-kr">-</span>
+            <span class="result-unit">mm</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">미국 (US)</span>
+            <span class="result-value" id="out-us">-</span>
+            <span class="result-unit">US</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">영국 (UK)</span>
+            <span class="result-value" id="out-uk">-</span>
+            <span class="result-unit">UK</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">유럽 (EU)</span>
+            <span class="result-value" id="out-eu">-</span>
+            <span class="result-unit">EU</span>
+          </div>
+          <div class="result-card result-card-cm">
+            <span class="result-label">발 길이 참고값</span>
+            <span class="result-value" id="out-cm">-</span>
+            <span class="result-unit">cm</span>
+          </div>
+        </div>
+        <p class="result-note">
+          ※ 브랜드와 신발 모델에 따라 실제 착화감은 차이가 있을 수 있습니다.
+        </p>
+      </div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .converter {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .field-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .tab-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tab-btn {
+    flex: 1 1 auto;
+    min-width: 80px;
+    padding: 0.6rem 0.9rem;
+    background: var(--color-bg, #f8fafc);
+    color: var(--color-text, #1f2937);
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .tab-btn:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+  }
+
+  .tab-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+
+  .size-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1.1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--color-text);
+    box-sizing: border-box;
+  }
+
+  .size-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .error-msg {
+    color: #dc2626;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    background: #fef2f2;
+    border-radius: 6px;
+  }
+  .error-msg[hidden] {
+    display: none;
+  }
+
+  .convert-btn {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      opacity 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  .convert-btn:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .result-section[hidden] {
+    display: none;
+  }
+
+  .result-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .result-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.85rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+  }
+
+  .result-card-cm {
+    grid-column: 1 / -1;
+    background: color-mix(in srgb, var(--color-primary) 8%, #fff);
+    border-color: color-mix(in srgb, var(--color-primary) 30%, #fff);
+  }
+
+  .result-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .result-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .result-unit {
+    font-size: 0.8rem;
+    color: #6b7280;
+  }
+
+  .result-note {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+
+  @media (min-width: 640px) {
+    .result-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .result-card-cm {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // 사이즈 룩업 테이블
+    // KR: mm, US/UK: 사이즈, EU: 유럽 사이즈
+    const TABLES = {
+      men: [
+        { KR: 220, US: 4, UK: 3.5, EU: 36 },
+        { KR: 225, US: 4.5, UK: 4, EU: 36.5 },
+        { KR: 230, US: 5, UK: 4.5, EU: 37 },
+        { KR: 235, US: 5.5, UK: 5, EU: 37.5 },
+        { KR: 240, US: 6, UK: 5.5, EU: 38.5 },
+        { KR: 245, US: 6.5, UK: 6, EU: 39 },
+        { KR: 250, US: 7, UK: 6.5, EU: 40 },
+        { KR: 255, US: 7.5, UK: 7, EU: 40.5 },
+        { KR: 260, US: 8, UK: 7.5, EU: 41 },
+        { KR: 265, US: 8.5, UK: 8, EU: 42 },
+        { KR: 270, US: 9, UK: 8.5, EU: 42.5 },
+        { KR: 275, US: 9.5, UK: 9, EU: 43 },
+        { KR: 280, US: 10, UK: 9.5, EU: 44 },
+        { KR: 285, US: 10.5, UK: 10, EU: 44.5 },
+        { KR: 290, US: 11, UK: 10.5, EU: 45 },
+        { KR: 295, US: 11.5, UK: 11, EU: 45.5 },
+        { KR: 300, US: 12, UK: 11.5, EU: 46 },
+        { KR: 305, US: 12.5, UK: 12, EU: 47 },
+        { KR: 310, US: 13, UK: 12.5, EU: 47.5 },
+      ],
+      women: [
+        { KR: 210, US: 4, UK: 1.5, EU: 34 },
+        { KR: 215, US: 4.5, UK: 2, EU: 35 },
+        { KR: 220, US: 5, UK: 2.5, EU: 35.5 },
+        { KR: 225, US: 5.5, UK: 3, EU: 36 },
+        { KR: 230, US: 6, UK: 3.5, EU: 36.5 },
+        { KR: 235, US: 6.5, UK: 4, EU: 37 },
+        { KR: 240, US: 7, UK: 4.5, EU: 37.5 },
+        { KR: 245, US: 7.5, UK: 5, EU: 38 },
+        { KR: 250, US: 8, UK: 5.5, EU: 38.5 },
+        { KR: 255, US: 8.5, UK: 6, EU: 39 },
+        { KR: 260, US: 9, UK: 6.5, EU: 40 },
+        { KR: 265, US: 9.5, UK: 7, EU: 40.5 },
+        { KR: 270, US: 10, UK: 7.5, EU: 41 },
+        { KR: 275, US: 10.5, UK: 8, EU: 41.5 },
+        { KR: 280, US: 11, UK: 8.5, EU: 42 },
+      ],
+      kids: [
+        { KR: 100, US: 2, UK: 1.5, EU: 17 },
+        { KR: 110, US: 3, UK: 2.5, EU: 18 },
+        { KR: 115, US: 4, UK: 3, EU: 19 },
+        { KR: 125, US: 5, UK: 4, EU: 20 },
+        { KR: 130, US: 6, UK: 5, EU: 21 },
+        { KR: 140, US: 7, UK: 6, EU: 23 },
+        { KR: 150, US: 8, UK: 7, EU: 24 },
+        { KR: 160, US: 9, UK: 8, EU: 25.5 },
+        { KR: 165, US: 10, UK: 9, EU: 27 },
+        { KR: 175, US: 11, UK: 10, EU: 28 },
+        { KR: 185, US: 12, UK: 11, EU: 29.5 },
+        { KR: 195, US: 13, UK: 12, EU: 31 },
+        { KR: 205, US: 1, UK: 13, EU: 32 },
+        { KR: 215, US: 2, UK: 1, EU: 33 },
+        { KR: 225, US: 3, UK: 2, EU: 34 },
+      ],
+    };
+
+    let currentGender = "men";
+    let currentUnit = "KR";
+
+    const genderTabs = document.getElementById("gender-tabs");
+    const unitTabs = document.getElementById("unit-tabs");
+    const sizeInput = document.getElementById("size-input");
+    const convertBtn = document.getElementById("convert-btn");
+    const resultSection = document.getElementById("result-section");
+    const errMsg = document.getElementById("err-msg");
+
+    const outKR = document.getElementById("out-kr");
+    const outUS = document.getElementById("out-us");
+    const outUK = document.getElementById("out-uk");
+    const outEU = document.getElementById("out-eu");
+    const outCM = document.getElementById("out-cm");
+
+    function showError(msg) {
+      if (!errMsg) return;
+      errMsg.textContent = msg;
+      errMsg.hidden = false;
+    }
+    function hideError() {
+      if (!errMsg) return;
+      errMsg.hidden = true;
+    }
+
+    // 단위별 placeholder 및 대표 기본값
+    const UNIT_META = {
+      KR: { placeholder: "예: 260", defaultVal: "260" },
+      US: { placeholder: "예: 8",   defaultVal: "8" },
+      UK: { placeholder: "예: 7.5", defaultVal: "7.5" },
+      EU: { placeholder: "예: 41",  defaultVal: "41" },
+      CM: { placeholder: "예: 26.0",defaultVal: "26.0" },
+    };
+
+    function updateUnitDefaults() {
+      if (!sizeInput) return;
+      const meta = UNIT_META[currentUnit];
+      if (!meta) return;
+      sizeInput.placeholder = meta.placeholder;
+      sizeInput.value = meta.defaultVal;
+      clearResult();
+    }
+
+    function findClosestRow(table, unit, value) {
+      let closest = table[0];
+      let minDiff = Math.abs(table[0][unit] - value);
+      for (let i = 1; i < table.length; i++) {
+        const diff = Math.abs(table[i][unit] - value);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closest = table[i];
+        }
+      }
+      return closest;
+    }
+
+    function clearResult() {
+      if (resultSection) resultSection.hidden = true;
+    }
+
+    function convert() {
+      hideError();
+      if (!sizeInput) return;
+      const raw = sizeInput.value.trim();
+      if (raw === "") {
+        showError("사이즈 값을 입력해주세요.");
+        return;
+      }
+      const value = parseFloat(raw);
+      if (isNaN(value) || value <= 0) {
+        showError("올바른 숫자를 입력해주세요.");
+        return;
+      }
+
+      const table = TABLES[currentGender];
+      let searchUnit = currentUnit;
+      let searchValue = value;
+
+      // CM 입력은 KR(mm)로 변환하여 검색
+      if (currentUnit === "CM") {
+        searchUnit = "KR";
+        searchValue = value * 10;
+      }
+
+      const row = findClosestRow(table, searchUnit, searchValue);
+
+      if (outKR) outKR.textContent = row.KR.toString();
+      if (outUS) outUS.textContent = row.US.toString();
+      if (outUK) outUK.textContent = row.UK.toString();
+      if (outEU) outEU.textContent = row.EU.toString();
+      if (outCM) outCM.textContent = (row.KR / 10).toFixed(1);
+
+      if (resultSection) {
+        resultSection.hidden = false;
+        // 결과 영역으로 부드럽게 스크롤
+        setTimeout(() => {
+          resultSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }, 50);
+      }
+    }
+
+    if (genderTabs) {
+      genderTabs.addEventListener("click", function (e) {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const btn = target.closest(".tab-btn");
+        if (!btn || !genderTabs.contains(btn)) return;
+        const gender = btn.getAttribute("data-gender");
+        if (!gender) return;
+        currentGender = gender;
+        genderTabs
+          .querySelectorAll(".tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        clearResult();
+      });
+    }
+
+    if (unitTabs) {
+      unitTabs.addEventListener("click", function (e) {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const btn = target.closest(".tab-btn");
+        if (!btn || !unitTabs.contains(btn)) return;
+        const unit = btn.getAttribute("data-unit");
+        if (!unit) return;
+        currentUnit = unit;
+        unitTabs
+          .querySelectorAll(".tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        updateUnitDefaults();
+      });
+    }
+
+    if (sizeInput) {
+      sizeInput.addEventListener("focus", function () {
+        sizeInput.select();
+      });
+      sizeInput.addEventListener("input", function () {
+        clearResult();
+      });
+      sizeInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          convert();
+        }
+      });
+    }
+
+    if (convertBtn) {
+      convertBtn.addEventListener("click", convert);
+    }
+  });
+</script>
