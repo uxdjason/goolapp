@@ -94,3 +94,165 @@ if (related.length === 0) {
 
 [출력 형식]
 Astro 파일의 전체 소스코드만 출력하라. 마크다운 코드블록(```astro) 외의 불필요한 설명은 포함하지 마라.
+
+---
+
+[퀴즈 앱 전용 가이드라인 — category가 "quiz"인 경우 반드시 준수]
+
+퀴즈 앱을 생성할 때는 기존 사이트의 모든 퀴즈 앱과 완전히 동일한 구조·스타일·UX를 따라야 한다.
+아래 레퍼런스 템플릿을 그대로 사용하고, 앱 주제에 맞게 텍스트만 교체하라.
+
+## 1. JSON 데이터 형식 (필수)
+퀴즈 문항 JSON은 `/data/{json_data_filename}.json` 경로에서 fetch한다.
+스크립트 최상단에 반드시 `const JSON_URL = '/data/{json_data_filename}.json';` 로 선언한다.
+JSON 배열의 각 항목 형식:
+```json
+{ "quiz": "문제 텍스트(또는 단어)", "selection": ["선택1","선택2","선택3","선택4"], "answer": 정답번호(1~4정수) }
+```
+- `answer`는 `selection` 배열의 1-based 인덱스(1=첫 번째 선택지)
+- 선택지는 반드시 4개 (4지선다)
+
+## 2. HTML 구조 (5개 화면 + 모달 — 변경 금지)
+```html
+<div class="app-quiz-container">
+  <!-- 시작 화면 -->
+  <section id="start-screen" class="app-quiz-screen">
+    <div class="app-quiz-card app-quiz-start-card">
+      <h2 class="app-quiz-title">{앱 한국어 제목}</h2>
+      <p class="app-quiz-subtitle">{한 줄 설명}</p>
+      <ul class="app-quiz-info-list">
+        <li>🎯 4지선다형 퀴즈</li>
+        <li>🔀 매번 다른 순서로 출제</li>
+        <li>{주제 관련 아이콘+설명}</li>
+      </ul>
+      <button id="start-btn" class="app-btn app-btn-primary app-btn-lg">시작하기</button>
+    </div>
+  </section>
+
+  <!-- 퀴즈 화면 -->
+  <section id="quiz-screen" class="app-quiz-screen" hidden>
+    <div class="app-quiz-card">
+      <div class="app-quiz-header">
+        <span id="progress-text" class="app-quiz-progress-text">문제 1</span>
+        <span id="score-text" class="app-quiz-score-text">정답 0</span>
+      </div>
+      <div class="app-progress-track">
+        <div id="progress-fill" class="app-progress-fill"></div>
+      </div>
+      <p class="app-quiz-prompt">{문제 유형에 맞는 질문 문구 — 앱마다 다름}</p>
+      <div id="quiz-word" class="app-quiz-word">—</div>
+      <div id="choices" class="app-quiz-choices"></div>
+      <div id="feedback" class="app-feedback" hidden></div>
+      <div class="app-quiz-actions">
+        <button id="next-btn" class="app-btn app-btn-primary" hidden>다음 문제</button>
+        <button id="quit-btn" class="app-btn app-btn-text">그만하기</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 결과 화면 -->
+  <section id="result-screen" class="app-quiz-screen" hidden>
+    <div class="app-quiz-card app-quiz-result-card">
+      <h2 class="app-quiz-title">결과</h2>
+      <div class="app-quiz-score-circle">
+        <span id="score-value">0</span>
+        <span class="app-quiz-score-unit">점</span>
+      </div>
+      <p id="result-text" class="app-quiz-result-text">—</p>
+      <button id="restart-btn" class="app-btn app-btn-primary app-btn-lg">처음으로</button>
+    </div>
+  </section>
+
+  <!-- 로딩 화면 -->
+  <section id="loading-screen" class="app-quiz-screen" hidden>
+    <div class="app-quiz-card">
+      <div class="app-loading">
+        <div class="app-spinner"></div>
+        <p>문제를 불러오는 중...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 에러 화면 -->
+  <section id="error-screen" class="app-quiz-screen" hidden>
+    <div class="app-error-box">
+      <p id="error-text">문제를 불러오지 못했습니다.</p>
+      <button id="error-retry-btn" class="app-btn app-btn-primary">다시 시도</button>
+    </div>
+  </section>
+
+  <!-- 그만하기 확인 모달 -->
+  <div id="quit-modal" class="app-modal-overlay" hidden>
+    <div class="app-modal">
+      <div class="app-modal-icon">🤔</div>
+      <p class="app-modal-title">그만하시겠습니까?</p>
+      <p class="app-modal-body">지금까지의 결과가 표시됩니다.</p>
+      <div class="app-modal-actions">
+        <button id="quit-cancel-btn" class="app-btn app-btn-secondary">계속하기</button>
+        <button id="quit-confirm-btn" class="app-btn app-btn-primary">그만하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+## 3. 스크립트 구조 (변경 금지 — 기존 앱과 동일 패턴 사용)
+```javascript
+const JSON_URL = '/data/{json_data_filename}.json';
+
+// DOM 요소 참조 — 반드시 아래 ID 사용
+// start-screen, quiz-screen, result-screen, loading-screen, error-screen
+// quit-modal, start-btn, next-btn, quit-btn, restart-btn, error-retry-btn
+// quit-cancel-btn, quit-confirm-btn, quiz-word, choices, feedback
+// progress-text, score-text, progress-fill, score-value, result-text, error-text
+
+type QuizItem = { quiz: string; selection: string[]; answer: number };
+let quizData: QuizItem[] = [];
+let questionOrder: number[] = [];
+let currentIndex = 0;
+let correctCount = 0;
+let answered = false;
+
+// showOnly(): 5개 화면 중 하나만 표시
+// shuffle(): Fisher-Yates 알고리즘
+// loadQuizData(): fetch → JSON 파싱 → 에러 시 errorScreen
+// startQuiz(): loadQuizData → questionOrder 셔플 → loadQuestion
+// loadQuestion(): 현재 문항 표시, 선택지 버튼 동적 생성
+// checkAnswer(): 정오답 판정, 버튼 disable, feedback 표시, next/결과 보기 전환
+// nextQuestion(): currentIndex++ → loadQuestion or showResult
+// showResult(fromQuit): 점수 계산 → resultScreen 표시
+// openQuitModal / closeQuitModal
+// restartQuiz(): startScreen으로 복귀 (데이터 재로드 없이)
+```
+
+## 4. 선택지 버튼 동적 생성 패턴 (변경 금지)
+```javascript
+q.selection.forEach((opt, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'app-choice-btn';
+  btn.type = 'button';
+  btn.innerHTML = `<span class="app-choice-num">${i + 1}</span>${opt}`;
+  btn.addEventListener('click', () => checkAnswer(i + 1, q.answer, q.selection[q.answer - 1], btn));
+  choicesEl.appendChild(btn);
+});
+```
+
+## 5. 정오답 CSS 클래스 패턴 (변경 금지)
+- 정답: `btn.classList.add('correct')` + `feedbackEl.className = 'app-feedback correct'`
+- 오답: `clickedBtn.classList.add('wrong')` + `feedbackEl.className = 'app-feedback wrong'`
+- 정답 버튼은 항상 highlighted, 클릭한 오답 버튼은 `wrong` 표시
+
+## 6. 결과 텍스트 형식 (변경 금지)
+```javascript
+resultTextEl.innerHTML = `총 <strong>${attempted}</strong> 문제를 풀었으며 <strong>${correctCount}</strong> 문제의 정답을 맞췄습니다.`;
+```
+
+## 7. hidden 속성을 사용하는 모든 요소 CSS 규칙 (필수)
+```css
+.app-quiz-screen[hidden] { display: none; }
+.app-feedback[hidden] { display: none; }
+#next-btn[hidden] { display: none; }
+#quit-modal[hidden] { display: none; }
+#error-screen[hidden] { display: none; }
+```
+

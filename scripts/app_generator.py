@@ -88,6 +88,41 @@ def generate_app(slug: str) -> None:
         raise FileNotFoundError(f"Missing {sys_prompt_path}")
     system_prompt = sys_prompt_path.read_text(encoding="utf-8")
 
+    # 퀴즈 앱 여부 확인 및 전용 컨텍스트 준비
+    spec = app_data.get("_new_app_spec", {})
+    category = app_meta.get("category", "tool")
+    is_quiz = (category == "quiz" or slug.endswith("-quiz") or "-quiz-" in slug)
+
+    quiz_context = ""
+    if is_quiz:
+        json_data_filename = spec.get("json_data_filename", slug.replace("-", "_"))
+        quiz_prompt_text = spec.get("quiz_prompt", "다음 문제를 풀어보세요.")
+
+        # 레퍼런스 앱 코드 읽기 (존재할 경우)
+        ref_path = pathlib.Path("src/pages/country-capital-quiz/index.astro")
+        ref_code = ref_path.read_text(encoding="utf-8") if ref_path.exists() else ""
+
+        quiz_context = f"""
+⚠️ 이 앱은 퀴즈 앱(category=quiz)이다. 아래 규칙을 반드시 따르라.
+
+[퀴즈 JSON 파일]
+- JSON URL: /data/{json_data_filename}.json
+- 스크립트 최상단: const JSON_URL = '/data/{json_data_filename}.json';
+- JSON 형식: [{{"quiz": "문제텍스트", "selection": ["선택1","선택2","선택3","선택4"], "answer": 정답번호(1~4)}}]
+
+[퀴즈 화면 질문 문구]
+- quiz-screen의 .app-quiz-prompt 텍스트: "{quiz_prompt_text}"
+
+[레퍼런스 앱 전체 코드 — 이 구조를 그대로 따를 것]
+아래는 기존에 실제 서비스 중인 퀴즈 앱(country-capital-quiz)의 전체 코드다.
+HTML 구조, CSS 클래스명, JS 함수명, 이벤트 연결 방식을 그대로 재사용하고
+slug와 제목, quiz_prompt 텍스트, JSON_URL만 이 앱에 맞게 교체하라.
+
+```astro
+{ref_code}
+```
+"""
+
     user_prompt = f"""
     [앱 메타]
     {json.dumps(app_meta, ensure_ascii=False, indent=2)}
@@ -97,11 +132,12 @@ def generate_app(slug: str) -> None:
     
     [기존 인터랙티브 요소 (참고용)]
     {json.dumps(parsed.get('interactive', {}), ensure_ascii=False, indent=2)}
-    
+    {quiz_context}
     위 데이터를 기반으로 `src/pages/{slug}/index.astro` 파일을 작성해줘.
     slug는 정확히 "{slug}" 이므로, frontmatter의 getEntry 호출에서 반드시 getEntry('apps', '{slug}')를 사용해야 해.
     Astro 소스코드만 출력해.
     """
+
 
     def validate_astro(text: str) -> bool:
         # Named Slot 구조 사용 여부 확인

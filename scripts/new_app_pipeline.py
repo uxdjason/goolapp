@@ -3,10 +3,12 @@ Phase 4-2: 신규 앱 자동 생성 파이프라인
 - 사용자가 trend_collector.py 리포트에서 선택한 키워드를 기반으로 신규 앱 생성
 - 기존 Phase 3 스크립트(seo_meta_generator, longform_writer, app_generator, blog_writer) 재사용
 - legacy-extracts 없이 신규 사양(spec)을 직접 입력으로 사용
+- 퀴즈 앱(category=quiz)의 경우 자동으로 JSON 문항 데이터를 생성하고 기존 퀴즈 앱과
+  동일한 HTML 구조·CSS 클래스·UX 패턴을 강제하여 사이트 일관성을 유지한다.
 
 사용법:
   python scripts/new_app_pipeline.py "<키워드>" <slug>
-  예: python scripts/new_app_pipeline.py "환율 계산기" exchange-rate-calculator
+  예: python scripts/new_app_pipeline.py "반도체 퀴즈" semiconductor-quiz
 """# -*- coding: utf-8 -*-
 import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
@@ -48,9 +50,38 @@ def _repair_json(s: str) -> str:
     return s
 
 
+def is_quiz_app(slug: str, keyword: str = "", category: str = "") -> bool:
+    """슬러그, 키워드, 카테고리로 퀴즈 앱 여부를 판단한다."""
+    if category == "quiz":
+        return True
+    if slug.endswith("-quiz") or "-quiz-" in slug:
+        return True
+    if "퀴즈" in keyword or "quiz" in keyword.lower():
+        return True
+    return False
+
+
+def _quiz_json_filename(slug: str) -> str:
+    """slug → JSON 파일명 변환. 예: semiconductor-quiz → semiconductor_quiz"""
+    return slug.replace("-", "_")
+
+
 def step1_generate_spec(keyword: str, slug: str) -> dict:
     """키워드로부터 앱 사양 JSON 생성."""
     print(f"\n[Step 1/6] 앱 사양 생성: '{keyword}'", flush=True)
+
+    quiz_hint = ""
+    if is_quiz_app(slug, keyword):
+        quiz_hint = """
+이 앱은 퀴즈 앱이다. 반드시 아래 조건을 지켜라:
+- category는 반드시 "quiz"로 설정
+- inputs: ["퀴즈 시작 버튼"]
+- outputs: ["정오답 피드백", "점수", "결과 화면"]
+- js_logic_summary: "JSON URL에서 문항 데이터를 fetch → 4지선다 퀴즈 진행 → 정오답 판정 → 결과 표시"
+- json_data_filename: 퀴즈 JSON 파일명 (확장자 없이, 예: semiconductor_quiz)
+- quiz_topic: 퀴즈 주제 한국어 설명 (문항 생성에 사용)
+- quiz_prompt: 퀴즈 화면에서 보여줄 질문 문구 (예: "다음 설명에 해당하는 반도체 용어는?")
+"""
 
     SYSTEM = """너는 한국어 저관여 웹앱 기획자다.
 입력 키워드로부터 GoolAPP에 추가할 앱의 사양을 JSON으로 반환한다.
@@ -64,7 +95,7 @@ JSON만 반환, 설명 없이.
 - inputs: 사용자가 입력하는 값 목록 (배열)
 - outputs: 앱이 계산/출력하는 값 목록 (배열)
 - features: 주요 기능 목록 3~5개 (배열)
-- js_logic_summary: 핵심 계산 로직 의사코드 요약 (간결하게, 200자 이내)"""
+- js_logic_summary: 핵심 계산 로직 의사코드 요약 (간결하게, 200자 이내)""" + quiz_hint
 
     print(f"  → AI 호출 중 (앱 사양 JSON 생성)...")
     text = ai_client.call(
@@ -86,6 +117,13 @@ JSON만 반환, 설명 없이.
         repaired = _repair_json(cleaned)
         spec = json.loads(repaired)
         print(f"  ✓ JSON 자동 복구 성공")
+
+    # 퀴즈 앱이면 json_data_filename 기본값 보장
+    if is_quiz_app(slug, keyword, spec.get("category", "")):
+        spec.setdefault("category", "quiz")
+        spec.setdefault("json_data_filename", _quiz_json_filename(slug))
+        spec.setdefault("quiz_topic", spec.get("core_function", keyword))
+        spec.setdefault("quiz_prompt", "다음 문제를 풀어보세요.")
 
     # spec을 legacy-extracts 형식으로 감싸서 기존 스크립트 재사용 가능하게
     wrapped = {
@@ -111,7 +149,7 @@ JSON만 반환, 설명 없이.
             "faq_candidates": [],
             "astro_migration_notes": "신규 앱 — legacy 없음",
         },
-        "_new_app_spec": spec,  # 원본 사양 보존
+        "_new_app_spec": spec,  # 원본 사양 보존 (json_data_filename 등 퀴즈 전용 필드 포함)
     }
 
     # references/legacy-extracts/{slug}.json 에 저장 (기존 스크립트 재사용용)
@@ -121,6 +159,96 @@ JSON만 반환, 설명 없이.
     out_path.write_text(json.dumps(wrapped, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"  ✓ 앱 사양 생성: {out_path}")
     return wrapped
+
+
+def step1b_generate_quiz_json(slug: str, wrapped_spec: dict) -> str:
+    """퀴즈 앱 전용 — 4지선다 문항 JSON을 생성하여 public/data/에 저장한다.
+    반환값: json_data_filename (확장자 제외)
+    """
+    print(f"\n[Step 1b] 퀴즈 문항 JSON 생성...", flush=True)
+
+    spec = wrapped_spec.get("_new_app_spec", {})
+    json_data_filename = spec.get("json_data_filename", _quiz_json_filename(slug))
+    quiz_topic = spec.get("quiz_topic", spec.get("core_function", slug))
+    title = spec.get("title", slug)
+
+    SYSTEM = """너는 한국어 퀴즈 데이터 전문가다.
+주어진 주제에 대해 4지선다 퀴즈 문항을 JSON 배열로 생성한다.
+순수 JSON 배열만 반환하고, 설명·마크다운 코드블록 없이 출력한다.
+
+각 항목 형식 (반드시 준수):
+{"quiz": "문제 텍스트", "selection": ["선택지1","선택지2","선택지3","선택지4"], "answer": 정답번호}
+
+규칙:
+- answer는 selection 배열의 1-based 인덱스 (1~4 사이 정수)
+- selection은 반드시 4개
+- 문항은 너무 쉽거나 너무 어렵지 않게 — 일반 성인이 도전할 수 있는 수준
+- 정답 위치가 1,2,3,4에 고르게 분포되도록 작성
+- 모든 텍스트는 한국어로 작성 (영문 고유명사는 그대로 사용 가능)
+- 중복 문항 없이 30개 생성"""
+
+    user_prompt = f"""주제: {title} ({quiz_topic})
+위 주제에 대한 4지선다 퀴즈 문항 30개를 JSON 배열로 생성하라.
+문항 예시:
+{{"quiz": "반도체 공정에서 웨이퍼의 불순물을 제거하는 공정은?", "selection": ["세정 공정","식각 공정","증착 공정","포토 공정"], "answer": 1}}
+"""
+
+    def validate_quiz_json(text: str) -> bool:
+        t = text.strip()
+        if t.startswith("```"): t = t.split("\n", 1)[-1]
+        if t.endswith("```"): t = t.rsplit("```", 1)[0]
+        try:
+            data = json.loads(_repair_json(t.strip()))
+            return isinstance(data, list) and len(data) >= 20
+        except Exception:
+            return False
+
+    print(f"  → AI 호출 중 (퀴즈 문항 30개 생성)...", flush=True)
+    text = ai_client.call(
+        task="semantic_analysis",
+        system=SYSTEM,
+        user=user_prompt,
+        validator=validate_quiz_json,
+        max_tokens=4096,
+        log_label=f"quiz_json:{slug}",
+    )
+
+    cleaned = text.strip()
+    if cleaned.startswith("```json"): cleaned = cleaned[7:]
+    elif cleaned.startswith("```"): cleaned = cleaned[3:]
+    if cleaned.endswith("```"): cleaned = cleaned[:-3]
+    cleaned = cleaned.strip()
+
+    try:
+        quiz_data = json.loads(cleaned)
+    except json.JSONDecodeError:
+        print(f"  ⚠ JSON 파싱 실패 — 자동 복구 시도 중...")
+        quiz_data = json.loads(_repair_json(cleaned))
+
+    # 유효성 검사
+    valid_items = []
+    for item in quiz_data:
+        if (isinstance(item, dict)
+                and "quiz" in item
+                and "selection" in item
+                and "answer" in item
+                and isinstance(item["selection"], list)
+                and len(item["selection"]) == 4
+                and isinstance(item["answer"], int)
+                and 1 <= item["answer"] <= 4):
+            valid_items.append(item)
+    if len(valid_items) < 10:
+        raise ValueError(f"유효한 퀴즈 문항이 너무 적습니다: {len(valid_items)}개")
+
+    out_dir = pathlib.Path("public/data")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / f"{json_data_filename}.json"
+    out_path.write_text(
+        json.dumps(valid_items, ensure_ascii=False, indent=2),
+        encoding="utf-8"
+    )
+    print(f"  ✓ 퀴즈 문항 {len(valid_items)}개 저장: {out_path}")
+    return json_data_filename
 
 
 def step2_generate_seo(slug: str) -> dict:
@@ -165,6 +293,7 @@ def step5_build_check() -> bool:
     result = subprocess.run(
         "npm run build", shell=True,
         capture_output=True, text=True, cwd=str(root_dir),
+        encoding="utf-8", errors="replace"
     )
     if result.returncode == 0 or "Completed in" in result.stdout:
         print(f"  ✓ 빌드 성공")
@@ -207,8 +336,20 @@ def run(keyword: str, slug: str) -> None:
         print(f"  ✓ {label} 완료 [{elapsed()}]", flush=True)
 
     # Step 1: 앱 사양 생성
-    step1_generate_spec(keyword, slug)
+    wrapped_spec = step1_generate_spec(keyword, slug)
     step_done("Step 1: 앱 사양")
+
+    # Step 1b: 퀴즈 앱이면 JSON 문항 데이터 생성
+    spec = wrapped_spec.get("_new_app_spec", {})
+    _is_quiz = is_quiz_app(slug, keyword, spec.get("category", ""))
+    if _is_quiz:
+        json_data_filename = step1b_generate_quiz_json(slug, wrapped_spec)
+        # app_generator가 읽을 수 있도록 extract 파일에 json_data_filename 기록
+        spec["json_data_filename"] = json_data_filename
+        wrapped_spec["_new_app_spec"] = spec
+        extract_path = pathlib.Path(f"references/legacy-extracts/{slug}.json")
+        extract_path.write_text(json.dumps(wrapped_spec, ensure_ascii=False, indent=2), encoding="utf-8")
+        step_done("Step 1b: 퀴즈 문항 JSON")
 
     # Step 2: SEO 메타
     step2_generate_seo(slug)
@@ -241,6 +382,9 @@ def run(keyword: str, slug: str) -> None:
         print(f"   앱 페이지 : src/pages/{slug}/index.astro")
         print(f"   콘텐츠    : src/content/apps/{slug}.md")
         print(f"   블로그 초안: references/naver-blog-posting/{datetime.date.today().isoformat()}-{slug}.md")
+        if _is_quiz:
+            _jfn = spec.get("json_data_filename", _quiz_json_filename(slug))
+            print(f"   퀴즈 데이터: public/data/{_jfn}.json")
         print(f"\n📋 다음 단계 (사용자 검수):")
         print(f"   1. http://localhost:4321/{slug}/ 에서 앱 동작 확인")
         print(f"   2. src/content/apps/{slug}.md 롱폼 콘텐츠 검토")
@@ -255,7 +399,7 @@ def run(keyword: str, slug: str) -> None:
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("사용법: python scripts/new_app_pipeline.py \"<키워드>\" <slug>")
-        print("예시 : python scripts/new_app_pipeline.py \"환율 계산기\" exchange-rate-calculator")
+        print("예시 : python scripts/new_app_pipeline.py \"반도체 퀴즈\" semiconductor-quiz")
         sys.exit(1)
 
     keyword_arg = sys.argv[1]

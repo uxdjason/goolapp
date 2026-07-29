@@ -238,14 +238,31 @@ const robotsContent = isLiveDomain ? 'index,follow' : 'noindex,nofollow';
         }
       }
       
-      document.addEventListener('DOMContentLoaded', () => {
+      function initLayout() {
         updateFavIcons();
         applyFilter();
+        
+        document.body.removeEventListener('click', handleFavClick);
         document.body.addEventListener('click', handleFavClick);
+        
         const loadMoreBtn = document.querySelector('.load-more-btn');
         if (loadMoreBtn) {
+          loadMoreBtn.removeEventListener('click', handleLoadMore);
           loadMoreBtn.addEventListener('click', handleLoadMore);
         }
+      }
+      
+      document.addEventListener('DOMContentLoaded', initLayout);
+      document.addEventListener('astro:page-load', () => {
+        // astro:page-load 시엔 페이지가 바뀌었을 수 있으므로 limit을 9로 초기화
+        currentDisplayLimit = 9;
+        initLayout();
+      });
+
+      document.addEventListener('goolapp:refilter', () => {
+        // 정렬이 바뀌었을 때도 처음 9개부터 다시 보여줌
+        currentDisplayLimit = 9;
+        applyFilter();
       });
       
       window.addEventListener('hashchange', () => {

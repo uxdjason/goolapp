@@ -1,0 +1,302 @@
+[
+  {
+    "quiz": "순수한 반도체에 불순물을 첨가하여 전기적 특성을 변화시키는 공정을 무엇이라 하는가?",
+    "selection": [
+      "도핑(Doping)",
+      "에칭(Etching)",
+      "리소그래피(Lithography)",
+      "어닐링(Annealing)"
+    ],
+    "answer": 1
+  },
+  {
+    "quiz": "실리콘(Si)의 에너지 밴드갭(Band Gap)은 약 얼마인가?",
+    "selection": [
+      "0.67 eV",
+      "1.12 eV",
+      "1.42 eV",
+      "2.26 eV"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "P형 반도체를 만들기 위해 실리콘에 주입하는 불순물(도펀트)은?",
+    "selection": [
+      "인(P)",
+      "비소(As)",
+      "붕소(B)",
+      "안티몬(Sb)"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "반도체 웨이퍼 위에 회로 패턴을 형성하기 위해 빛을 이용하는 공정은?",
+    "selection": [
+      "CVD",
+      "CMP",
+      "포토리소그래피",
+      "스퍼터링"
+    ],
+    "answer": 4
+  },
+  {
+    "quiz": "MOSFET에서 게이트 전압에 의해 형성되는 전류 통로를 무엇이라 하는가?",
+    "selection": [
+      "드레인",
+      "채널(Channel)",
+      "벌크",
+      "소스"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "반도체 소자에서 전자와 정공이 결합하여 빛을 방출하는 소자는?",
+    "selection": [
+      "MOSFET",
+      "BJT",
+      "LED",
+      "Zener Diode"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "화학기상증착(CVD) 공정에서 박막을 형성하는 방식은?",
+    "selection": [
+      "물리적 충돌에 의한 증착",
+      "화학 반응을 이용한 박막 증착",
+      "전기화학적 도금",
+      "레이저를 이용한 용융 증착"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "집적회로(IC)의 미세 패턴을 형성할 때 사용하는 빛에 민감한 물질은?",
+    "selection": [
+      "포토레지스트(Photoresist)",
+      "산화막(Oxide)",
+      "질화막(Nitride)",
+      "폴리실리콘"
+    ],
+    "answer": 1
+  },
+  {
+    "quiz": "반도체 공정에서 웨이퍼 표면을 평탄화하는 CMP 공정의 풀네임은?",
+    "selection": [
+      "Chemical Mechanical Polishing",
+      "Chemical Metal Plating",
+      "Circuit Mask Printing",
+      "Copper Metal Process"
+    ],
+    "answer": 1
+  },
+  {
+    "quiz": "PN 접합 다이오드에 역방향 전압이 계속 증가할 때 갑자기 전류가 흐르는 현상은?",
+    "selection": [
+      "순방향 바이어스",
+      "홀 효과",
+      "항복(Breakdown) 현상",
+      "터널링 효과"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "반도체 공정에서 특정 영역을 선택적으로 제거하는 공정을 무엇이라 하는가?",
+    "selection": [
+      "증착(Deposition)",
+      "식각(Etching)",
+      "이온주입(Ion Implantation)",
+      "산화(Oxidation)"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "현재 가장 널리 사용되는 반도체 기판 재료는?",
+    "selection": [
+      "갈륨비소(GaAs)",
+      "실리콘(Si)",
+      "게르마늄(Ge)",
+      "탄화규소(SiC)"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "트랜지스터의 집적도와 관련하여 '18개월마다 집적도가 2배 증가한다'는 법칙은?",
+    "selection": [
+      "파인만 법칙",
+      "옴의 법칙",
+      "무어의 법칙",
+      "키르히호프의 법칙"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "NAND 플래시 메모리와 NOR 플래시 메모리 중 순차 읽기 속도가 더 빠른 것은?",
+    "selection": [
+      "NAND 플래시",
+      "NOR 플래시",
+      "둘 다 동일하다",
+      "속도는 용량에만 의존한다"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "반도체 공정 중 실리콘 표면을 고온에서 산소와 반응시켜 절연막을 형성하는 공정은?",
+    "selection": [
+      "질화(Nitridation)",
+      "열산화(Thermal Oxidation)",
+      "스퍼터링(Sputtering)",
+      "확산(Diffusion)"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "BJT(Bipolar Junction Transistor)의 세 가지 단자를 올바르게 나열한 것은?",
+    "selection": [
+      "소스, 게이트, 드레인",
+      "에미터, 베이스, 컬렉터",
+      "양극, 음극, 게이트",
+      "입력, 출력, 접지"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "반도체의 전기 전도에 기여하는 두 가지 캐리어는?",
+    "selection": [
+      "양성자와 중성자",
+      "전자와 정공(Hole)",
+      "이온과 원자",
+      "광자와 포논"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "극자외선(EUV) 리소그래피에서 사용하는 광원의 파장은 약 얼마인가?",
+    "selection": [
+      "193 nm",
+      "13.5 nm",
+      "248 nm",
+      "436 nm"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "반도체 소자에서 게이트 산화막(Gate Oxide) 소재로 기존 SiO₂를 대체하기 위해 도입된 고유전율(High-k) 물질은?",
+    "selection": [
+      "Al₂O₃",
+      "TiO₂",
+      "HfO₂",
+      "ZrO₂"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "DRAM에서 하나의 셀은 몇 개의 트랜지스터와 커패시터로 구성되는가?",
+    "selection": [
+      "2T2C",
+      "1T1C",
+      "4T",
+      "6T"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "반도체 공정에서 이온주입(Ion Implantation) 후 결정 손상을 회복시키기 위한 열처리 공정은?",
+    "selection": [
+      "산화(Oxidation)",
+      "어닐링(Annealing)",
+      "식각(Etching)",
+      "세정(Cleaning)"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "실리콘 웨이퍼의 크기를 나타낼 때 일반적으로 사용하는 단위는?",
+    "selection": [
+      "mm²",
+      "인치(Inch)",
+      "마이크론(μm)",
+      "나노미터(nm)"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "반도체 패키징 기술 중 칩을 뒤집어 기판에 직접 연결하는 방식은?",
+    "selection": [
+      "와이어 본딩(Wire Bonding)",
+      "플립칩(Flip Chip)",
+      "TAB 본딩",
+      "COB 방식"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "반도체 공정 후 웨이퍼에서 개별 칩을 잘라내는 공정을 무엇이라 하는가?",
+    "selection": [
+      "CMP",
+      "다이싱(Dicing)",
+      "디포지션",
+      "리소그래피"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "전력 반도체 소자로 고전압, 고전류 스위칭에 주로 사용되는 소자는?",
+    "selection": [
+      "MOSFET",
+      "IGBT(Insulated Gate Bipolar Transistor)",
+      "JFET",
+      "Zener Diode"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "핀펫(FinFET) 구조가 기존 평면 MOSFET 대비 개선한 가장 큰 문제점은?",
+    "selection": [
+      "소비 전력 증가",
+      "단채널 효과(Short Channel Effect)",
+      "공정 비용 절감",
+      "게이트 산화막 두께 증가"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "반도체 생산 수율(Yield)을 계산할 때 기준이 되는 것은?",
+    "selection": [
+      "전체 웨이퍼 수 대비 불량 웨이퍼 수",
+      "전체 다이 수 대비 양품 다이 수",
+      "투입 원자재 대비 완성품 무게",
+      "공정 시간 대비 생산량"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "차세대 반도체 기판 소재로 고전압·고온 환경에서 우수한 특성을 갖는 와이드 밴드갭 반도체는?",
+    "selection": [
+      "게르마늄(Ge)",
+      "탄화규소(SiC)",
+      "실리콘(Si)",
+      "인듐인화물(InP)"
+    ],
+    "answer": 2
+  },
+  {
+    "quiz": "반도체 메모리 중 전원이 꺼져도 데이터가 유지되는 비휘발성 메모리에 해당하는 것은?",
+    "selection": [
+      "DRAM",
+      "SRAM",
+      "플래시 메모리(Flash Memory)",
+      "Cache Memory"
+    ],
+    "answer": 3
+  },
+  {
+    "quiz": "반도체 칩 내부에서 금속 배선층을 형성할 때 알루미늄(Al) 대신 현재 주로 사용되는 금속은?",
+    "selection": [
+      "금(Au)",
+      "구리(Cu)",
+      "텅스텐(W)",
+      "티타늄(Ti)"
+    ],
+    "answer": 2
+  }
+]

@@ -129,6 +129,9 @@
     applyActiveClass(toggle, value);
     positionPill(toggle, value, animate);
     sortCards(value);
+    
+    // 카드 순서가 바뀌었으므로 BaseLayout에 페이지네이션 필터를 다시 적용하라고 알림
+    document.dispatchEvent(new CustomEvent('goolapp:refilter'));
   }
 
   // 모듈 스코프 — 페이지 전체에 리스너 하나만 유지
