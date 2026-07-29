@@ -366,12 +366,12 @@ if (related.length === 0) {
       ],
     };
 
-    let currentGender = "men";
-    let currentUnit = "KR";
+    let currentGender: 'men' | 'women' | 'kids' = "men";
+    let currentUnit: 'KR' | 'US' | 'UK' | 'EU' | 'CM' = "KR";
 
     const genderTabs = document.getElementById("gender-tabs");
     const unitTabs = document.getElementById("unit-tabs");
-    const sizeInput = document.getElementById("size-input");
+    const sizeInput = document.getElementById("size-input") as HTMLInputElement | null;
     const convertBtn = document.getElementById("convert-btn");
     const resultSection = document.getElementById("result-section");
     const errMsg = document.getElementById("err-msg");
@@ -382,7 +382,7 @@ if (related.length === 0) {
     const outEU = document.getElementById("out-eu");
     const outCM = document.getElementById("out-cm");
 
-    function showError(msg) {
+    function showError(msg: string) {
       if (!errMsg) return;
       errMsg.textContent = msg;
       errMsg.hidden = false;
@@ -393,7 +393,7 @@ if (related.length === 0) {
     }
 
     // 단위별 placeholder 및 대표 기본값
-    const UNIT_META = {
+    const UNIT_META: Record<string, { placeholder: string; defaultVal: string }> = {
       KR: { placeholder: "예: 260", defaultVal: "260" },
       US: { placeholder: "예: 8",   defaultVal: "8" },
       UK: { placeholder: "예: 7.5", defaultVal: "7.5" },
@@ -410,7 +410,7 @@ if (related.length === 0) {
       clearResult();
     }
 
-    function findClosestRow(table, unit, value) {
+    function findClosestRow(table: any[], unit: string, value: number) {
       let closest = table[0];
       let minDiff = Math.abs(table[0][unit] - value);
       for (let i = 1; i < table.length; i++) {

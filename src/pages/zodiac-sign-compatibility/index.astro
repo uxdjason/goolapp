@@ -1,0 +1,581 @@
+---
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
+
+const entry = await getEntry("apps", "zodiac-sign-compatibility");
+if (!entry) throw new Error("zodiac-sign-compatibility entry not found");
+const { Content } = await render(entry);
+
+const allApps = await getCollection("apps");
+let related = allApps
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
+if (related.length === 0) {
+  related = allApps
+    .filter((app) => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="zodiac-app">
+      <div class="input-panel">
+        <div class="person-card">
+          <h3 class="person-title">🙋 나</h3>
+          <label class="field-label" for="my-year">태어난 연도 (음력)</label>
+          <input
+            type="number"
+            id="my-year"
+            class="year-input"
+            placeholder="예: 1990"
+            min="1900"
+            max="2100"
+          />
+          <label class="field-label" for="my-zodiac">또는 띠 직접 선택</label>
+          <select id="my-zodiac" class="zodiac-select">
+            <option value="">— 선택 안 함 —</option>
+            <option value="0">🐭 자(子) 쥐띠</option>
+            <option value="1">🐮 축(丑) 소띠</option>
+            <option value="2">🐯 인(寅) 호랑이띠</option>
+            <option value="3">🐰 묘(卯) 토끼띠</option>
+            <option value="4">🐲 진(辰) 용띠</option>
+            <option value="5">🐍 사(巳) 뱀띠</option>
+            <option value="6">🐴 오(午) 말띠</option>
+            <option value="7">🐑 미(未) 양띠</option>
+            <option value="8">🐵 신(申) 원숭이띠</option>
+            <option value="9">🐔 유(酉) 닭띠</option>
+            <option value="10">🐶 술(戌) 개띠</option>
+            <option value="11">🐷 해(亥) 돼지띠</option>
+          </select>
+        </div>
+
+        <div class="person-card">
+          <h3 class="person-title">💕 상대방</h3>
+          <label class="field-label" for="partner-year"
+            >태어난 연도 (음력)</label
+          >
+          <input
+            type="number"
+            id="partner-year"
+            class="year-input"
+            placeholder="예: 1992"
+            min="1900"
+            max="2100"
+          />
+          <label class="field-label" for="partner-zodiac"
+            >또는 띠 직접 선택</label
+          >
+          <select id="partner-zodiac" class="zodiac-select">
+            <option value="">— 선택 안 함 —</option>
+            <option value="0">🐭 자(子) 쥐띠</option>
+            <option value="1">🐮 축(丑) 소띠</option>
+            <option value="2">🐯 인(寅) 호랑이띠</option>
+            <option value="3">🐰 묘(卯) 토끼띠</option>
+            <option value="4">🐲 진(辰) 용띠</option>
+            <option value="5">🐍 사(巳) 뱀띠</option>
+            <option value="6">🐴 오(午) 말띠</option>
+            <option value="7">🐑 미(未) 양띠</option>
+            <option value="8">🐵 신(申) 원숭이띠</option>
+            <option value="9">🐔 유(酉) 닭띠</option>
+            <option value="10">🐶 술(戌) 개띠</option>
+            <option value="11">🐷 해(亥) 돼지띠</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button id="calc-btn" class="btn-primary" type="button"
+          >궁합 보기</button
+        >
+        <button id="reset-btn" class="btn-secondary" type="button"
+          >초기화</button
+        >
+      </div>
+
+      <div id="err-msg" class="error-msg" hidden></div>
+
+      <section id="result-section" class="result-section" hidden>
+        <div class="zodiac-pair">
+          <div class="zodiac-box">
+            <div class="zodiac-emoji" id="my-emoji">🐭</div>
+            <div class="zodiac-name" id="my-name">-</div>
+            <div class="zodiac-label">나</div>
+          </div>
+          <div class="heart-icon" id="heart-icon">💗</div>
+          <div class="zodiac-box">
+            <div class="zodiac-emoji" id="partner-emoji">🐭</div>
+            <div class="zodiac-name" id="partner-name">-</div>
+            <div class="zodiac-label">상대방</div>
+          </div>
+        </div>
+
+        <div class="score-panel">
+          <div class="score-big">
+            <span id="score-value">0</span><span class="score-unit">점</span>
+          </div>
+          <div class="score-grade" id="score-grade">-</div>
+          <div class="score-bar-track">
+            <div class="score-bar-fill" id="score-bar-fill"></div>
+          </div>
+        </div>
+
+        <div class="desc-box" id="desc-box">
+          <p id="desc-text">-</p>
+        </div>
+      </section>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .zodiac-app {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .input-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 640px) {
+    .input-panel {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .person-card {
+    margin-bottom: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .person-title {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text, #111);
+  }
+
+  .field-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted, #666);
+    margin-bottom: -0.25rem;
+  }
+
+  .year-input,
+  .zodiac-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fff;
+    color: var(--color-text, #111);
+    box-sizing: border-box;
+  }
+
+  .year-input:focus,
+  .zodiac-select:focus {
+    outline: none;
+    border-color: var(--color-primary, #6366f1);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    flex: 1;
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      background 0.15s ease;
+  }
+
+  .btn-primary {
+    background: var(--color-primary, #6366f1);
+    color: #fff;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-text, #111);
+    border: 1px solid var(--color-border, #e5e7eb);
+  }
+  .btn-secondary:hover {
+    background: var(--color-surface-alt, #f3f4f6);
+  }
+
+  .error-msg {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+  .error-msg[hidden] {
+    display: none;
+  }
+
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    border-radius: 14px;
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e5e7eb);
+  }
+  .result-section[hidden] {
+    display: none;
+  }
+
+  .zodiac-pair {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .zodiac-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 90px;
+  }
+
+  .zodiac-emoji {
+    font-size: 3.5rem;
+    line-height: 1;
+  }
+
+  .zodiac-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text, #111);
+  }
+
+  .zodiac-label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #666);
+  }
+
+  .heart-icon {
+    font-size: 2.5rem;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.15);
+    }
+  }
+
+  .score-panel {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .score-big {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--color-primary, #6366f1);
+    line-height: 1;
+  }
+  .score-unit {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-left: 0.25rem;
+    color: var(--color-text-muted, #666);
+  }
+
+  .score-grade {
+    font-size: 1.3rem;
+    font-weight: 700;
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+    background: var(--color-surface-alt, #f3f4f6);
+    color: var(--color-text, #111);
+  }
+
+  .score-bar-track {
+    width: 100%;
+    max-width: 400px;
+    height: 12px;
+    background: var(--color-surface-alt, #f3f4f6);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #f87171, #fbbf24, #34d399);
+    border-radius: 999px;
+    transition: width 0.6s ease;
+  }
+
+  .desc-box {
+    background: var(--color-surface-alt, #f9fafb);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    line-height: 1.7;
+    color: var(--color-text, #111);
+    font-size: 0.98rem;
+    border-left: 4px solid var(--color-primary, #6366f1);
+  }
+  .desc-box p {
+    margin: 0;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const ZODIACS = [
+      { name: "쥐띠", hanja: "子", emoji: "🐭" },
+      { name: "소띠", hanja: "丑", emoji: "🐮" },
+      { name: "호랑이띠", hanja: "寅", emoji: "🐯" },
+      { name: "토끼띠", hanja: "卯", emoji: "🐰" },
+      { name: "용띠", hanja: "辰", emoji: "🐲" },
+      { name: "뱀띠", hanja: "巳", emoji: "🐍" },
+      { name: "말띠", hanja: "午", emoji: "🐴" },
+      { name: "양띠", hanja: "未", emoji: "🐑" },
+      { name: "원숭이띠", hanja: "申", emoji: "🐵" },
+      { name: "닭띠", hanja: "酉", emoji: "🐔" },
+      { name: "개띠", hanja: "戌", emoji: "🐶" },
+      { name: "돼지띠", hanja: "亥", emoji: "🐷" },
+    ];
+
+    // 12x12 궁합 점수 매트릭스 (전통 12지신 삼합/육합/육충 기반)
+    const M = [
+      [70, 95, 60, 55, 95, 65, 40, 55, 95, 70, 60, 75], // 쥐
+      [95, 70, 55, 65, 60, 95, 55, 40, 65, 95, 55, 60], // 소
+      [60, 55, 70, 70, 60, 55, 95, 65, 40, 55, 95, 70], // 호랑이
+      [55, 65, 70, 70, 55, 65, 60, 95, 55, 40, 60, 95], // 토끼
+      [95, 60, 60, 55, 70, 65, 65, 55, 95, 70, 40, 55], // 용
+      [65, 95, 55, 65, 65, 70, 55, 65, 65, 95, 60, 40], // 뱀
+      [40, 55, 95, 60, 65, 55, 70, 95, 55, 60, 65, 65], // 말
+      [55, 40, 65, 95, 55, 65, 95, 70, 60, 55, 65, 95], // 양
+      [95, 65, 40, 55, 95, 65, 55, 60, 70, 60, 65, 55], // 원숭이
+      [70, 95, 55, 40, 70, 95, 60, 55, 60, 70, 55, 65], // 닭
+      [60, 55, 95, 60, 40, 60, 65, 65, 65, 55, 70, 70], // 개
+      [75, 60, 70, 95, 55, 40, 65, 95, 55, 65, 70, 70], // 돼지
+    ];
+
+    const DESCRIPTIONS: Record<string, string> = {
+      soulmate:
+        "천생연분! 서로를 완벽하게 보완하는 이상적인 관계입니다. 함께 있으면 시너지가 폭발하고, 어려운 순간에도 든든한 지지자가 되어줍니다. 이 인연을 소중히 여기세요.",
+      good: "좋은 궁합입니다. 서로의 개성을 존중하면 큰 갈등 없이 편안한 관계를 유지할 수 있습니다. 대화와 배려로 더욱 깊은 유대를 쌓아보세요.",
+      normal:
+        "보통의 궁합입니다. 성향 차이가 있지만, 서로 이해하려는 노력이 있다면 충분히 좋은 관계로 발전할 수 있습니다. 열린 마음이 열쇠입니다.",
+      caution:
+        "주의가 필요한 조합입니다. 성향이나 가치관 차이로 갈등이 생기기 쉽지만, 이는 절대적인 것이 아닙니다. 서로의 차이를 인정하고 존중한다면 오히려 특별한 인연이 될 수 있어요.",
+    };
+
+    function getZodiacIndex(year: number) {
+      return (((year - 4) % 12) + 12) % 12;
+    }
+
+    function calcGrade(score: number) {
+      if (score >= 90) return { label: "천생연분 💫", key: "soulmate" };
+      if (score >= 70) return { label: "좋음 😊", key: "good" };
+      if (score >= 50) return { label: "보통 🙂", key: "normal" };
+      return { label: "주의 ⚠️", key: "caution" };
+    }
+
+    const myYearEl = document.getElementById(
+      "my-year",
+    ) as HTMLInputElement | null;
+    const myZodiacEl = document.getElementById(
+      "my-zodiac",
+    ) as HTMLSelectElement | null;
+    const partnerYearEl = document.getElementById(
+      "partner-year",
+    ) as HTMLInputElement | null;
+    const partnerZodiacEl = document.getElementById(
+      "partner-zodiac",
+    ) as HTMLSelectElement | null;
+    const calcBtn = document.getElementById("calc-btn");
+    const resetBtn = document.getElementById("reset-btn");
+    const errMsg = document.getElementById("err-msg");
+    const resultSection = document.getElementById("result-section");
+    const myEmoji = document.getElementById("my-emoji");
+    const myName = document.getElementById("my-name");
+    const partnerEmoji = document.getElementById("partner-emoji");
+    const partnerName = document.getElementById("partner-name");
+    const scoreValue = document.getElementById("score-value");
+    const scoreGrade = document.getElementById("score-grade");
+    const scoreBarFill = document.getElementById("score-bar-fill");
+    const descText = document.getElementById("desc-text");
+
+    function showError(msg: string) {
+      if (!errMsg) return;
+      errMsg.textContent = msg;
+      errMsg.hidden = false;
+    }
+    function hideError() {
+      if (!errMsg) return;
+      errMsg.hidden = true;
+      errMsg.textContent = "";
+    }
+
+    function resolveZodiacIdx(
+      yearInput: HTMLInputElement | null,
+      zodiacSelect: HTMLSelectElement | null,
+      who: string,
+    ) {
+      const yearRaw = yearInput?.value.trim() || "";
+      const selectRaw = zodiacSelect?.value || "";
+
+      if (selectRaw !== "") {
+        const idx = parseInt(selectRaw, 10);
+        if (idx >= 0 && idx < 12) return { idx: idx, ok: true };
+      }
+
+      if (yearRaw !== "") {
+        const y = parseInt(yearRaw, 10);
+        if (isNaN(y) || y < 1900 || y > 2100) {
+          return {
+            ok: false,
+            err: who + "의 연도를 1900~2100 사이로 입력해주세요.",
+          };
+        }
+        return { idx: getZodiacIndex(y), ok: true };
+      }
+
+      return {
+        ok: false,
+        err: who + "의 연도를 입력하거나 띠를 선택해주세요.",
+      };
+    }
+
+    function calculate() {
+      hideError();
+      const me = resolveZodiacIdx(myYearEl, myZodiacEl, "나");
+      if (!me.ok || me.idx === undefined) {
+        showError(me.err || "");
+        return;
+      }
+      const partner = resolveZodiacIdx(
+        partnerYearEl,
+        partnerZodiacEl,
+        "상대방",
+      );
+      if (!partner.ok || partner.idx === undefined) {
+        showError(partner.err || "");
+        return;
+      }
+
+      const myZ = ZODIACS[me.idx];
+      const pZ = ZODIACS[partner.idx];
+      const score = M[me.idx][partner.idx];
+      const grade = calcGrade(score);
+
+      if (myEmoji) myEmoji.textContent = myZ.emoji;
+      if (myName) myName.textContent = myZ.name + " (" + myZ.hanja + ")";
+      if (partnerEmoji) partnerEmoji.textContent = pZ.emoji;
+      if (partnerName)
+        partnerName.textContent = pZ.name + " (" + pZ.hanja + ")";
+      if (scoreValue) scoreValue.textContent = String(score);
+      if (scoreGrade) scoreGrade.textContent = grade.label;
+      if (scoreBarFill) (scoreBarFill as HTMLElement).style.width = score + "%";
+      if (descText) descText.textContent = DESCRIPTIONS[grade.key];
+
+      if (resultSection) {
+        resultSection.hidden = false;
+        resultSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+
+    function reset() {
+      hideError();
+      if (myYearEl) myYearEl.value = "";
+      if (partnerYearEl) partnerYearEl.value = "";
+      if (myZodiacEl) myZodiacEl.value = "";
+      if (partnerZodiacEl) partnerZodiacEl.value = "";
+      if (resultSection) resultSection.hidden = true;
+    }
+
+    if (calcBtn) calcBtn.addEventListener("click", calculate);
+    if (resetBtn) resetBtn.addEventListener("click", reset);
+
+    function clearResult() {
+      if (resultSection) resultSection.hidden = true;
+      hideError();
+    }
+
+    if (myYearEl)
+      myYearEl.addEventListener("input", function () {
+        if (myZodiacEl && myYearEl.value.trim() !== "") myZodiacEl.value = "";
+        clearResult();
+      });
+    if (partnerYearEl)
+      partnerYearEl.addEventListener("input", function () {
+        if (partnerZodiacEl && partnerYearEl.value.trim() !== "")
+          partnerZodiacEl.value = "";
+        clearResult();
+      });
+    if (myZodiacEl)
+      myZodiacEl.addEventListener("change", function () {
+        if (myYearEl && myZodiacEl.value !== "") myYearEl.value = "";
+        clearResult();
+      });
+    if (partnerZodiacEl)
+      partnerZodiacEl.addEventListener("change", function () {
+        if (partnerYearEl && partnerZodiacEl.value !== "") partnerYearEl.value = "";
+        clearResult();
+      });
+  });
+</script>

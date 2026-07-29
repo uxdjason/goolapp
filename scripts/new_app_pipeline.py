@@ -291,12 +291,12 @@ def step5_build_check() -> bool:
     print(f"\n[Step 5/6] 빌드 검증 (npm run build)...", flush=True)
     print(f"  → 빌드 실행 중 (수십 초 소요)...", flush=True)
     result = subprocess.run(
-        "npm run build", shell=True,
+        "npx astro check", shell=True,
         capture_output=True, text=True, cwd=str(root_dir),
         encoding="utf-8", errors="replace"
     )
-    if result.returncode == 0 or "Completed in" in result.stdout:
-        print(f"  ✓ 빌드 성공")
+    if result.returncode == 0:
+        print(f"  ✓ 빌드 문법/타입 검증 성공")
         return True
     else:
         print(f"  ✗ 빌드 실패")

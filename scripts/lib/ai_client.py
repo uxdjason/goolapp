@@ -20,11 +20,11 @@ class AICallError(Exception):
 
 # (provider, model) 튜플의 우선순위 체인
 TASK_CHAINS: dict[str, list[tuple[str, str]]] = {
-    "code_generation":   [("anthropic","claude-opus-4-7"), ("anthropic","claude-sonnet-4-6"), ("google","gemini-2.5-pro")],
-    "longform_korean":   [("anthropic","claude-opus-4-7"), ("anthropic","claude-sonnet-4-6"), ("google","gemini-2.5-pro")],
+    "code_generation":   [("anthropic","claude-sonnet-4-6"), ("anthropic","claude-opus-4-7"), ("google","gemini-2.5-pro")],
+    "longform_korean":   [("anthropic","claude-sonnet-4-6"), ("anthropic","claude-opus-4-7"), ("google","gemini-2.5-pro")],
     "seo_meta":          [("anthropic","claude-haiku-4-5"), ("anthropic","claude-sonnet-4-6"), ("google","gemini-2.5-flash")],
     "json_ld":           [("anthropic","claude-haiku-4-5"), ("anthropic","claude-sonnet-4-6"), ("google","gemini-2.5-flash")],
-    "naver_blog":        [("anthropic","claude-opus-4-7"), ("anthropic","claude-sonnet-4-6"), ("google","gemini-2.5-pro")],
+    "naver_blog":        [("anthropic","claude-sonnet-4-6"), ("anthropic","claude-opus-4-7"), ("google","gemini-2.5-pro")],
     "semantic_analysis": [("anthropic","claude-sonnet-4-6"), ("anthropic","claude-opus-4-7"), ("google","gemini-2.5-pro")],
     "keyword_scoring":   [("anthropic","claude-haiku-4-5"), ("anthropic","claude-sonnet-4-6"), ("google","gemini-2.5-flash")],
 }

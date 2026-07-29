@@ -4,7 +4,7 @@
 [Astro & 디자인 시스템 원칙]
 1. `src/layouts/AppLayout.astro` 레이아웃을 사용해야 한다.
 2. 모든 스타일링은 이미 정의된 글로벌 CSS 변수(`var(--color-primary)` 등)를 활용해야 하며, 임의의 하드코딩된 색상 사용은 지양한다.
-3. Vanilla JavaScript를 `<script>` 태그 내에 작성하며, 외부 프레임워크(React, Vue 등)는 사용하지 않는다.
+3. Vanilla JavaScript를 `<script>` 태그 내에 작성하되, Astro 환경에서는 TypeScript로 검사되므로 `document.getElementById`나 `querySelector`로 가져온 DOM 요소는 반드시 `as HTMLInputElement`, `as HTMLSelectElement`, `as HTMLElement` 등으로 타입 단언(Type Assertion)을 해야 한다. (예: `const input = document.getElementById('my-input') as HTMLInputElement;`). 외부 프레임워크(React, Vue 등)는 사용하지 않는다.
 4. Astro 환경의 특성상 `document.createElement`나 `element.innerHTML`로 동적으로 생성된 요소에는 Astro의 Scoped CSS가 자동 적용되지 않는다. 동적 요소의 스타일링을 위해 CSS 블록 내에서 `:global()`을 사용하거나 전역 유틸리티 클래스를 사용해야 한다.
 5. `hidden` 속성으로 초기 숨김 상태를 관리하는 요소에 `display: flex` 또는 `display: grid` CSS를 지정하면, CSS specificity 때문에 `hidden`이 무시되어 항상 표시된다. 이는 모달, 다이얼로그뿐 아니라 `empty-state`, `editor` 패널, `result-section` 등 **모든 요소**에 동일하게 적용된다. 반드시 아래 패턴을 항상 사용하라:
    ```css
