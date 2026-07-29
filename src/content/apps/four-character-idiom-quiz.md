@@ -12,7 +12,7 @@ secondaryKeywords:
 - 4지선다 퀴즈
 - 한자 학습
 - 무료 퀴즈 앱
-publishedAt: 2026-06-03
+publishedAt: 2026-03-25
 seo:
   title: 사자성어 퀴즈로 한자 어휘력 테스트하기
   description: 사자성어 퀴즈로 한자 어휘와 사자성어 의미를 쉽게 배워보세요. 4지선다형 랜덤 퀴즈로 즉시 피드백을 받고 점수를 확인할

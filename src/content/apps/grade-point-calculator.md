@@ -12,7 +12,7 @@ secondaryKeywords:
 - 학점 관리
 - 4.5 만점
 - 4.3 만점
-publishedAt: 2026-06-03
+publishedAt: 2025-11-05
 seo:
   title: 학점 계산기 - GPA 평점 자동 계산 도구
   description: 4.5/4.3 만점 기준 학점 계산기로 과목별 성적을 입력하면 GPA 평점을 즉시 계산합니다. S/U/P 성적도 반영되며

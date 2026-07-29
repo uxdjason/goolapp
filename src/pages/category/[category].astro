@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import AppCard from '../../components/AppCard.astro';
 import CategoryNav from '../../components/CategoryNav.astro';
 import SearchBar from '../../components/SearchBar.astro';
+import SortToggle from '../../components/SortToggle.astro';
 
 export async function getStaticPaths() {
   const categories = ['calculator', 'datetime', 'tool', 'quiz', 'fun', 'finance'];
@@ -52,6 +53,8 @@ const label = categoryLabels[category ?? ''] ?? category;
     <div class="container">
       <CategoryNav activeCategory={category} />
       
+      <SortToggle />
+
       <div class="app-grid">
         {sortedApps.length > 0 ? (
           sortedApps.map(app => (
@@ -61,6 +64,7 @@ const label = categoryLabels[category ?? ''] ?? category;
               slug={app.data.slug}
               category={app.data.category}
               contentSnippet={app.body}
+              publishedAt={app.data.publishedAt}
             />
           ))
         ) : (

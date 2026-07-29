@@ -12,7 +12,7 @@ secondaryKeywords:
 - 무료 로또번호
 - 랜덤 로또번호
 - 로또 자동생성
-publishedAt: 2026-06-03
+publishedAt: 2025-11-19
 seo:
   title: 로또 번호 생성기 - 무료 랜덤 로또번호 추천
   description: 로또 번호 생성기로 45개 숫자 중 6개를 자동으로 추출해 로또번호를 만들어보세요. 1세트 또는 5세트를 한 번에 생성하고

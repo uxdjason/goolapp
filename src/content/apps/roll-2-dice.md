@@ -12,7 +12,7 @@ secondaryKeywords:
 - 무료 주사위 굴리기
 - 3D 주사위
 - 보드게임 주사위
-publishedAt: 2026-06-03
+publishedAt: 2026-01-21
 seo:
   title: 주사위 2개 굴리기 - 무료 온라인 주사위 앱
   description: 실물 주사위 없이 온라인에서 주사위 2개를 한 번에 굴릴 수 있는 무료 앱입니다. 3D 애니메이션으로 사실감 있게 주사위를

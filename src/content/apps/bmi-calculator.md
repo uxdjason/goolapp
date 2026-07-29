@@ -13,7 +13,7 @@ secondaryKeywords:
 - 체중 분석
 - 정상 체중 범위
 - 비만 판정
-publishedAt: 2026-06-03
+publishedAt: 2025-10-15
 seo:
   title: BMI 계산기 - 비만도 측정 및 체중 분석
   description: 간단한 비만도 BMI 계산기로 키, 몸무게, 나이를 입력하여 즉시 BMI 지수를 계산하고 저체중부터 3단계 비만까지 정확히

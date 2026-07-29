@@ -4,10 +4,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import AppCard from '../components/AppCard.astro';
 import CategoryNav from '../components/CategoryNav.astro';
 import SearchBar from '../components/SearchBar.astro';
+import SortToggle from '../components/SortToggle.astro';
 
 const allApps = await getCollection('apps', ({ data }) => !data.draft);
 const sortedApps = allApps.sort((a, b) =>
-  a.data.title.localeCompare(b.data.title, 'ko-KR')
+  b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
 );
 ---
 
@@ -42,6 +43,8 @@ const sortedApps = allApps.sort((a, b) =>
     <div class="container">
       <CategoryNav activeCategory="all" />
 
+      <SortToggle />
+
       <div class="app-grid">
         {sortedApps.map(app => (
           <AppCard
@@ -50,6 +53,7 @@ const sortedApps = allApps.sort((a, b) =>
             slug={app.data.slug}
             category={app.data.category}
             contentSnippet={app.body}
+            publishedAt={app.data.publishedAt}
           />
         ))}
       </div>

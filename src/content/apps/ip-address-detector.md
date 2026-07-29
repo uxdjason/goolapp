@@ -13,7 +13,7 @@ secondaryKeywords:
 - 내 IP 확인
 - ISP 정보
 - IP 위치 조회
-publishedAt: 2026-07-20
+publishedAt: 2026-07-15
 seo:
   title: IP 주소 확인기 - 내 공인 IP 주소 조회
   description: 내 IP 주소 확인하기 앱으로 현재 공인 IP 주소를 즉시 조회하세요. 국가, 지역, ISP 정보까지 한눈에 확인할 수 있습니다.

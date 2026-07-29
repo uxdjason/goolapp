@@ -12,7 +12,7 @@ secondaryKeywords:
 - 년월일 차이
 - 날짜 차이 계산
 - 일수 계산
-publishedAt: 2026-06-03
+publishedAt: 2025-11-26
 seo:
   title: 날짜 차이 계산기 - 정확한 년월일 계산
   description: 두 날짜의 차이를 빠르게 계산하세요. 년 개월 일, 총 개월 수, 총 일수로 정확히 표시됩니다. 업무와 일정 관리에 필수적인

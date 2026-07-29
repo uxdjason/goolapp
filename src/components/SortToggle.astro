@@ -1,0 +1,163 @@
+---
+// SortToggle.astro
+---
+
+<div class="sort-bar">
+  <div class="sort-toggle" id="sort-toggle" role="group" aria-label="정렬 방식 선택">
+    <div class="sort-pill" id="sort-pill" aria-hidden="true"></div>
+    <button class="sort-option" data-sort="recent" id="sort-recent" type="button" aria-pressed="true">최근 추가된 순서</button>
+    <button class="sort-option" data-sort="name" id="sort-name" type="button" aria-pressed="false">이름 순서</button>
+  </div>
+</div>
+
+<style>
+  .sort-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+  }
+
+  .sort-toggle {
+    position: relative;
+    display: inline-flex;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(216, 194, 185, 0.55);
+    border-radius: 9999px;
+    padding: 3px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(74, 68, 63, 0.06);
+    user-select: none;
+  }
+
+  .sort-pill {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    height: calc(100% - 6px);
+    background: var(--color-primary, #8b4f32);
+    border-radius: 9999px;
+    transition:
+      left 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+      width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .sort-option {
+    position: relative;
+    z-index: 1;
+    padding: 6px 14px;
+    border: none;
+    background: transparent;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #6b5952;
+    cursor: pointer;
+    transition: color 0.18s ease;
+    white-space: nowrap;
+    line-height: 1.4;
+  }
+
+  .sort-option.active {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  @media (max-width: 480px) {
+    .sort-option { padding: 6px 10px; font-size: 0.75rem; }
+  }
+</style>
+
+<script>
+  const STORAGE_KEY = 'goolapp-sort-order';
+
+  function getSavedSort(): 'recent' | 'name' {
+    try {
+      const v = localStorage.getItem(STORAGE_KEY);
+      return v === 'name' ? 'name' : 'recent';
+    } catch { return 'recent'; }
+  }
+
+  function saveSort(v: string) {
+    try { localStorage.setItem(STORAGE_KEY, v); } catch {}
+  }
+
+  function positionPill(toggle: Element, value: string, animate: boolean) {
+    const pill = toggle.parentElement?.querySelector<HTMLElement>('#sort-pill');
+    if (!pill) return;
+    const activeBtn = toggle.querySelector<HTMLElement>(`[data-sort="${value}"]`);
+    if (!activeBtn) return;
+    if (!animate) pill.style.transition = 'none';
+    pill.style.left  = activeBtn.offsetLeft + 'px';
+    pill.style.width = activeBtn.offsetWidth + 'px';
+    if (!animate) requestAnimationFrame(() => { pill.style.transition = ''; });
+  }
+
+  function applyActiveClass(toggle: Element, value: string) {
+    toggle.querySelectorAll('.sort-option').forEach(btn => {
+      const isActive = btn.getAttribute('data-sort') === value;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-pressed', String(isActive));
+    });
+  }
+
+  function sortCards(value: string) {
+    const grid = document.querySelector('.app-grid');
+    if (!grid) return;
+    const cards = [...grid.querySelectorAll<HTMLElement>('.app-card')];
+    if (cards.length < 2) return;
+
+    cards.sort((a, b) => {
+      if (value === 'name') {
+        const ta = a.getAttribute('data-title') ?? '';
+        const tb = b.getAttribute('data-title') ?? '';
+        return ta.localeCompare(tb, 'ko-KR');
+      }
+      const da = a.getAttribute('data-published-at') ?? '';
+      const db = b.getAttribute('data-published-at') ?? '';
+      return db < da ? -1 : db > da ? 1 : 0;
+    });
+
+    const frag = document.createDocumentFragment();
+    cards.forEach(c => frag.appendChild(c));
+    grid.appendChild(frag);
+  }
+
+  function applySort(toggle: Element, value: string, animate: boolean) {
+    applyActiveClass(toggle, value);
+    positionPill(toggle, value, animate);
+    sortCards(value);
+  }
+
+  // 모듈 스코프 — 페이지 전체에 리스너 하나만 유지
+  let clickController: AbortController | null = null;
+
+  function setup() {
+    const toggle = document.getElementById('sort-toggle');
+    if (!toggle) return;
+
+    // 이전 클릭 리스너 정리 → 중복 등록 원천 차단
+    clickController?.abort();
+    clickController = new AbortController();
+
+    // 현재 저장된 정렬을 즉시 적용 (애니메이션 없이)
+    applySort(toggle, getSavedSort(), false);
+
+    toggle.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>('.sort-option');
+      if (!btn) return;
+      const newSort = btn.getAttribute('data-sort');
+      if (!newSort) return;
+      saveSort(newSort);
+      applySort(toggle, newSort, true);
+    }, { signal: clickController.signal });
+  }
+
+  // 모듈은 defer 실행 → DOM 완성 후 즉시 실행
+  setup();
+
+  // 페이지 이동마다 재실행 (View Transitions & 일반 네비게이션 모두 대응)
+  document.addEventListener('astro:page-load', setup);
+</script>

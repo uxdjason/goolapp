@@ -5,8 +5,9 @@ interface Props {
   slug: string;
   category: string[];
   contentSnippet?: string;
+  publishedAt?: Date;
 }
-const { title, shortDescription, slug, category, contentSnippet = '' } = Astro.props;
+const { title, shortDescription, slug, category, contentSnippet = '', publishedAt } = Astro.props;
 
 const categoryLabels: Record<string, string> = {
   calculator: '각종 계산기',
@@ -18,8 +19,9 @@ const categoryLabels: Record<string, string> = {
 };
 const catLabel = category.map(c => categoryLabels[c] ?? c).join(', ');
 const categorySlugs = category.join(',');
+const publishedAtISO = publishedAt ? publishedAt.toISOString() : '';
 ---
-<article class="app-card" data-slug={slug} data-title={title} data-desc={shortDescription} data-content={contentSnippet} data-category-slugs={categorySlugs}>
+<article class="app-card" data-slug={slug} data-title={title} data-desc={shortDescription} data-content={contentSnippet} data-category-slugs={categorySlugs} data-published-at={publishedAtISO}>
   <!-- Top row: category chip + favourite star -->
   <div class="card-top">
     <span class="cat-chip">

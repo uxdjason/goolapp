@@ -12,7 +12,7 @@ secondaryKeywords:
 - 세계 국기 학습
 - 지리 상식 퀴즈
 - 플래그 게임
-publishedAt: 2026-06-03
+publishedAt: 2026-03-18
 seo:
   title: 국기 나라 맞추기 퀴즈 - 238개 나라 플래그 학습
   description: 238개 나라의 국기를 보고 4지선다로 정답을 맞추는 무료 국기 퀴즈. 즉시 정답 여부를 확인하고 최종 점수까지 한 번에

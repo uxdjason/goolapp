@@ -12,7 +12,7 @@ secondaryKeywords:
 - QR 코드 무료
 - 링크 QR 코드 변환
 - QR 코드 다운로드
-publishedAt: 2026-06-02
+publishedAt: 2026-02-04
 seo:
   title: QR 코드 생성기 - 무료로 URL을 QR 코드로 변환하기
   description: QR 코드 생성기로 URL, 링크, 텍스트를 간단하게 QR 코드로 변환하세요. 생성된 QR 코드를 PNG로 저장하고 공유할

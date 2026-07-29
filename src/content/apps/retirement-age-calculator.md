@@ -12,7 +12,7 @@ secondaryKeywords:
 - 직종별 정년
 - 공무원 정년
 - 교원 정년
-publishedAt: 2026-07-20
+publishedAt: 2026-07-01
 seo:
   title: 정년 퇴직일 계산기 - 직종별 정년 나이 자동 계산
   description: 정년 퇴직일 계산기로 생년월일과 직종을 입력하면 법정 정년 퇴직일과 퇴직까지 남은 날짜를 즉시 확인하세요. 일반직, 공무원,

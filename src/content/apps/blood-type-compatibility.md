@@ -12,7 +12,7 @@ secondaryKeywords:
 - 연애 궁합
 - 혈액형 성격
 - 관계 분석
-publishedAt: 2026-07-12
+publishedAt: 2026-06-10
 seo:
   title: 혈액형 궁합 테스트 - 연애·우정·업무 관계 분석
   description: 혈액형 궁합 테스트로 두 사람의 연애, 우정, 업무 관계를 분석해보세요. A/B/O/AB형 조합별 상세 점수와 궁합 등급을
