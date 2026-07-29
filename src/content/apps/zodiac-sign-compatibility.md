@@ -13,7 +13,7 @@ secondaryKeywords:
 - 띠 궁합 보기
 - 천생연분
 - 연도별 띠 계산
-publishedAt: 2026-07-29
+publishedAt: 2026-07-30
 seo:
   title: 띠 궁합 보기 - 12지신 궁합 점수 및 연애 조언
   description: 띠 궁합을 무료로 확인하세요. 태어난 연도를 입력하면 12지신 기준 궁합 점수와 관계 설명, 조언 메시지를 제공합니다.
