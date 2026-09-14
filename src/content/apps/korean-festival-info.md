@@ -12,15 +12,15 @@ secondaryKeywords:
 - 지자체 축제 정보
 publishedAt: 2026-09-14
 seo:
-  title: 한국 지역 축제 정보 & 일정 찾기
-  description: 전국 지자체 축제 103개 이상을 한눈에! 시·도별 드롭다운 필터와 검색으로 원하는 한국 지역 축제를 빠르게 찾고, 남은 일정을 확인하세요.
+  title: 한국 지역 축제 정보 & 전국 행사 일정 찾기
+  description: 전국 지자체 축제 103개 이상을 한눈에 살펴보세요! 편리한 시·도별 지역 드롭다운 필터와 검색 기능으로 내가 원하는 한국 지역 축제를 아주 빠르게 찾고, 앞으로 다가오는 남은 일정과 D-day를 쉽게 확인하실 수 있습니다.
   canonicalPath: /korean-festival-info/
-  ogTitle: 한국 지역 축제 정보 & 일정 찾기
+  ogTitle: 한국 지역 축제 정보 & 전국 행사 일정 찾기
   ogDescription: 화천 산천어 축제, 보령 머드 축제, 진해 군항제 등 전국 103개 지역 축제 정보를 지역 드롭다운으로 검색하고, 축제 시작까지 남은 날짜를 확인하세요.
   ogImage: /og/GoolAPP-korean-festival-info.webp
   twitterCard: summary_large_image
-  searchTitle: 한국 지역 축제 정보 & 일정 찾기
-  searchDescription: 전국 지자체 축제 103개 이상을 한눈에! 시·도별 드롭다운 필터와 검색으로 원하는 한국 지역 축제를 빠르게 찾고, 축제 일정을 확인하세요.
+  searchTitle: 한국 지역 축제 정보 & 전국 행사 일정 찾기
+  searchDescription: 전국 지자체 축제 103개 이상을 한눈에 살펴보세요! 편리한 시·도별 지역 드롭다운 필터와 검색 기능으로 내가 원하는 한국 지역 축제를 아주 빠르게 찾고, 앞으로 다가오는 남은 일정과 D-day를 쉽게 확인하실 수 있습니다.
   intent: informational
   primaryKeyword: 한국 지역 축제 정보
   secondaryKeywords:
