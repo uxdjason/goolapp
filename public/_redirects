@@ -9,3 +9,6 @@ http://goolapp.com/* https://goolapp.com/:splat 301
 # Legacy WordPress author pages (Optional catch-all)
 /author/* / 301
 
+# Slug Migration
+/festival-countdown-calculator/* /korean-festival-info/ 301
+/festival-countdown-calculator /korean-festival-info/ 301

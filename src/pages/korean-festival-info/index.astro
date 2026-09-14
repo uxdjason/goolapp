@@ -1,0 +1,1236 @@
+---
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
+
+const entry = await getEntry("apps", "korean-festival-info");
+if (!entry) throw new Error("korean-festival-info entry not found");
+const { Content } = await render(entry);
+
+const allApps = await getCollection("apps");
+let related = allApps
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
+if (related.length === 0) {
+  related = allApps
+    .filter((app) => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="festival-app">
+      <div id="list-view">
+        <!-- 상단 컨트롤러: 검색창 & 지역 드롭다운 -->
+        <div class="control-panel">
+          <div class="search-box">
+            <span class="search-icon" aria-hidden="true">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </span>
+            <input
+              id="search-input"
+              type="text"
+              class="search-input"
+              placeholder="축제 이름, 시·군·구, 장소 검색..."
+              autocomplete="off"
+              aria-label="축제 검색"
+            />
+          </div>
+
+          <div class="select-box">
+            <label for="region-select" class="sr-only">지역 선택</label>
+            <select id="region-select" class="region-select">
+              <option value="">전국 (전체 지역)</option>
+              <option value="서울특별시">서울특별시 (서울)</option>
+              <option value="경기도">경기도 (경기)</option>
+              <option value="인천광역시">인천광역시 (인천)</option>
+              <option value="강원도">강원도 (강원)</option>
+              <option value="충청북도">충청북도 (충북)</option>
+              <option value="충청남도">충청남도 (충남)</option>
+              <option value="대전광역시">대전광역시 (대전)</option>
+              <option value="세종특별자치시">세종특별자치시 (세종)</option>
+              <option value="전라북도">전북특별자치도 (전북)</option>
+              <option value="전라남도">전라남도 (전남)</option>
+              <option value="광주광역시">광주광역시 (광주)</option>
+              <option value="경상북도">경상북도 (경북)</option>
+              <option value="경상남도">경상남도 (경남)</option>
+              <option value="부산광역시">부산광역시 (부산)</option>
+              <option value="대구광역시">대구광역시 (대구)</option>
+              <option value="울산광역시">울산광역시 (울산)</option>
+              <option value="제주특별자치도">제주특별자치도 (제주)</option>
+            </select>
+            <span class="select-arrow" aria-hidden="true">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- 리스트 상태 요약 바 -->
+        <div class="status-bar" id="status-bar">
+          <span class="result-count" id="result-count"
+            >축제 목록을 불러오는 중입니다...</span
+          >
+          <span class="sort-info">가장 최근 시작일순 정렬</span>
+        </div>
+
+        <!-- 로딩 인디케이터 -->
+        <div id="loading-state" class="loading-state">
+          <div class="spinner"></div>
+          <p>전국 축제 데이터(103개+)를 불러오는 중...</p>
+        </div>
+
+        <!-- 에러 상태 -->
+        <div id="error-state" class="error-state" hidden>
+          <div class="error-icon">⚠️</div>
+          <p>축제 정보를 불러오지 못했습니다. 네트워크 상태를 확인해주세요.</p>
+          <button id="retry-btn" class="retry-btn">다시 시도하기</button>
+        </div>
+
+        <!-- 타일 그리드 리스트 (동적 열 반응형 그리드) -->
+        <div id="festival-grid" class="festival-grid" hidden></div>
+
+        <!-- 검색 결과 없음 상태 -->
+        <div id="empty-state" class="empty-state" hidden>
+          <div class="empty-icon">🔍</div>
+          <p class="empty-title">일치하는 축제를 찾을 수 없습니다.</p>
+          <p class="empty-desc">
+            검색어 철자를 확인하거나 지역 필터를 '전국'으로 변경해보세요.
+          </p>
+          <button id="reset-filter-btn" class="reset-filter-btn"
+            >필터 초기화</button
+          >
+        </div>
+      </div>
+      <!-- end list-view -->
+
+      <div id="detail-view" class="detail-page" hidden>
+        <div class="detail-card">
+          <div class="detail-header">
+            <div class="detail-badges">
+              <span class="region-badge" id="detail-region"></span>
+              <span id="detail-status-pill" class="status-pill"></span>
+            </div>
+            <h2 class="detail-name" id="detail-name"></h2>
+            <p class="detail-venue" id="detail-venue"></p>
+          </div>
+
+          <div class="detail-dates">
+            <div class="date-item">
+              <span class="date-label">개최 시작</span>
+              <span class="date-val" id="detail-start"></span>
+            </div>
+            <div class="date-sep">~</div>
+            <div class="date-item">
+              <span class="date-label">행사 종료</span>
+              <span class="date-val" id="detail-end"></span>
+            </div>
+          </div>
+
+          <!-- 축제 시작까지 남은 날짜 -->
+          <div id="countdown-wrap" class="countdown-wrap" hidden>
+            <p class="countdown-label">🎉 축제 시작까지 남은 날짜</p>
+            <div class="countdown-grid">
+              <div class="cd-block">
+                <span id="cd-days" class="cd-num">0</span><span class="cd-unit"
+                  >일</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- 진행 중 상태 텍스트 -->
+          <div id="ongoing-wrap" class="ongoing-wrap" hidden></div>
+
+          <div id="past-wrap" class="past-wrap" hidden>
+            <p class="past-label">해당 기간의 축제는 종료되었습니다.</p>
+          </div>
+
+          <div class="detail-tags" id="detail-tags"></div>
+
+          <button
+            id="back-btn"
+            class="back-btn back-btn-bottom"
+            aria-label="뒤로 가기"
+          >
+            <span class="back-arrow">←</span> 목록으로 돌아가기
+          </button>
+        </div>
+      </div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style is:global>
+  .festival-app {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  /* --- Detail View Styles --- */
+  .detail-page {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .detail-page [hidden] {
+    display: none !important;
+  }
+
+  .back-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #334155;
+    cursor: pointer;
+    margin-top: 2rem;
+    transition: all 0.2s ease;
+  }
+
+  .back-btn:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+    background: #eff6ff;
+  }
+
+  .detail-card {
+  }
+
+  .detail-header {
+    margin-bottom: 2rem;
+  }
+
+  .detail-badges {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .region-badge {
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.3rem 0.8rem;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 8px;
+    border: 1px solid #bfdbfe;
+  }
+
+  .status-pill {
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.3rem 0.8rem;
+    border-radius: 8px;
+  }
+
+  .status-pill.upcoming {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+  }
+  .status-pill.ongoing {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+  }
+  .status-pill.past {
+    background: #f3f4f6;
+    color: #9ca3af;
+    border: 1px solid #e5e7eb;
+  }
+
+  .detail-name {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1.3;
+    margin: 0 0 0.6rem 0;
+  }
+
+  .detail-venue {
+    font-size: 1.05rem;
+    color: #4b5563;
+    margin: 0;
+  }
+
+  .detail-dates {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .date-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .date-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .date-val {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+  .date-sep {
+    color: #cbd5e1;
+    font-size: 1.6rem;
+    font-weight: 300;
+  }
+
+  .countdown-wrap {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 1.5rem 1rem 1.75rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.28);
+  }
+
+  .countdown-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    opacity: 0.9;
+    margin: 0 0 1.2rem;
+  }
+
+  .countdown-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .cd-block {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 0.7rem 0.9rem;
+    min-width: 64px;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+
+  .cd-num {
+    font-size: 2rem;
+    font-weight: 900;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .cd-unit {
+    font-size: 1.1rem;
+    font-weight: 700;
+    opacity: 0.9;
+  }
+  .cd-sep {
+    font-size: 1.6rem;
+    font-weight: 700;
+    opacity: 0.5;
+    margin-bottom: 0.5rem;
+  }
+
+  .ongoing-wrap {
+    background: #fef2f2;
+    border: 1.5px solid #fecaca;
+    border-radius: 14px;
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .ongoing-icon {
+    font-size: 2.2rem;
+    flex-shrink: 0;
+  }
+  .ongoing-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .ongoing-label {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #991b1b;
+    margin: 0 0 0.3rem;
+  }
+  .ongoing-sub {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #b91c1c;
+    margin: 0;
+  }
+
+  .past-wrap {
+    background: #f3f4f6;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 1.2rem 1.5rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .past-label {
+    color: #4b5563;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .detail-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .tag {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4b5563;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    padding: 0.3rem 0.8rem;
+    border-radius: 8px;
+  }
+
+  @media (max-width: 640px) {
+    .detail-card {
+    }
+    .detail-name {
+      font-size: 1.5rem;
+    }
+    .cd-num {
+      font-size: 1.4rem;
+    }
+    .cd-block {
+      min-width: 46px;
+      padding: 0.5rem 1rem;
+    }
+    .cd-unit {
+      font-size: 1rem;
+    }
+    .cd-sep {
+      font-size: 1.2rem;
+      margin: 0 0.1rem;
+    }
+    .date-val {
+      font-size: 0.95rem;
+    }
+    .detail-dates {
+      flex-direction: column;
+      gap: 0.8rem;
+      padding: 1.2rem;
+    }
+    .date-sep {
+      transform: rotate(90deg);
+      font-size: 1.2rem;
+    }
+    .countdown-grid {
+      gap: 0.2rem;
+    }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* 상단 컨트롤러 (검색 & 드롭다운) */
+  .control-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+
+  .search-box {
+    flex: 1 1 320px;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    color: var(--color-text-muted, #9ca3af);
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .search-input {
+    width: 100%;
+    height: 48px;
+    padding: 0 1rem 0 2.85rem;
+    border: 2px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    font-size: 0.96rem;
+    color: var(--color-text, #111827);
+    background: var(--color-surface, #ffffff);
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+  }
+
+  .search-input:focus {
+    border-color: var(--color-primary, #2563eb);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+
+  .select-box {
+    flex: 0 0 240px;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  @media (max-width: 640px) {
+    .select-box {
+      flex: 1 1 100%;
+    }
+  }
+
+  .region-select {
+    width: 100%;
+    height: 48px;
+    padding: 0 2.5rem 0 1rem;
+    border: 2px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text, #1f2937);
+    background: var(--color-surface, #ffffff);
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+  }
+
+  .region-select:focus {
+    border-color: var(--color-primary, #2563eb);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+
+  .select-arrow {
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+    color: var(--color-text-muted, #6b7280);
+    display: flex;
+    align-items: center;
+  }
+
+  /* 상태 바 */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0.2rem 1rem;
+    font-size: 0.88rem;
+    color: var(--color-text-muted, #6b7280);
+  }
+
+  .result-count {
+    font-weight: 600;
+    color: var(--color-text, #374151);
+  }
+
+  .sort-info {
+    font-size: 0.82rem;
+    color: var(--color-text-muted, #9ca3af);
+  }
+
+  /* 로딩 & 에러 */
+  .loading-state {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--color-text-muted, #6b7280);
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3.5px solid var(--color-border, #e5e7eb);
+    border-top-color: var(--color-primary, #2563eb);
+    border-radius: 50%;
+    animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    margin: 0 auto 1.25rem;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .error-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    border-radius: 16px;
+    margin: 1rem 0;
+  }
+
+  .error-icon {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .error-state p {
+    color: #b91c1c;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .retry-btn,
+  .reset-filter-btn {
+    padding: 0.6rem 1.5rem;
+    background: var(--color-primary, #2563eb);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      transform 0.1s ease;
+  }
+
+  .retry-btn:hover,
+  .reset-filter-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+  }
+
+  /* 빈 상태 */
+  .empty-state {
+    text-align: center;
+    padding: 4.5rem 1rem;
+    background: var(--color-surface, #ffffff);
+    border: 2px dashed var(--color-border, #e5e7eb);
+    border-radius: 16px;
+    margin: 1rem 0;
+  }
+
+  .empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.6;
+  }
+
+  .empty-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text, #1f2937);
+    margin-bottom: 0.35rem;
+  }
+
+  .empty-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted, #6b7280);
+    margin-bottom: 1.25rem;
+  }
+
+  /* 동적 타일 그리드 레이아웃 */
+  .festival-grid {
+    display: grid;
+    /* 폭에 맞게 한 row에 들어갈 타일 개수가 동적으로 결정 */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.1rem;
+    margin-bottom: 2rem;
+  }
+
+  /* 모바일 (< 540px): 한 row에 1개 타일로 세로 나열 */
+  @media (max-width: 540px) {
+    .festival-grid {
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+    }
+  }
+
+  /* 개별 타일 (카드) 스타일링 */
+  .festival-tile {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.25rem 1.15rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  }
+
+  .festival-tile.is-ongoing {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+  }
+
+  .festival-tile:hover {
+    border-color: #2563eb;
+    background: #f0f6ff;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.15);
+  }
+
+  .festival-tile:active {
+    transform: translateY(-1px);
+  }
+
+  .tile-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .region-tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-primary, #2563eb);
+    background: #eff6ff;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    letter-spacing: -0.02em;
+  }
+
+  .tile-badge {
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 0.22rem 0.65rem;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .tile-badge.upcoming {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+  }
+
+  .tile-badge.ongoing {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  .tile-badge.past {
+    background: #f3f4f6;
+    color: #9ca3af;
+  }
+
+  .tile-body {
+    flex: 1;
+    margin-bottom: 0.9rem;
+  }
+
+  .tile-name {
+    font-size: 1.12rem;
+    font-weight: 800;
+    color: var(--color-text, #111827);
+    line-height: 1.38;
+    margin: 0 0 0.5rem 0;
+    word-break: keep-all;
+  }
+
+  .tile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.83rem;
+    color: var(--color-text-muted, #4b5563);
+  }
+
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .info-icon {
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .tile-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-border, #f3f4f6);
+  }
+
+  .tile-tags {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    overflow: hidden;
+    max-height: 24px;
+  }
+
+  .tile-tag {
+    font-size: 0.72rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+  }
+
+  .tile-cta {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-primary, #2563eb);
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    margin-left: auto;
+  }
+</style>
+
+<script>
+  const API = "https://goolapp-festivals-api.uxd-jason.workers.dev";
+
+  const loadingEl = document.getElementById("loading-state") as HTMLElement;
+  const errorEl = document.getElementById("error-state") as HTMLElement;
+  const gridEl = document.getElementById("festival-grid") as HTMLElement;
+  const emptyEl = document.getElementById("empty-state") as HTMLElement;
+  const searchEl = document.getElementById("search-input") as HTMLInputElement;
+  const selectEl = document.getElementById(
+    "region-select",
+  ) as HTMLSelectElement;
+  const resultCountEl = document.getElementById("result-count") as HTMLElement;
+  const resetBtn = document.getElementById(
+    "reset-filter-btn",
+  ) as HTMLButtonElement;
+  const retryBtn = document.getElementById("retry-btn") as HTMLButtonElement;
+
+  const listView = document.getElementById("list-view") as HTMLElement;
+  const detailView = document.getElementById("detail-view") as HTMLElement;
+  const backBtn = document.getElementById("back-btn") as HTMLButtonElement;
+
+  let allFestivals: any[] = [];
+  let currentRegion = "";
+  let currentQ = "";
+  let cdTimer: ReturnType<typeof setInterval> | null = null;
+
+  function fmtDate(d: string): string {
+    if (!d) return "";
+    const [y, m, day] = d.split("-");
+    return `${y}년 ${parseInt(m)}월 ${parseInt(day)}일`;
+  }
+
+  function fmtShortDate(d: string): string {
+    if (!d) return "";
+    return d.slice(5).replace("-", ".");
+  }
+
+  function getDDay(startDate: string): { label: string; diff: number } {
+    const now = new Date();
+    const start = new Date(startDate + "T00:00:00");
+    const diff = Math.ceil((start.getTime() - now.getTime()) / 86400000);
+    if (diff > 0) return { label: `D-${diff}`, diff };
+    if (diff === 0) return { label: "D-Day", diff: 0 };
+    return { label: `D+${Math.abs(diff)}`, diff };
+  }
+
+  function getFestivalStatus(f: any): "upcoming" | "ongoing" | "past" {
+    const now = new Date();
+    const start = new Date(f.start_date + "T00:00:00");
+    const end = new Date(f.end_date + "T23:59:59");
+    if (now < start) return "upcoming";
+    if (now > end) return "past";
+    return "ongoing";
+  }
+
+  function getShortRegion(region: string): string {
+    const map: Record<string, string> = {
+      서울특별시: "서울",
+      경기도: "경기",
+      인천광역시: "인천",
+      강원도: "강원",
+      충청북도: "충북",
+      충청남도: "충남",
+      대전광역시: "대전",
+      세종특별자치시: "세종",
+      전라북도: "전북",
+      전라남도: "전남",
+      광주광역시: "광주",
+      경상북도: "경북",
+      경상남도: "경남",
+      부산광역시: "부산",
+      대구광역시: "대구",
+      울산광역시: "울산",
+      제주특별자치도: "제주",
+    };
+    return map[region] || region;
+  }
+
+  // 타일 렌더링 함수
+  function renderTiles(festivals: any[]) {
+    const now = new Date();
+    // 지난 축제는 제외 (진행 중 + 예정 축제 대상)
+    const visible = festivals.filter(
+      (f) => new Date(f.end_date + "T23:59:59") >= now,
+    );
+
+    // 날짜순으로 정렬 (가장 최근의 시작일을 기준으로)
+    visible.sort(
+      (a, b) =>
+        new Date(a.start_date).getTime() - new Date(b.start_date).getTime(),
+    );
+
+    gridEl.innerHTML = "";
+    resultCountEl.textContent = `축제 ${visible.length}개`;
+
+    if (visible.length === 0) {
+      gridEl.hidden = true;
+      emptyEl.hidden = false;
+      return;
+    }
+
+    emptyEl.hidden = true;
+    gridEl.hidden = false;
+
+    visible.forEach((f) => {
+      const status = getFestivalStatus(f);
+      let badgeHtml = "";
+      if (status === "ongoing") {
+        badgeHtml = `<span class="tile-badge ongoing">● 진행 중</span>`;
+      } else {
+        const dd = getDDay(f.start_date);
+        badgeHtml = `<span class="tile-badge upcoming">${dd.label}</span>`;
+      }
+
+      const tags = (f.tags || "")
+        .split(",")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((t: string) => `<span class="tile-tag">#${t.trim()}</span>`)
+        .join("");
+
+      const tile = document.createElement("div");
+      tile.className = "festival-tile";
+      if (status === "ongoing") {
+        tile.classList.add("is-ongoing");
+      }
+      tile.setAttribute("tabindex", "0");
+      tile.setAttribute("role", "button");
+      tile.setAttribute("aria-label", `${f.name} 축제 상세보기`);
+
+      tile.innerHTML = `
+        <div>
+          <div class="tile-top">
+            <span class="region-tag">${getShortRegion(f.region)}</span>
+            ${badgeHtml}
+          </div>
+          <div class="tile-body">
+            <h3 class="tile-name">${f.name}</h3>
+            <div class="tile-info">
+              <div class="info-item" title="${f.city} · ${f.venue}">
+                <span class="info-icon">📍</span>
+                <span>${f.city} · ${f.venue}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-icon">📅</span>
+                <span>${fmtShortDate(f.start_date)} ~ ${fmtShortDate(f.end_date)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tile-bottom">
+          <div class="tile-tags">${tags}</div>
+          <span class="tile-cta">상세보기 &rarr;</span>
+        </div>
+      `;
+
+      tile.addEventListener("click", () => openDetail(f));
+      tile.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openDetail(f);
+        }
+      });
+
+      gridEl.appendChild(tile);
+    });
+  }
+
+  function filterAndRender() {
+    let list = allFestivals;
+    if (currentRegion) {
+      list = list.filter((f) => f.region === currentRegion);
+    }
+    if (currentQ) {
+      const q = currentQ.toLowerCase();
+      list = list.filter(
+        (f) =>
+          f.name.toLowerCase().includes(q) ||
+          f.city.toLowerCase().includes(q) ||
+          f.venue.toLowerCase().includes(q) ||
+          (f.tags && f.tags.toLowerCase().includes(q)),
+      );
+    }
+    renderTiles(list);
+  }
+
+  async function loadFestivals() {
+    loadingEl.hidden = false;
+    errorEl.hidden = true;
+    gridEl.hidden = true;
+    emptyEl.hidden = true;
+    resultCountEl.textContent = "축제 정보를 불러오는 중...";
+
+    try {
+      // 최근 6개월 이전 축제부터 가져와 현재 진행 중인 축제도 포함
+      const sixMonthsAgo = new Date(Date.now() - 180 * 86400000)
+        .toISOString()
+        .slice(0, 10);
+      const res = await fetch(`${API}/festivals?from=${sixMonthsAgo}`);
+      if (!res.ok) throw new Error("API request failed");
+      allFestivals = await res.json();
+      loadingEl.hidden = true;
+      filterAndRender();
+    } catch {
+      loadingEl.hidden = true;
+      errorEl.hidden = false;
+      resultCountEl.textContent = "불러오기 실패";
+    }
+  }
+
+  // 카운트다운 로직 (남은 날짜만)
+  function startCountdown(startDate: string, endDate: string) {
+    const daysEl = document.getElementById("cd-days") as HTMLElement;
+    const now = new Date().getTime();
+    const target = new Date(startDate + "T00:00:00").getTime();
+    const diff = target - now;
+    if (diff <= 0) {
+      daysEl.textContent = "0";
+      return;
+    }
+    const d = Math.ceil(diff / 86400000);
+    daysEl.textContent = String(d);
+  }
+
+  let savedScrollPosition = 0;
+
+  function openDetail(f: any) {
+    savedScrollPosition = window.scrollY;
+    const status = getFestivalStatus(f);
+    (document.getElementById("detail-region") as HTMLElement).textContent =
+      f.region;
+    (document.getElementById("detail-name") as HTMLElement).textContent =
+      f.name;
+    (document.getElementById("detail-venue") as HTMLElement).textContent =
+      `📍 ${f.city} · ${f.venue}`;
+    (document.getElementById("detail-start") as HTMLElement).textContent =
+      fmtDate(f.start_date);
+    (document.getElementById("detail-end") as HTMLElement).textContent =
+      fmtDate(f.end_date);
+
+    const statusPill = document.getElementById(
+      "detail-status-pill",
+    ) as HTMLElement;
+    const cdWrap = document.getElementById("countdown-wrap") as HTMLElement;
+    const ongoingWrap = document.getElementById("ongoing-wrap") as HTMLElement;
+    const pastWrap = document.getElementById("past-wrap") as HTMLElement;
+
+    cdWrap.hidden = true;
+    ongoingWrap.hidden = true;
+    pastWrap.hidden = true;
+
+    // reset classes
+    statusPill.className = "status-pill";
+
+    if (status === "upcoming") {
+      const dd = getDDay(f.start_date);
+      statusPill.textContent = dd.label;
+      statusPill.classList.add("upcoming");
+      cdWrap.hidden = false;
+      startCountdown(f.start_date, f.end_date);
+    } else if (status === "ongoing") {
+      const endDiff = Math.ceil(
+        (new Date(f.end_date + "T23:59:59").getTime() - Date.now()) / 86400000,
+      );
+      statusPill.textContent = "진행 중";
+      statusPill.classList.add("ongoing");
+      ongoingWrap.hidden = false;
+      ongoingWrap.innerHTML = `
+        <div class="ongoing-icon">🔥</div>
+        <div class="ongoing-text">
+          <p class="ongoing-label">현재 신나게 진행 중인 축제입니다!</p>
+          <p class="ongoing-sub">${fmtDate(f.end_date)} 종료 예정 (${endDiff}일 남음)</p>
+        </div>
+      `;
+    } else {
+      statusPill.textContent = "종료된 축제";
+      statusPill.classList.add("past");
+      pastWrap.hidden = false;
+    }
+
+    // 태그 목록
+    const tagsEl = document.getElementById("detail-tags") as HTMLElement;
+    tagsEl.innerHTML = (f.tags || "")
+      .split(",")
+      .filter(Boolean)
+      .map((t: string) => `<span class="tag">#${t.trim()}</span>`)
+      .join("");
+
+    // 화면 전환
+    listView.hidden = true;
+    detailView.hidden = false;
+    const appEl = document.querySelector(".festival-app");
+    if (appEl) {
+      const topPos = appEl.getBoundingClientRect().top + window.scrollY - 100;
+      window.scrollTo({ top: topPos, behavior: "smooth" });
+    }
+  }
+
+  function closeDetail() {
+    detailView.hidden = true;
+    listView.hidden = false;
+    window.scrollTo({ top: savedScrollPosition, behavior: "auto" });
+  }
+
+  // 이벤트 바인딩
+  retryBtn.addEventListener("click", loadFestivals);
+  backBtn.addEventListener("click", closeDetail);
+
+  // ★ 드롭다운 체인지 이벤트
+  selectEl.addEventListener("change", () => {
+    currentRegion = selectEl.value;
+    filterAndRender();
+  });
+
+  // 검색창 입력 이벤트 디바운스
+  let searchTimer: ReturnType<typeof setTimeout>;
+  searchEl.addEventListener("input", () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      currentQ = searchEl.value.trim();
+      filterAndRender();
+    }, 200);
+  });
+
+  // 필터 초기화 버튼
+  resetBtn.addEventListener("click", () => {
+    searchEl.value = "";
+    selectEl.value = "";
+    currentQ = "";
+    currentRegion = "";
+    filterAndRender();
+  });
+
+  loadFestivals();
+</script>

@@ -1,0 +1,8 @@
+name = "goolapp-festivals-api"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+[[d1_databases]]
+binding = "goolapp_festivals"
+database_name = "goolapp-festivals"
+database_id = "3038bb3c-5bda-4cb3-a80c-fdedb1237242"
