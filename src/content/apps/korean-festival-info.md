@@ -3,8 +3,7 @@ title: 한국 지역 축제 정보 & 일정 찾기
 slug: korean-festival-info
 description: 전국 지자체 축제 103개 이상을 한눈에! 시·도별 드롭다운 필터와 검색으로 원하는 한국 지역 축제를 빠르게 찾고, 다가오는 일정을 확인하세요.
 shortDescription: 전국 지자체 축제 정보를 지역별 드롭다운으로 빠르게 찾고, 남은 기간을 확인하세요.
-category:
-- tool
+category: ['datetime', 'tool']
 primaryKeyword: 한국 지역 축제 정보
 secondaryKeywords:
 - 전국 축제 일정
