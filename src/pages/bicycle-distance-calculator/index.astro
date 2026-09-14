@@ -1,0 +1,596 @@
+---
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
+
+const entry = await getEntry("apps", "bicycle-distance-calculator");
+if (!entry) throw new Error("bicycle-distance-calculator entry not found");
+const { Content } = await render(entry);
+
+const allApps = await getCollection("apps");
+let related = allApps
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
+if (related.length === 0) {
+  related = allApps
+    .filter((app) => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="calc-container">
+      <!-- 탭 전환 -->
+      <div class="tab-group" role="tablist">
+        <button
+          class="tab-btn active"
+          id="tab-time"
+          role="tab"
+          aria-selected="true"
+          data-tab="time">⏱ 시간 계산</button
+        >
+        <button
+          class="tab-btn"
+          id="tab-calories"
+          role="tab"
+          aria-selected="false"
+          data-tab="calories">🔥 칼로리 계산</button
+        >
+      </div>
+
+      <!-- 시간 계산 패널 -->
+      <div id="panel-time" class="panel">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="distance">주행 거리 (km)</label>
+            <input
+              type="number"
+              id="distance"
+              class="input-field"
+              placeholder="예: 20"
+              min="0"
+              step="0.1"
+            />
+          </div>
+          <div class="form-group">
+            <label for="speed">평균 속도 (km/h)</label>
+            <input
+              type="number"
+              id="speed"
+              class="input-field"
+              placeholder="예: 20"
+              min="1"
+              step="0.1"
+            />
+          </div>
+          <div class="form-group">
+            <label for="weight-time">체중 (kg)</label>
+            <input
+              type="number"
+              id="weight-time"
+              class="input-field"
+              placeholder="예: 70"
+              min="1"
+              step="0.1"
+            />
+          </div>
+        </div>
+        <div id="err-time" class="error-msg" hidden></div>
+        <button id="calc-time-btn" class="calc-btn">계산하기</button>
+
+        <div id="result-time" class="result-section" hidden>
+          <h3 class="result-title">🚴 주행 분석 결과</h3>
+          <div class="result-grid">
+            <div class="result-card">
+              <span class="result-icon">⏱</span>
+              <span class="result-label">예상 소요 시간</span>
+              <span id="res-duration" class="result-value">—</span>
+            </div>
+            <div class="result-card">
+              <span class="result-icon">📏</span>
+              <span class="result-label">주행 거리</span>
+              <span id="res-distance" class="result-value">—</span>
+            </div>
+            <div class="result-card">
+              <span class="result-icon">🔥</span>
+              <span class="result-label">칼로리 소모</span>
+              <span id="res-calories-t" class="result-value">—</span>
+            </div>
+            <div class="result-card">
+              <span class="result-icon">🌿</span>
+              <span class="result-label">탄소 절감량</span>
+              <span id="res-co2-t" class="result-value">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 칼로리 계산 패널 -->
+      <div id="panel-calories" class="panel" hidden>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="ride-time">주행 시간 (분)</label>
+            <input
+              type="number"
+              id="ride-time"
+              class="input-field"
+              placeholder="예: 60"
+              min="1"
+              step="1"
+            />
+          </div>
+          <div class="form-group">
+            <label for="speed-cal">평균 속도 (km/h)</label>
+            <input
+              type="number"
+              id="speed-cal"
+              class="input-field"
+              placeholder="예: 20"
+              min="1"
+              step="0.1"
+            />
+          </div>
+          <div class="form-group">
+            <label for="weight-cal">체중 (kg)</label>
+            <input
+              type="number"
+              id="weight-cal"
+              class="input-field"
+              placeholder="예: 70"
+              min="1"
+              step="0.1"
+            />
+          </div>
+        </div>
+        <div id="err-cal" class="error-msg" hidden></div>
+        <button id="calc-cal-btn" class="calc-btn">계산하기</button>
+
+        <div id="result-cal" class="result-section" hidden>
+          <h3 class="result-title">🔥 운동 분석 결과</h3>
+          <div class="result-grid">
+            <div class="result-card">
+              <span class="result-icon">🔥</span>
+              <span class="result-label">칼로리 소모</span>
+              <span id="res-calories-c" class="result-value">—</span>
+            </div>
+            <div class="result-card">
+              <span class="result-icon">📏</span>
+              <span class="result-label">예상 주행 거리</span>
+              <span id="res-dist-c" class="result-value">—</span>
+            </div>
+            <div class="result-card">
+              <span class="result-icon">🌿</span>
+              <span class="result-label">탄소 절감량</span>
+              <span id="res-co2-c" class="result-value">—</span>
+            </div>
+            <div class="result-card">
+              <span class="result-icon">⚡</span>
+              <span class="result-label">운동 강도</span>
+              <span id="res-intensity" class="result-value">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .calc-container {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* 탭 */
+  .tab-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--color-border, #e5e7eb);
+    padding-bottom: 0;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    border: none;
+    border-radius: 8px 8px 0 0;
+    background: transparent;
+    color: var(--color-text-muted, #6b7280);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background 0.2s,
+      color 0.2s;
+  }
+
+  .tab-btn.active {
+    background: var(--color-primary, #2563eb);
+    color: #fff;
+  }
+
+  .tab-btn:not(.active):hover {
+    background: var(--color-surface-hover, #f3f4f6);
+    color: var(--color-text, #111827);
+  }
+
+  /* 패널 */
+  .panel {
+    display: block;
+  }
+
+  .panel[hidden] {
+    display: none;
+  }
+
+  /* 폼 */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text, #111827);
+  }
+
+  .input-field {
+    padding: 0.6rem 0.85rem;
+    border: 2px solid var(--color-border, #d1d5db);
+    border-radius: 8px;
+    font-size: 1rem;
+    color: var(--color-text, #111827);
+    background: var(--color-surface, #fff);
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .input-field:focus {
+    border-color: var(--color-primary, #2563eb);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+
+  /* 에러 */
+  .error-msg {
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: #fef2f2;
+    border-radius: 6px;
+    border: 1px solid #fecaca;
+  }
+
+  .error-msg[hidden] {
+    display: none;
+  }
+
+  /* 계산 버튼 */
+  .calc-btn {
+    width: 100%;
+    padding: 0.85rem;
+    background: var(--color-primary, #2563eb);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      opacity 0.2s,
+      transform 0.15s;
+    margin-bottom: 1.5rem;
+  }
+
+  .calc-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .calc-btn:active {
+    transform: translateY(0);
+  }
+
+  /* 결과 섹션 */
+  .result-section {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .result-section[hidden] {
+    display: none;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .result-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text, #111827);
+    margin: 0 0 1rem 0;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 400px) {
+    .result-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .result-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 1rem 0.75rem;
+    background: var(--color-surface, #f9fafb);
+    border: 1.5px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .result-icon {
+    font-size: 1.5rem;
+  }
+
+  .result-label {
+    font-size: 0.78rem;
+    color: var(--color-text-muted, #6b7280);
+    font-weight: 500;
+  }
+
+  .result-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-primary, #2563eb);
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    /* ── 탭 전환 ── */
+    const tabBtns = document.querySelectorAll(
+      ".tab-btn",
+    ) as NodeListOf<HTMLButtonElement>;
+    const panelTime = document.getElementById("panel-time") as HTMLElement;
+    const panelCal = document.getElementById("panel-calories") as HTMLElement;
+
+    tabBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        tabBtns.forEach((b) => {
+          b.classList.remove("active");
+          b.setAttribute("aria-selected", "false");
+        });
+        btn.classList.add("active");
+        btn.setAttribute("aria-selected", "true");
+
+        const tab = btn.dataset.tab;
+        if (tab === "time") {
+          panelTime.removeAttribute("hidden");
+          panelCal.setAttribute("hidden", "");
+        } else {
+          panelCal.removeAttribute("hidden");
+          panelTime.setAttribute("hidden", "");
+        }
+      });
+    });
+
+    /* ── 포커스 시 값 초기화 ── */
+    document.querySelectorAll(".input-field").forEach((el) => {
+      (el as HTMLInputElement).addEventListener("focus", function () {
+        (this as HTMLInputElement).select();
+      });
+    });
+
+    /* ── 입력값 변경 시 결과 숨김 ── */
+    document.querySelectorAll("#panel-time .input-field").forEach((el) => {
+      (el as HTMLInputElement).addEventListener("input", () => {
+        const r = document.getElementById("result-time");
+        if (r) r.setAttribute("hidden", "");
+      });
+    });
+    document.querySelectorAll("#panel-calories .input-field").forEach((el) => {
+      (el as HTMLInputElement).addEventListener("input", () => {
+        const r = document.getElementById("result-cal");
+        if (r) r.setAttribute("hidden", "");
+      });
+    });
+
+    /* ── 유틸 함수 ── */
+    function getMET(speed: number): number {
+      if (speed < 16) return 4;
+      if (speed < 24) return 8;
+      return 12;
+    }
+
+    function formatDuration(hours: number): string {
+      const totalMin = Math.round(hours * 60);
+      if (totalMin < 60) return `${totalMin}분`;
+      const h = Math.floor(totalMin / 60);
+      const m = totalMin % 60;
+      return m === 0 ? `${h}시간` : `${h}시간 ${m}분`;
+    }
+
+    function showError(el: HTMLElement, msg: string) {
+      el.textContent = msg;
+      el.removeAttribute("hidden");
+    }
+
+    function hideError(el: HTMLElement) {
+      el.setAttribute("hidden", "");
+    }
+
+    /* ── 시간 계산 ── */
+    const calcTimeBtn = document.getElementById(
+      "calc-time-btn",
+    ) as HTMLButtonElement;
+    const errTime = document.getElementById("err-time") as HTMLElement;
+    const resultTime = document.getElementById("result-time") as HTMLElement;
+
+    const inDistance = document.getElementById("distance") as HTMLInputElement;
+    const inSpeed = document.getElementById("speed") as HTMLInputElement;
+    const inWeightTime = document.getElementById(
+      "weight-time",
+    ) as HTMLInputElement;
+
+    const resDuration = document.getElementById("res-duration") as HTMLElement;
+    const resDistanceEl = document.getElementById(
+      "res-distance",
+    ) as HTMLElement;
+    const resCaloriesT = document.getElementById(
+      "res-calories-t",
+    ) as HTMLElement;
+    const resCo2T = document.getElementById("res-co2-t") as HTMLElement;
+
+    if (calcTimeBtn) {
+      calcTimeBtn.addEventListener("click", () => {
+        const dist = parseFloat(inDistance.value);
+        const speed = parseFloat(inSpeed.value);
+        const weight = parseFloat(inWeightTime.value);
+
+        if (!dist || dist <= 0) {
+          showError(errTime, "주행 거리를 올바르게 입력해 주세요.");
+          return;
+        }
+        if (!speed || speed <= 0) {
+          showError(errTime, "평균 속도를 올바르게 입력해 주세요.");
+          return;
+        }
+        if (!weight || weight <= 0) {
+          showError(errTime, "체중을 올바르게 입력해 주세요.");
+          return;
+        }
+        hideError(errTime);
+
+        const timeHours = dist / speed;
+        const MET = getMET(speed);
+        const calories = Math.round(MET * weight * timeHours);
+        const co2 = (dist * 0.21).toFixed(0);
+
+        resDuration.textContent = formatDuration(timeHours);
+        resDistanceEl.textContent = `${dist.toFixed(1)} km`;
+        resCaloriesT.textContent = `${calories.toLocaleString()} kcal`;
+        resCo2T.textContent = `${co2} g`;
+
+        resultTime.removeAttribute("hidden");
+      });
+    }
+
+    /* ── 칼로리 계산 ── */
+    const calcCalBtn = document.getElementById(
+      "calc-cal-btn",
+    ) as HTMLButtonElement;
+    const errCal = document.getElementById("err-cal") as HTMLElement;
+    const resultCal = document.getElementById("result-cal") as HTMLElement;
+
+    const inRideTime = document.getElementById("ride-time") as HTMLInputElement;
+    const inSpeedCal = document.getElementById("speed-cal") as HTMLInputElement;
+    const inWeightCal = document.getElementById(
+      "weight-cal",
+    ) as HTMLInputElement;
+
+    const resCaloriesC = document.getElementById(
+      "res-calories-c",
+    ) as HTMLElement;
+    const resDistC = document.getElementById("res-dist-c") as HTMLElement;
+    const resCo2C = document.getElementById("res-co2-c") as HTMLElement;
+    const resIntensity = document.getElementById(
+      "res-intensity",
+    ) as HTMLElement;
+
+    if (calcCalBtn) {
+      calcCalBtn.addEventListener("click", () => {
+        const minutes = parseFloat(inRideTime.value);
+        const speed = parseFloat(inSpeedCal.value);
+        const weight = parseFloat(inWeightCal.value);
+
+        if (!minutes || minutes <= 0) {
+          showError(errCal, "주행 시간을 올바르게 입력해 주세요.");
+          return;
+        }
+        if (!speed || speed <= 0) {
+          showError(errCal, "평균 속도를 올바르게 입력해 주세요.");
+          return;
+        }
+        if (!weight || weight <= 0) {
+          showError(errCal, "체중을 올바르게 입력해 주세요.");
+          return;
+        }
+        hideError(errCal);
+
+        const timeHours = minutes / 60;
+        const MET = getMET(speed);
+        const calories = Math.round(MET * weight * timeHours);
+        const dist = (speed * timeHours).toFixed(1);
+        const co2 = (parseFloat(dist) * 0.21).toFixed(0);
+
+        let intensity = "저강도 (가볍게 라이딩)";
+        if (MET >= 8 && MET < 12) intensity = "중강도 (유산소 효과)";
+        if (MET >= 12) intensity = "고강도 (심폐 강화)";
+
+        resCaloriesC.textContent = `${calories.toLocaleString()} kcal`;
+        resDistC.textContent = `${dist} km`;
+        resCo2C.textContent = `${co2} g`;
+        resIntensity.textContent = intensity;
+
+        resultCal.removeAttribute("hidden");
+      });
+    }
+  });
+</script>
