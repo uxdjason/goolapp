@@ -143,9 +143,16 @@ slug와 제목, quiz_prompt 텍스트, JSON_URL만 이 앱에 맞게 교체하�
         # Named Slot 구조 사용 여부 확인
         if 'slot="app"' not in text and "slot='app'" not in text:
             return False
-        # 파일이 잘리지 않았는지 확인 (마지막 토큰이 </script> 또는 </style> 또는 </AppLayout> 로 끝나야 함)
+        # 파일이 잘리지 않았는지 확인: 마지막 의미있는 줄에 닫는 태그가 있어야 함
         stripped = text.strip()
-        if not (stripped.endswith('</script>') or stripped.endswith('</style>') or stripped.endswith('</AppLayout>') or stripped.endswith('```')):
+        # 코드블록 래핑 제거 후 확인
+        check = stripped
+        if check.startswith("```astro"): check = check[8:]
+        elif check.startswith("```"): check = check[3:]
+        if check.endswith("```"): check = check[:-3]
+        check = check.strip()
+        valid_endings = ('</script>', '</style>', '</AppLayout>', '</Fragment>')
+        if not any(check.endswith(e) for e in valid_endings):
             return False
         return True
 
@@ -154,7 +161,7 @@ slug와 제목, quiz_prompt 텍스트, JSON_URL만 이 앱에 맞게 교체하�
         system=system_prompt,
         user=user_prompt,
         validator=validate_astro,
-        max_tokens=8192,
+        max_tokens=16000,
         log_label=f"code_generation:{slug}"
     )
 

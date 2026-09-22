@@ -4,8 +4,7 @@ slug: baseball-batter-stats
 description: 야구 타자 성적 계산기로 타수, 안타, 홈런 등을 입력하면 타율, 출루율, 장타율, OPS를 즉시 계산합니다. 프로야구 선수와
   아마추어를 위한 성적 분석 도구입니다.
 shortDescription: 야구 타자 성적 계산기로 타수, 안타, 홈런 등을 입력하면 타율, 출루율, 장타율, OPS를 즉시 계산합니다.
-category:
-- calculator
+category: ['calculator', 'tool']
 primaryKeyword: 야구 타자 성적 계산기
 secondaryKeywords:
 - 야구 타율 계산
@@ -13,7 +12,7 @@ secondaryKeywords:
 - 출루율 계산기
 - 장타율 계산
 - 타자 성적 분석
-publishedAt: 2026-09-22
+publishedAt: 2026-09-21
 seo:
   title: 야구 타자 성적 계산기 - 타율·OPS 실시간 분석
   description: 야구 타자 성적 계산기로 타수, 안타, 홈런 등을 입력하면 타율, 출루율, 장타율, OPS를 즉시 계산합니다. 프로야구

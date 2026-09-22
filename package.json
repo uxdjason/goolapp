@@ -19,6 +19,7 @@
     "@astrojs/sitemap": "^3.7.2",
     "astro": "^6.3.3",
     "astro-seo": "^1.1.0",
+    "korean-lunar-calendar": "^0.4.0",
     "typescript": "^6.0.3"
   }
 }

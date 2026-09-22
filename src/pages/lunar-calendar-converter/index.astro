@@ -1,0 +1,617 @@
+---
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
+
+const entry = await getEntry("apps", "lunar-calendar-converter");
+if (!entry) throw new Error("lunar-calendar-converter entry not found");
+const { Content } = await render(entry);
+
+const allApps = await getCollection("apps");
+let related = allApps
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
+if (related.length === 0) {
+  related = allApps
+    .filter((app) => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="converter-wrap">
+      <!-- 방향 탭 -->
+      <div class="tab-bar" role="tablist">
+        <button
+          id="tab-s2l"
+          class="tab-btn active"
+          role="tab"
+          aria-selected="true"
+          type="button"
+        >
+          ☀️ 양력 → 음력
+        </button>
+        <button
+          id="tab-l2s"
+          class="tab-btn"
+          role="tab"
+          aria-selected="false"
+          type="button"
+        >
+          🌙 음력 → 양력
+        </button>
+      </div>
+
+      <!-- 음력→양력 입력 패널 -->
+      <div id="panel-l2s" class="input-panel" hidden>
+        <p class="panel-guide">변환할 음력 날짜를 입력하세요. <span class="guide-range">(지원 범위: 1391~2050년)</span></p>
+        <div class="field-group">
+          <div class="field">
+            <label for="l-year">연도</label>
+            <input
+              id="l-year"
+              type="number"
+              min="1391"
+              max="2050"
+              placeholder="예) 2024"
+              class="input-field"
+            />
+          </div>
+          <div class="field">
+            <label for="l-month">월</label>
+            <select id="l-month" class="input-field">
+              <option value="">월 선택</option>
+              <option value="1">1월</option>
+              <option value="2">2월</option>
+              <option value="3">3월</option>
+              <option value="4">4월</option>
+              <option value="5">5월</option>
+              <option value="6">6월</option>
+              <option value="7">7월</option>
+              <option value="8">8월</option>
+              <option value="9">9월</option>
+              <option value="10">10월</option>
+              <option value="11">11월</option>
+              <option value="12">12월</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="l-day">일</label>
+            <input
+              id="l-day"
+              type="number"
+              min="1"
+              max="30"
+              placeholder="예) 15"
+              class="input-field"
+            />
+          </div>
+        </div>
+        <div class="leap-check">
+          <label class="checkbox-label">
+            <input id="l-leap" type="checkbox" />
+            <span>윤달</span>
+          </label>
+        </div>
+        <div id="err-l2s" class="error-msg" hidden></div>
+        <button id="btn-l2s" class="convert-btn" type="button">변환하기</button>
+      </div>
+
+      <!-- 양력→음력 입력 패널 -->
+      <div id="panel-s2l" class="input-panel">
+        <p class="panel-guide">변환할 양력 날짜를 입력하세요. <span class="guide-range">(지원 범위: 1391~2050년)</span></p>
+        <div class="field-group">
+          <div class="field">
+            <label for="s-year">연도</label>
+            <input
+              id="s-year"
+              type="number"
+              min="1391"
+              max="2050"
+              placeholder="예) 2024"
+              class="input-field"
+            />
+          </div>
+          <div class="field">
+            <label for="s-month">월</label>
+            <select id="s-month" class="input-field">
+              <option value="">월 선택</option>
+              <option value="1">1월</option>
+              <option value="2">2월</option>
+              <option value="3">3월</option>
+              <option value="4">4월</option>
+              <option value="5">5월</option>
+              <option value="6">6월</option>
+              <option value="7">7월</option>
+              <option value="8">8월</option>
+              <option value="9">9월</option>
+              <option value="10">10월</option>
+              <option value="11">11월</option>
+              <option value="12">12월</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="s-day">일</label>
+            <input
+              id="s-day"
+              type="number"
+              min="1"
+              max="31"
+              placeholder="예) 15"
+              class="input-field"
+            />
+          </div>
+        </div>
+        <div id="err-s2l" class="error-msg" hidden></div>
+        <button id="btn-s2l" class="convert-btn" type="button">변환하기</button>
+      </div>
+
+      <!-- 결과 섹션 -->
+      <div id="result-section" class="result-section" hidden>
+        <p id="result-desc" class="result-desc"></p>
+        <div class="result-grid">
+          <div class="result-card">
+            <span class="result-label">변환된 날짜</span>
+            <span id="res-date" class="result-value">—</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">요일</span>
+            <span id="res-dow" class="result-value">—</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">음력 간지</span>
+            <span id="res-ganji" class="result-value">—</span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">띠</span>
+            <span id="res-tti" class="result-value">—</span>
+          </div>
+          <div id="res-leap-wrap" class="result-card" hidden>
+            <span class="result-label">윤달</span>
+            <span id="res-leap" class="result-value">—</span>
+          </div>
+        </div>
+        <div class="result-reset-wrap">
+          <button id="reset-btn" class="reset-btn" type="button">↺ 초기화</button>
+        </div>
+      </div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  /* ── 레이아웃 ── */
+  .converter-wrap {
+    max-width: 540px;
+    margin: 0 auto;
+    font-family: inherit;
+  }
+
+  /* ── 탭 ── */
+  .tab-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    border: 2px solid var(--color-primary);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background 0.18s,
+      color 0.18s;
+  }
+  .tab-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .tab-btn:not(.active):hover {
+    background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  }
+
+  /* ── 입력 패널 ── */
+  .panel-guide {
+    font-size: 0.88rem;
+    color: var(--color-text-muted, #6b7280);
+    margin: 0 0 1rem 0;
+  }
+  .guide-range {
+    font-size: 0.82rem;
+    color: var(--color-text-muted, #9ca3af);
+    font-weight: 400;
+  }
+  .input-panel[hidden] {
+    display: none;
+  }
+
+  .field-group {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;
+    min-width: 90px;
+  }
+  .field label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text-muted, #6b7280);
+  }
+  .input-field {
+    padding: 0.6rem 0.75rem;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+    background: var(--color-surface, #fff);
+    color: var(--color-text, #111827);
+  }
+  .input-field:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  /* ── 윤달 체크 ── */
+  .leap-check {
+    margin-top: 0.9rem;
+  }
+  .checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.92rem;
+    cursor: pointer;
+    color: var(--color-text, #111827);
+  }
+  .checkbox-label input[type="checkbox"] {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+  }
+
+  /* ── 에러 ── */
+  .error-msg {
+    margin-top: 0.6rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 6px;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 0.88rem;
+  }
+  .error-msg[hidden] {
+    display: none;
+  }
+
+  /* ── 변환 버튼 ── */
+  .convert-btn {
+    display: block;
+    width: 100%;
+    margin-top: 1.2rem;
+    padding: 0.85rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      opacity 0.15s,
+      transform 0.12s;
+  }
+  .convert-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  .convert-btn:active {
+    transform: translateY(0);
+  }
+
+  /* ── 결과 ── */
+  .result-section {
+    margin-top: 1.8rem;
+    border-top: 2px solid
+      color-mix(in srgb, var(--color-primary) 20%, transparent);
+    padding-top: 1.2rem;
+  }
+  .result-section[hidden] {
+    display: none;
+  }
+
+  .result-desc {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin: 0 0 1rem 0;
+  }
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  .result-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    background: var(--color-surface, #f9fafb);
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+  }
+  .result-card[hidden] {
+    display: none;
+  }
+  .result-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-muted, #6b7280);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .result-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text, #111827);
+  }
+
+  @media (max-width: 420px) {
+    .result-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ── 결과 하단 초기화 버튼 ── */
+  .result-reset-wrap {
+    margin-top: 1.25rem;
+  }
+  .reset-btn {
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    color: var(--color-text-muted, #6b7280);
+    border: 1.5px solid var(--color-border, #d1d5db);
+    border-radius: 0.6rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+  }
+  .reset-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+</style>
+
+<script>
+  import KoreanLunarCalendar from "korean-lunar-calendar";
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const cal = new KoreanLunarCalendar();
+
+    /* ── 간지 / 띠 ── */
+    const CHEONGAN = ["갑","을","병","정","무","기","경","신","임","계"];
+    const JIJI     = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
+    const TTI      = ["쥐","소","호랑이","토끼","용","뱀","말","양","원숭이","닭","개","돼지"];
+    const DOW      = ["일","월","화","수","목","금","토"];
+
+    function getGanji(year: number): string {
+      const idx = (year - 4) % 60;
+      const tg = (((idx % 60) + 60) % 60) % 10;
+      const tj = (((idx % 60) + 60) % 60) % 12;
+      return `${CHEONGAN[tg]}${JIJI[tj]}년`;
+    }
+    function getTti(year: number): string {
+      const tj = (((year - 4) % 12) + 12) % 12;
+      return `${TTI[tj]}띠`;
+    }
+
+    /* ── DOM 참조 ── */
+    const tabL2S = document.getElementById("tab-l2s") as HTMLButtonElement;
+    const tabS2L = document.getElementById("tab-s2l") as HTMLButtonElement;
+    const panelL2S = document.getElementById("panel-l2s") as HTMLElement;
+    const panelS2L = document.getElementById("panel-s2l") as HTMLElement;
+
+    const lYear  = document.getElementById("l-year")  as HTMLInputElement;
+    const lMonth = document.getElementById("l-month") as HTMLSelectElement;
+    const lDay   = document.getElementById("l-day")   as HTMLInputElement;
+    const lLeap  = document.getElementById("l-leap")  as HTMLInputElement;
+    const errL2S = document.getElementById("err-l2s") as HTMLElement;
+    const btnL2S = document.getElementById("btn-l2s") as HTMLButtonElement;
+
+    const sYear  = document.getElementById("s-year")  as HTMLInputElement;
+    const sMonth = document.getElementById("s-month") as HTMLSelectElement;
+    const sDay   = document.getElementById("s-day")   as HTMLInputElement;
+    const errS2L = document.getElementById("err-s2l") as HTMLElement;
+    const btnS2L = document.getElementById("btn-s2l") as HTMLButtonElement;
+
+    const resultSection = document.getElementById("result-section") as HTMLElement;
+    const resDesc   = document.getElementById("result-desc")  as HTMLElement;
+    const resDate   = document.getElementById("res-date")     as HTMLElement;
+    const resDow    = document.getElementById("res-dow")      as HTMLElement;
+    const resGanji  = document.getElementById("res-ganji")    as HTMLElement;
+    const resTti    = document.getElementById("res-tti")      as HTMLElement;
+    const resLeapWrap = document.getElementById("res-leap-wrap") as HTMLElement;
+    const resLeap   = document.getElementById("res-leap")     as HTMLElement;
+    const resetBtn  = document.getElementById("reset-btn")    as HTMLButtonElement;
+
+    /* ── 탭 전환 ── */
+    function activateTab(mode: "l2s" | "s2l") {
+      if (mode === "l2s") {
+        tabL2S.classList.add("active");    tabL2S.setAttribute("aria-selected", "true");
+        tabS2L.classList.remove("active"); tabS2L.setAttribute("aria-selected", "false");
+        panelL2S.removeAttribute("hidden"); panelS2L.setAttribute("hidden", "");
+      } else {
+        tabS2L.classList.add("active");    tabS2L.setAttribute("aria-selected", "true");
+        tabL2S.classList.remove("active"); tabL2S.setAttribute("aria-selected", "false");
+        panelS2L.removeAttribute("hidden"); panelL2S.setAttribute("hidden", "");
+      }
+      resultSection.setAttribute("hidden", "");
+    }
+
+    // 초기 탭: 양력→음력
+    activateTab("s2l");
+    tabL2S.addEventListener("click", () => activateTab("l2s"));
+    tabS2L.addEventListener("click", () => activateTab("s2l"));
+
+    /* ── 에러 표시 ── */
+    function showErr(el: HTMLElement, msg: string) {
+      el.textContent = msg;
+      el.removeAttribute("hidden");
+    }
+    function clearErr(el: HTMLElement) {
+      el.textContent = "";
+      el.setAttribute("hidden", "");
+    }
+
+    /* ── 결과 표시 ── */
+    function showResult(
+      dateStr: string,
+      dowStr: string,
+      ganjiYear: number,
+      leapStr: string | null,
+      descStr: string,
+    ) {
+      resDesc.textContent  = descStr;
+      resDate.textContent  = dateStr;
+      resDow.textContent   = dowStr;
+      resGanji.textContent = getGanji(ganjiYear);
+      resTti.textContent   = getTti(ganjiYear);
+      if (leapStr !== null) {
+        resLeap.textContent = leapStr;
+        resLeapWrap.removeAttribute("hidden");
+      } else {
+        resLeapWrap.setAttribute("hidden", "");
+      }
+      resultSection.removeAttribute("hidden");
+      resultSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    /* ── 입력값 변경 시 결과 숨김 ── */
+    function hideResult() {
+      if (!resultSection.hasAttribute("hidden")) {
+        resultSection.setAttribute("hidden", "");
+      }
+    }
+    [lYear, lDay, sYear, sDay].forEach((el) => el.addEventListener("input", hideResult));
+    [lMonth, sMonth].forEach((el) => el.addEventListener("change", hideResult));
+    lLeap.addEventListener("change", hideResult);
+
+    /* ── 초기화 ── */
+    resetBtn.addEventListener("click", () => {
+      lYear.value = ""; lMonth.value = ""; lDay.value = "";
+      lLeap.checked = false;
+      sYear.value = ""; sMonth.value = ""; sDay.value = "";
+      clearErr(errL2S); clearErr(errS2L);
+      resultSection.setAttribute("hidden", "");
+      const appSection = document.querySelector(".app-ui-section");
+      if (appSection) {
+        const top = (appSection as HTMLElement).getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+    });
+
+    /* ── 음력 → 양력 변환 ── */
+    btnL2S.addEventListener("click", () => {
+      clearErr(errL2S);
+      const y = parseInt(lYear.value);
+      const m = parseInt(lMonth.value);
+      const d = parseInt(lDay.value);
+      const leap = lLeap.checked;
+
+      if (!lYear.value || isNaN(y) || y < 1391 || y > 2050)
+        return showErr(errL2S, "연도는 1391~2050 범위만 지원합니다.");
+      if (!lMonth.value || isNaN(m))
+        return showErr(errL2S, "월을 선택해 주세요.");
+      if (!lDay.value || isNaN(d) || d < 1 || d > 30)
+        return showErr(errL2S, "일을 1~30 범위로 입력해 주세요.");
+
+      const ok = cal.setLunarDate(y, m, d, leap);
+      if (!ok) return showErr(errL2S, "해당 음력 날짜를 변환할 수 없습니다. 날짜를 확인해 주세요.");
+
+      const solar = cal.getSolarCalendar();
+      const solarDate = new Date(solar.year, solar.month - 1, solar.day);
+      const dateStr = `${solar.year}년 ${solar.month}월 ${solar.day}일`;
+      const dowStr  = `${DOW[solarDate.getDay()]}요일`;
+      showResult(dateStr, dowStr, solar.year, null, "양력으로 변환된 날짜는 아래와 같습니다.");
+    });
+
+    /* ── 양력 → 음력 변환 ── */
+    btnS2L.addEventListener("click", () => {
+      clearErr(errS2L);
+      const y = parseInt(sYear.value);
+      const m = parseInt(sMonth.value);
+      const d = parseInt(sDay.value);
+
+      if (!sYear.value || isNaN(y) || y < 1391 || y > 2050)
+        return showErr(errS2L, "연도는 1391~2050 범위만 지원합니다.");
+      if (!sMonth.value || isNaN(m))
+        return showErr(errS2L, "월을 선택해 주세요.");
+      if (!sDay.value || isNaN(d) || d < 1 || d > 31)
+        return showErr(errS2L, "일을 1~31 범위로 입력해 주세요.");
+
+      // 날짜 유효성 검사
+      const testDate = new Date(y, m - 1, d);
+      if (testDate.getMonth() !== m - 1)
+        return showErr(errS2L, "유효하지 않은 날짜입니다.");
+
+      const ok = cal.setSolarDate(y, m, d);
+      if (!ok) return showErr(errS2L, "해당 양력 날짜를 변환할 수 없습니다. 날짜를 확인해 주세요.");
+
+      const lunar = cal.getLunarCalendar();
+      const isLeap = lunar.intercalation;
+      const dateStr = `${lunar.year}년 ${lunar.month}월 ${lunar.day}일${isLeap ? " (윤달)" : ""}`;
+      const dowStr  = `${DOW[testDate.getDay()]}요일`;
+      showResult(dateStr, dowStr, lunar.year, isLeap ? "윤달" : "평달", "음력으로 변환된 날짜는 아래와 같습니다.");
+    });
+
+    /* ── 포커스 시 0 지우기 ── */
+    [lYear, lDay, sYear, sDay].forEach((input) => {
+      input.addEventListener("focus", function () {
+        if (this.value === "0") this.value = "";
+      });
+    });
+  });
+</script>
