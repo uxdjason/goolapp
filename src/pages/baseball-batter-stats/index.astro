@@ -1,0 +1,748 @@
+---
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
+
+const entry = await getEntry("apps", "baseball-batter-stats");
+if (!entry) throw new Error("baseball-batter-stats entry not found");
+const { Content } = await render(entry);
+
+const allApps = await getCollection("apps");
+let related = allApps
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
+if (related.length === 0) {
+  related = allApps
+    .filter((app) => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="batter-container">
+      <div class="batter-card">
+        <div class="batter-header">
+          <span class="batter-icon">⚾</span>
+          <h2 class="batter-title">타자 성적 입력</h2>
+        </div>
+
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="ab" class="input-label"
+              >타수 <span class="input-abbr">(AB)</span></label
+            >
+            <input
+              type="number"
+              id="ab"
+              class="input-field"
+              min="0"
+              placeholder="0"
+            />
+          </div>
+          <div class="input-group">
+            <label for="h" class="input-label"
+              >안타 <span class="input-abbr">(H)</span></label
+            >
+            <input
+              type="number"
+              id="h"
+              class="input-field"
+              min="0"
+              placeholder="0"
+            />
+          </div>
+          <div class="input-group">
+            <label for="double" class="input-label"
+              >2루타 <span class="input-abbr">(2B)</span></label
+            >
+            <input
+              type="number"
+              id="double"
+              class="input-field"
+              min="0"
+              placeholder="0"
+            />
+          </div>
+          <div class="input-group">
+            <label for="triple" class="input-label"
+              >3루타 <span class="input-abbr">(3B)</span></label
+            >
+            <input
+              type="number"
+              id="triple"
+              class="input-field"
+              min="0"
+              placeholder="0"
+            />
+          </div>
+          <div class="input-group">
+            <label for="hr" class="input-label"
+              >홈런 <span class="input-abbr">(HR)</span></label
+            >
+            <input
+              type="number"
+              id="hr"
+              class="input-field"
+              min="0"
+              placeholder="0"
+            />
+          </div>
+          <div class="input-group">
+            <label for="bb" class="input-label"
+              >볼넷 <span class="input-abbr">(BB)</span></label
+            >
+            <input
+              type="number"
+              id="bb"
+              class="input-field"
+              min="0"
+              placeholder="0"
+            />
+          </div>
+          <div class="input-group">
+            <label for="hbp" class="input-label"
+              >사구 <span class="input-abbr">(HBP)</span></label
+            >
+            <input
+              type="number"
+              id="hbp"
+              class="input-field"
+              min="0"
+              placeholder="0"
+            />
+          </div>
+          <div class="input-group">
+            <label for="sf" class="input-label"
+              >희생플라이 <span class="input-abbr">(SF)</span></label
+            >
+            <input
+              type="number"
+              id="sf"
+              class="input-field"
+              min="0"
+              placeholder="0"
+            />
+          </div>
+          <div class="input-group">
+            <label for="so" class="input-label"
+              >삼진 <span class="input-abbr">(SO)</span></label
+            >
+            <input
+              type="number"
+              id="so"
+              class="input-field"
+              min="0"
+              placeholder="0"
+            />
+          </div>
+        </div>
+
+        <div id="err-msg" class="error-msg" hidden>
+          입력값을 확인해주세요. 타수는 0보다 커야 하며, 안타·2루타·3루타·홈런의
+          합이 타수를 초과할 수 없습니다.
+        </div>
+
+        <div class="btn-row">
+          <button id="calc-btn" class="calc-btn">계산하기</button>
+        </div>
+      </div>
+
+      <!-- 결과 카드 -->
+      <div id="result-section" class="result-card" hidden>
+        <div class="result-header">
+          <span class="result-icon">📊</span>
+          <h3 class="result-title">성적 분석 결과</h3>
+        </div>
+
+        <div id="ops-badge-wrap" class="ops-badge-wrap">
+          <span id="ops-badge" class="ops-badge"></span>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">타율</span>
+            <span class="stat-abbr">AVG</span>
+            <span id="avg-val" class="stat-value">—</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">출루율</span>
+            <span class="stat-abbr">OBP</span>
+            <span id="obp-val" class="stat-value">—</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">장타율</span>
+            <span class="stat-abbr">SLG</span>
+            <span id="slg-val" class="stat-value">—</span>
+          </div>
+          <div class="stat-item stat-item-highlight">
+            <span class="stat-label">OPS</span>
+            <span class="stat-abbr">출루율 + 장타율</span>
+            <span id="ops-val" class="stat-value stat-value-ops">—</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">총 루타</span>
+            <span class="stat-abbr">TB</span>
+            <span id="tb-val" class="stat-value">—</span>
+          </div>
+        </div>
+
+        <div class="formula-section">
+          <h4 class="formula-title">계산 공식 안내</h4>
+          <ul class="formula-list">
+            <li><strong>AVG</strong> = 안타 ÷ 타수</li>
+            <li>
+              <strong>TB</strong> = 안타 + (2루타×2) + (3루타×3) + (홈런×4)
+            </li>
+            <li><strong>SLG</strong> = 총루타 ÷ 타수</li>
+            <li>
+              <strong>OBP</strong> = (안타+볼넷+사구) ÷ (타수+볼넷+사구+희생플라이)
+            </li>
+            <li><strong>OPS</strong> = 출루율 + 장타율</li>
+          </ul>
+        </div>
+
+        <div class="result-reset-wrap">
+          <button id="reset-btn" class="reset-btn">↺ 초기화</button>
+        </div>
+      </div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .batter-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* 입력 카드 */
+  .batter-card {
+  }
+
+  .batter-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .batter-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+
+  .batter-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-text, #111);
+    margin: 0;
+  }
+
+  /* 입력 그리드 */
+  .input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  @media (min-width: 480px) {
+    .input-grid {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .input-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text, #111);
+  }
+
+  .input-abbr {
+    font-weight: 400;
+    color: var(--color-text-muted, #6b7280);
+    font-size: 0.78rem;
+  }
+
+  .input-field {
+    padding: 0.55rem 0.75rem;
+    border: 1.5px solid var(--color-border, #d1d5db);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    color: var(--color-text, #111);
+    background: var(--color-bg, #f9fafb);
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .input-field:focus {
+    outline: none;
+    border-color: var(--color-primary, #2563eb);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    background: #fff;
+  }
+
+  /* 에러 메시지 */
+  .error-msg {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+    margin-bottom: 1rem;
+  }
+
+  .error-msg[hidden] {
+    display: none;
+  }
+
+  /* 버튼 행 */
+  .btn-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  /* 결과 하단 초기화 버튼 */
+  .result-reset-wrap {
+    margin-top: 1.25rem;
+  }
+
+  .result-reset-wrap .reset-btn {
+    width: 100%;
+  }
+
+  .calc-btn {
+    flex: 1;
+    padding: 0.75rem 1.25rem;
+    background: var(--color-primary, #2563eb);
+    color: #fff;
+    border: none;
+    border-radius: 0.6rem;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      background 0.2s,
+      transform 0.1s;
+  }
+
+  .calc-btn:hover {
+    background: var(--color-primary-dark, #1d4ed8);
+    transform: translateY(-1px);
+  }
+
+  .calc-btn:active {
+    transform: translateY(0);
+  }
+
+  .reset-btn {
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    color: var(--color-text-muted, #6b7280);
+    border: 1.5px solid var(--color-border, #d1d5db);
+    border-radius: 0.6rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+  }
+
+  .reset-btn:hover {
+    border-color: var(--color-primary, #2563eb);
+    color: var(--color-primary, #2563eb);
+  }
+
+  /* 결과 카드 */
+  .result-card {
+    margin-top: 2rem;
+  }
+
+  .result-card[hidden] {
+    display: none;
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .result-icon {
+    font-size: 1.5rem;
+  }
+
+  .result-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text, #111);
+    margin: 0;
+  }
+
+  /* OPS 배지 */
+  .ops-badge-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .ops-badge {
+    display: inline-block;
+    padding: 0.45rem 1.25rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  :global(.ops-badge.elite) {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1.5px solid #fbbf24;
+  }
+
+  :global(.ops-badge.good) {
+    background: #dcfce7;
+    color: #166534;
+    border: 1.5px solid #4ade80;
+  }
+
+  :global(.ops-badge.average) {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1.5px solid #60a5fa;
+  }
+
+  :global(.ops-badge.below) {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1.5px solid #d1d5db;
+  }
+
+  /* 스탯 그리드 */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (min-width: 480px) {
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--color-bg, #f9fafb);
+    border-radius: 0.75rem;
+    padding: 1rem 0.75rem;
+    border: 1.5px solid var(--color-border, #e5e7eb);
+    text-align: center;
+  }
+
+  .stat-item-highlight {
+    border-color: var(--color-primary, #2563eb);
+    background: #eff6ff;
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 480px) {
+    .stat-item-highlight {
+      grid-column: auto;
+    }
+  }
+
+  .stat-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text, #111);
+    margin-bottom: 0.2rem;
+  }
+
+  .stat-abbr {
+    font-size: 0.72rem;
+    color: var(--color-text-muted, #6b7280);
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--color-primary, #2563eb);
+    line-height: 1;
+  }
+
+  .stat-value-ops {
+    font-size: 1.7rem;
+  }
+
+  /* 공식 안내 */
+  .formula-section {
+    background: var(--color-bg, #f9fafb);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--color-border, #e5e7eb);
+  }
+
+  .formula-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-text, #111);
+    margin: 0 0 0.6rem 0;
+  }
+
+  .formula-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .formula-list li {
+    font-size: 0.82rem;
+    color: var(--color-text-muted, #6b7280);
+    line-height: 1.5;
+  }
+
+  .formula-list li strong {
+    color: var(--color-text, #111);
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const abInput = document.getElementById("ab") as HTMLInputElement;
+    const hInput = document.getElementById("h") as HTMLInputElement;
+    const dblInput = document.getElementById("double") as HTMLInputElement;
+    const triInput = document.getElementById("triple") as HTMLInputElement;
+    const hrInput = document.getElementById("hr") as HTMLInputElement;
+    const bbInput = document.getElementById("bb") as HTMLInputElement;
+    const hbpInput = document.getElementById("hbp") as HTMLInputElement;
+    const sfInput = document.getElementById("sf") as HTMLInputElement;
+    const soInput = document.getElementById("so") as HTMLInputElement;
+
+    const calcBtn = document.getElementById("calc-btn") as HTMLButtonElement;
+    const resetBtn = document.getElementById("reset-btn") as HTMLButtonElement;
+    const errMsg = document.getElementById("err-msg") as HTMLDivElement;
+    const resultSec = document.getElementById(
+      "result-section",
+    ) as HTMLDivElement;
+
+    const avgVal = document.getElementById("avg-val") as HTMLSpanElement;
+    const obpVal = document.getElementById("obp-val") as HTMLSpanElement;
+    const slgVal = document.getElementById("slg-val") as HTMLSpanElement;
+    const opsVal = document.getElementById("ops-val") as HTMLSpanElement;
+    const tbVal = document.getElementById("tb-val") as HTMLSpanElement;
+    const opsBadge = document.getElementById("ops-badge") as HTMLSpanElement;
+
+    function getVal(input: HTMLInputElement): number {
+      const v = parseFloat(input.value);
+      return isNaN(v) || v < 0 ? 0 : Math.floor(v);
+    }
+
+    function fmt3(n: number): string {
+      return n.toFixed(3);
+    }
+
+    function showError(msg: string) {
+      errMsg.textContent = msg;
+      errMsg.hidden = false;
+    }
+
+    function hideError() {
+      errMsg.hidden = true;
+    }
+
+    function calculate() {
+      const AB = getVal(abInput);
+      const H = getVal(hInput);
+      const D = getVal(dblInput);
+      const T = getVal(triInput);
+      const HR = getVal(hrInput);
+      const BB = getVal(bbInput);
+      const HBP = getVal(hbpInput);
+      const SF = getVal(sfInput);
+
+      // 유효성 검사
+      if (AB <= 0) {
+        showError("타수(AB)는 1 이상이어야 합니다.");
+        resultSec.hidden = true;
+        return;
+      }
+
+      if (H > AB) {
+        showError("안타(H)가 타수(AB)보다 클 수 없습니다.");
+        resultSec.hidden = true;
+        return;
+      }
+
+      if (D + T + HR > H) {
+        showError("2루타 + 3루타 + 홈런의 합이 안타(H)보다 클 수 없습니다.");
+        resultSec.hidden = true;
+        return;
+      }
+
+      hideError();
+
+      // 계산
+      const AVG = H / AB;
+      const TB = H + D * 1 + T * 2 + HR * 3;
+      // TB 공식: 1루타=1, 2루타=2, 3루타=3, 홈런=4
+      // H에는 이미 1루타+2루타+3루타+홈런 포함, 각 추가 진루 계산
+      const TB_correct = (H - D - T - HR) * 1 + D * 2 + T * 3 + HR * 4;
+      const SLG = TB_correct / AB;
+      const obpDenom = AB + BB + HBP + SF;
+      const OBP = obpDenom > 0 ? (H + BB + HBP) / obpDenom : 0;
+      const OPS = OBP + SLG;
+
+      // 출력
+      avgVal.textContent = fmt3(AVG);
+      obpVal.textContent = fmt3(OBP);
+      slgVal.textContent = fmt3(SLG);
+      opsVal.textContent = fmt3(OPS);
+      tbVal.textContent = String(TB_correct);
+
+      // OPS 배지
+      opsBadge.className = "ops-badge";
+      if (OPS >= 0.9) {
+        opsBadge.textContent = "🏆 엘리트 타자 (OPS 0.900+)";
+        opsBadge.classList.add("elite");
+      } else if (OPS >= 0.8) {
+        opsBadge.textContent = "⭐ 좋은 타자 (OPS 0.800+)";
+        opsBadge.classList.add("good");
+      } else if (OPS >= 0.7) {
+        opsBadge.textContent = "✅ 평균 타자 (OPS 0.700+)";
+        opsBadge.classList.add("average");
+      } else {
+        opsBadge.textContent = "📉 개선 필요 (OPS 0.700 미만)";
+        opsBadge.classList.add("below");
+      }
+
+      resultSec.hidden = false;
+      resultSec.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function reset() {
+      [
+        abInput,
+        hInput,
+        dblInput,
+        triInput,
+        hrInput,
+        bbInput,
+        hbpInput,
+        sfInput,
+        soInput,
+      ].forEach((el) => {
+        if (el) el.value = "";
+      });
+      hideError();
+      resultSec.hidden = true;
+      // 앱 UI 섹션 상단으로 스크롤
+      const appSection = document.querySelector(".app-ui-section");
+      if (appSection) {
+        const top = (appSection as HTMLElement).getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+    }
+
+    // 포커스 시 값 초기화 UX
+    [
+      abInput,
+      hInput,
+      dblInput,
+      triInput,
+      hrInput,
+      bbInput,
+      hbpInput,
+      sfInput,
+      soInput,
+    ].forEach((el) => {
+      if (!el) return;
+      el.addEventListener("focus", function () {
+        if (this.value === "0") this.value = "";
+      });
+    });
+
+    if (calcBtn) calcBtn.addEventListener("click", calculate);
+    if (resetBtn) resetBtn.addEventListener("click", reset);
+
+    // 입력값 변경 시 결과 숨기기
+    [
+      abInput,
+      hInput,
+      dblInput,
+      triInput,
+      hrInput,
+      bbInput,
+      hbpInput,
+      sfInput,
+      soInput,
+    ].forEach((el) => {
+      if (!el) return;
+      el.addEventListener("input", function () {
+        if (!resultSec.hidden) {
+          resultSec.hidden = true;
+          hideError();
+        }
+      });
+    });
+
+    // Enter 키로 계산
+    document.querySelectorAll(".input-field").forEach((field) => {
+      field.addEventListener("keydown", function (e) {
+        if ((e as KeyboardEvent).key === "Enter") calculate();
+      });
+    });
+  });
+</script>
