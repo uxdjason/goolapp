@@ -541,7 +541,9 @@ if (related.length === 0) {
     function openFullscreen() {
       if (!fsOverlay) return;
       fsOverlay.hidden = false;
-      document.documentElement.requestFullscreen().catch(() => {});
+      fsOverlay.requestFullscreen().catch(() => {
+        // 전체화면 API 미지원 시 오버레이만 표시
+      });
       fsIconExpand.style.display = 'none';
       fsIconCompress.style.display = 'block';
       updateFsDisplay();
