@@ -1,0 +1,630 @@
+---
+import { getEntry, render, getCollection } from "astro:content";
+import AppLayout from "../../layouts/AppLayout.astro";
+import RelatedApps from "../../components/RelatedApps.astro";
+
+const entry = await getEntry("apps", "gpa-converter");
+if (!entry) throw new Error("gpa-converter entry not found");
+const { Content } = await render(entry);
+
+const allApps = await getCollection("apps");
+let related = allApps
+  .filter((app) => entry.data.relatedSlugs?.includes(app.data.slug))
+  .map((app) => ({
+    title: app.data.title,
+    shortDescription: app.data.shortDescription,
+    slug: app.data.slug,
+    category: app.data.category,
+  }));
+if (related.length === 0) {
+  related = allApps
+    .filter((app) => app.data.slug !== entry.data.slug)
+    .slice(0, 3)
+    .map((app) => ({
+      title: app.data.title,
+      shortDescription: app.data.shortDescription,
+      slug: app.data.slug,
+      category: app.data.category,
+    }));
+}
+---
+
+<AppLayout
+  title={entry.data.title}
+  description={entry.data.seo.description}
+  shortDescription={entry.data.shortDescription}
+  category={entry.data.category}
+  keywords={entry.data.seo.secondaryKeywords}
+  ogImage={entry.data.seo.ogImage}
+  ogTitle={entry.data.seo.ogTitle}
+  ogDescription={entry.data.seo.ogDescription}
+  canonicalUrl={`https://goolapp.com${entry.data.seo.canonicalPath}`}
+  publishedAt={entry.data.publishedAt}
+>
+  <Fragment slot="app">
+    <div class="calculator">
+      <div class="mode-tabs" role="tablist">
+        <button type="button" class="mode-tab active" data-mode="calc">숫자 입력 환산</button>
+        <button type="button" class="mode-tab" data-mode="table">변환표 보기</button>
+      </div>
+
+      <!-- Mode 1: 숫자 입력 환산 -->
+      <div id="mode-calc" class="mode-content">
+        <div class="form-section">
+          <div class="field-group">
+            <label class="field-label">환산 방향 선택</label>
+            <div class="tab-group" role="tablist">
+              <button type="button" class="tab-btn active" data-dir="to45">4.3 만점 → 4.5 만점</button>
+              <button type="button" class="tab-btn" data-dir="to43">4.5 만점 → 4.3 만점</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="gpa-input" id="gpa-label">현재 GPA (4.3 만점 기준)</label>
+            <input
+              type="number"
+              id="gpa-input"
+              class="field-input"
+              placeholder="예: 3.85"
+              min="0"
+              max="4.5"
+              step="0.01"
+            />
+            <div class="hint">소수점 둘째 자리까지 입력해 주세요.</div>
+          </div>
+
+          <div id="err-msg" class="error-msg" hidden></div>
+          <button type="button" id="calc-btn" class="btn-primary">환산하기</button>
+        </div>
+
+        <section class="result-section" id="result-section" hidden>
+          <h2 class="result-title">환산 결과</h2>
+          
+          <div class="result-summary">
+            <div class="summary-label" id="res-label">4.5 만점 기준 환산 점수</div>
+            <div class="summary-value" id="res-score">-</div>
+          </div>
+
+          <div class="result-grid">
+            <div class="result-row">
+              <span class="result-label">근사 성적 등급</span>
+              <span class="result-value" id="res-grade">-</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">비례 환산 공식</span>
+              <span class="result-value" id="res-formula">-</span>
+            </div>
+          </div>
+          
+          <div class="notice">
+            ※ 과목별 학점과 성적으로 전체 평점 평균(GPA)을 새로 계산하려면 <a href="/grade-point-calculator/" class="text-link">학점 계산기</a>를 이용해 주세요.
+          </div>
+          <button type="button" id="reset-btn" class="btn-text">초기화</button>
+        </section>
+      </div>
+
+      <!-- Mode 2: 변환표 보기 -->
+      <div id="mode-table" class="mode-content" hidden>
+        <div class="table-container">
+          <table class="gpa-table">
+            <thead>
+              <tr>
+                <th>등급</th>
+                <th>4.5 만점</th>
+                <th>4.3 만점</th>
+                <th>4.3 → 4.5 환산</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-grade="A+">
+                <td>A+</td>
+                <td>4.5</td>
+                <td>4.3</td>
+                <td>4.50</td>
+              </tr>
+              <tr data-grade="A0">
+                <td>A0</td>
+                <td>4.0</td>
+                <td>4.0</td>
+                <td>4.19</td>
+              </tr>
+              <tr data-grade="B+">
+                <td>B+</td>
+                <td>3.5</td>
+                <td>3.5</td>
+                <td>3.66</td>
+              </tr>
+              <tr data-grade="B0">
+                <td>B0</td>
+                <td>3.0</td>
+                <td>3.0</td>
+                <td>3.14</td>
+              </tr>
+              <tr data-grade="C+">
+                <td>C+</td>
+                <td>2.5</td>
+                <td>2.5</td>
+                <td>2.62</td>
+              </tr>
+              <tr data-grade="C0">
+                <td>C0</td>
+                <td>2.0</td>
+                <td>2.0</td>
+                <td>2.09</td>
+              </tr>
+              <tr data-grade="D+">
+                <td>D+</td>
+                <td>1.5</td>
+                <td>1.5</td>
+                <td>1.57</td>
+              </tr>
+              <tr data-grade="D0">
+                <td>D0</td>
+                <td>1.0</td>
+                <td>1.0</td>
+                <td>1.05</td>
+              </tr>
+              <tr data-grade="F">
+                <td>F</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="notice" style="margin-top: 1rem;">
+          ※ 위 표는 일반적인 비례 환산 공식을 바탕으로 작성되었습니다. 지원하시는 기관의 실제 규정과 다를 수 있습니다.
+        </div>
+      </div>
+    </div>
+  </Fragment>
+
+  <Fragment slot="longform">
+    <Content />
+    <RelatedApps apps={related} />
+  </Fragment>
+</AppLayout>
+
+<style>
+  .calculator {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .mode-tabs {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 2px solid var(--color-border);
+    margin-bottom: 0.5rem;
+  }
+
+  .mode-tab {
+    flex: 1;
+    padding: 0.75rem;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: -2px;
+  }
+
+  .mode-tab:hover {
+    color: var(--color-text);
+  }
+
+  .mode-tab.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+
+  .mode-content[hidden] {
+    display: none;
+  }
+
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .field-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .field-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1.1rem;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-background);
+    color: var(--color-text);
+    transition: border-color 0.15s ease;
+    box-sizing: border-box;
+  }
+
+  .field-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .hint {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .tab-group {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--color-background);
+    padding: 0.25rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    background: transparent;
+    color: var(--color-text-muted);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .tab-btn:hover {
+    color: var(--color-text);
+  }
+
+  .tab-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+
+  .btn-text {
+    width: 100%;
+    padding: 0.6rem;
+    background: transparent;
+    color: var(--color-text-muted);
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  .btn-text:hover {
+    color: var(--color-text);
+  }
+
+  .error-msg {
+    color: var(--color-danger, #ef4444);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background-color: #fee2e2;
+    border: 1px solid #f87171;
+    border-radius: var(--radius-sm);
+  }
+
+  .error-msg[hidden] {
+    display: none;
+  }
+
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .result-section[hidden] {
+    display: none;
+  }
+
+  .result-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .result-summary {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 1.25rem;
+    border-radius: var(--radius-md);
+    text-align: center;
+  }
+
+  .summary-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 0.3rem;
+  }
+
+  .summary-value {
+    font-size: 2rem;
+    font-weight: 800;
+  }
+
+  .result-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 0;
+    border-bottom: 1px dashed var(--color-border);
+    font-size: 0.95rem;
+  }
+
+  .result-row:last-child {
+    border-bottom: none;
+  }
+
+  .result-label {
+    color: var(--color-text-muted);
+  }
+
+  .result-value {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .notice {
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  .text-link {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  .table-container {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+  }
+
+  .gpa-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 0.95rem;
+  }
+
+  .gpa-table th {
+    background: var(--color-background);
+    padding: 0.75rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  .gpa-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+    transition: background 0.2s;
+  }
+
+  .gpa-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .gpa-table tr.highlight td {
+    background: #eef2ff;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const state = {
+      mode: "calc", // 'calc' | 'table'
+      dir: "to45" // 'to45' (4.3->4.5) | 'to43' (4.5->4.3)
+    };
+
+    const gpaInput = document.getElementById("gpa-input") as HTMLInputElement;
+    const gpaLabel = document.getElementById("gpa-label") as HTMLElement;
+    const calcBtn = document.getElementById("calc-btn") as HTMLButtonElement;
+    const resetBtn = document.getElementById("reset-btn") as HTMLButtonElement;
+    const errMsg = document.getElementById("err-msg") as HTMLElement;
+    const resultSection = document.getElementById("result-section") as HTMLElement;
+    const resLabel = document.getElementById("res-label") as HTMLElement;
+    const resScore = document.getElementById("res-score") as HTMLElement;
+    const resGrade = document.getElementById("res-grade") as HTMLElement;
+    const resFormula = document.getElementById("res-formula") as HTMLElement;
+
+    function showError(msg: string) {
+      if (errMsg) {
+        errMsg.textContent = msg;
+        errMsg.hidden = false;
+      }
+    }
+
+    function clearError() {
+      if (errMsg) {
+        errMsg.textContent = "";
+        errMsg.hidden = true;
+      }
+    }
+
+    function hideResult() {
+      if (resultSection && !resultSection.hidden) resultSection.hidden = true;
+      clearError();
+      document.querySelectorAll(".gpa-table tr").forEach(row => row.classList.remove("highlight"));
+    }
+
+    // 모드 탭 전환
+    document.querySelectorAll<HTMLButtonElement>(".mode-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".mode-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        state.mode = tab.dataset.mode as "calc" | "table";
+        
+        document.getElementById("mode-calc")!.hidden = state.mode !== "calc";
+        document.getElementById("mode-table")!.hidden = state.mode !== "table";
+      });
+    });
+
+    // 환산 방향 전환
+    document.querySelectorAll<HTMLButtonElement>(".tab-btn[data-dir]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn[data-dir]").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.dir = btn.dataset.dir as "to45" | "to43";
+        
+        if (state.dir === "to45") {
+          gpaLabel.textContent = "현재 GPA (4.3 만점 기준)";
+          resLabel.textContent = "4.5 만점 기준 환산 점수";
+          gpaInput.max = "4.3";
+        } else {
+          gpaLabel.textContent = "현재 GPA (4.5 만점 기준)";
+          resLabel.textContent = "4.3 만점 기준 환산 점수";
+          gpaInput.max = "4.5";
+        }
+        hideResult();
+      });
+    });
+
+    if (gpaInput) {
+      gpaInput.addEventListener("input", hideResult);
+    }
+
+    function calculate() {
+      const gpa = Number(gpaInput.value);
+      if (isNaN(gpa) || gpaInput.value.trim() === "") {
+        showError("정확한 학점을 입력해주세요.");
+        return;
+      }
+
+      const maxGpa = state.dir === "to45" ? 4.3 : 4.5;
+      if (gpa < 0 || gpa > maxGpa) {
+        showError(`0에서 ${maxGpa} 사이의 값을 입력해주세요.`);
+        return;
+      }
+
+      clearError();
+
+      let result = 0;
+      let formula = "";
+      let targetGrade = "F";
+
+      if (state.dir === "to45") {
+        // 4.3 -> 4.5
+        result = gpa * (4.5 / 4.3);
+        formula = `${gpa.toFixed(2)} × (4.5 / 4.3)`;
+        
+        // 근사 등급 추정 (4.3 만점 기준 입력값이 어디에 가까운지)
+        if (gpa >= 4.15) targetGrade = "A+";
+        else if (gpa >= 3.85) targetGrade = "A0";
+        else if (gpa >= 3.35) targetGrade = "B+";
+        else if (gpa >= 2.85) targetGrade = "B0";
+        else if (gpa >= 2.35) targetGrade = "C+";
+        else if (gpa >= 1.85) targetGrade = "C0";
+        else if (gpa >= 1.35) targetGrade = "D+";
+        else if (gpa >= 0.85) targetGrade = "D0";
+      } else {
+        // 4.5 -> 4.3
+        result = gpa * (4.3 / 4.5);
+        formula = `${gpa.toFixed(2)} × (4.3 / 4.5)`;
+
+        // 근사 등급 추정 (4.5 만점 기준)
+        if (gpa >= 4.25) targetGrade = "A+";
+        else if (gpa >= 3.75) targetGrade = "A0";
+        else if (gpa >= 3.25) targetGrade = "B+";
+        else if (gpa >= 2.75) targetGrade = "B0";
+        else if (gpa >= 2.25) targetGrade = "C+";
+        else if (gpa >= 1.75) targetGrade = "C0";
+        else if (gpa >= 1.25) targetGrade = "D+";
+        else if (gpa >= 0.75) targetGrade = "D0";
+      }
+
+      resScore.textContent = result.toFixed(2);
+      resFormula.textContent = formula;
+      resGrade.textContent = targetGrade;
+
+      // 표 하이라이트
+      document.querySelectorAll(".gpa-table tr").forEach(row => row.classList.remove("highlight"));
+      const targetRow = document.querySelector(`.gpa-table tr[data-grade="${targetGrade}"]`);
+      if (targetRow) {
+        targetRow.classList.add("highlight");
+      }
+
+      if (resultSection) {
+        resultSection.hidden = false;
+        resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function reset() {
+      gpaInput.value = "";
+      hideResult();
+      
+      // 상태 초기화
+      state.dir = "to45";
+      document.querySelectorAll(".tab-btn[data-dir]").forEach((b) => {
+        b.classList.toggle("active", (b as HTMLElement).dataset.dir === "to45");
+      });
+      gpaLabel.textContent = "현재 GPA (4.3 만점 기준)";
+      resLabel.textContent = "4.5 만점 기준 환산 점수";
+      gpaInput.max = "4.3";
+      
+      const calcContainer = document.querySelector(".calculator");
+      if (calcContainer) {
+        calcContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    if (calcBtn) calcBtn.addEventListener("click", calculate);
+    if (resetBtn) resetBtn.addEventListener("click", reset);
+  });
+</script>
