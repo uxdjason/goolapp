@@ -46,23 +46,23 @@ if (related.length === 0) {
       <div class="form-card">
         <div class="form-group">
           <label for="birthDate">생년월일</label>
-          <input type="date" id="birthDate" />
+          <input type="date" id="birthDate" lang="ko-KR" />
         </div>
 
         <div class="form-group">
           <label for="jobType">직종 / 고용형태</label>
           <select id="jobType">
-            <option value="60">일반직 근로자 (정년 60세)</option>
-            <option value="60">공무원 (정년 60세)</option>
-            <option value="62">교원 / 초중고 교사 (정년 62세)</option>
-            <option value="65">대학교수 (정년 65세)</option>
-            <option value="45">군인 - 소령 (계급정년 45세)</option>
-            <option value="53">군인 - 중령 (계급정년 53세)</option>
-            <option value="56">군인 - 대령 (계급정년 56세)</option>
-            <option value="63">헌법재판관 / 판사 (정년 63세)</option>
-            <option value="65">검사 / 대법관 (정년 65세)</option>
-            <option value="70">대법원장 (정년 70세)</option>
-            <option value="custom">직접 입력</option>
+            <option value="general" data-age="60">일반직 근로자 (정년 60세)</option>
+            <option value="civil_servant" data-age="60">공무원 (정년 60세)</option>
+            <option value="teacher_k12" data-age="62">교원 / 초중고 교사 (정년 62세)</option>
+            <option value="professor" data-age="65">대학교수 (정년 65세)</option>
+            <option value="military" data-age="45">군인 - 소령 (계급정년 45세)</option>
+            <option value="military" data-age="53">군인 - 중령 (계급정년 53세)</option>
+            <option value="military" data-age="56">군인 - 대령 (계급정년 56세)</option>
+            <option value="general" data-age="63">검사 (정년 63세)</option>
+            <option value="general" data-age="65">판사 / 대법관 (정년 65세)</option>
+            <option value="general" data-age="70">헌법재판관 / 대법원장 (정년 70세)</option>
+            <option value="custom" data-age="">직접 입력</option>
           </select>
         </div>
 
@@ -81,7 +81,7 @@ if (related.length === 0) {
           <label for="hireDate"
             >입사일 <span class="optional">(선택)</span></label
           >
-          <input type="date" id="hireDate" />
+          <input type="date" id="hireDate" lang="ko-KR" />
         </div>
 
         <button type="button" id="calcBtn" class="btn-primary"
@@ -97,9 +97,15 @@ if (related.length === 0) {
         </div>
 
         <div class="result-highlight">
-          <div class="highlight-label">정년 퇴직 예정일</div>
+          <div class="highlight-label">법정 정년 생일 기준일</div>
           <div class="highlight-value" id="retirementDate">-</div>
           <div class="highlight-sub" id="retirementAgeText">-</div>
+        </div>
+
+        <div class="result-item" style="margin-bottom: 1.25rem; text-align: center; border: 2px solid var(--color-primary); background: #f0f7ff;">
+          <div class="result-label" style="color: var(--color-primary); font-weight: 600;">직종별 기준 퇴직 예정일(참고)</div>
+          <div class="result-value" id="actualRetirementDate" style="font-size: 1.5rem; color: var(--color-primary); margin-top: 0.5rem;">-</div>
+          <div class="highlight-sub" id="actualRetirementRule" style="margin-top: 0.5rem; font-size: 0.85rem; color: #475569;">-</div>
         </div>
 
         <div class="result-grid">
@@ -356,6 +362,8 @@ if (related.length === 0) {
     const resultSection = document.getElementById("resultSection");
     const retirementDateEl = document.getElementById("retirementDate");
     const retirementAgeTextEl = document.getElementById("retirementAgeText");
+    const actualRetirementDateEl = document.getElementById("actualRetirementDate");
+    const actualRetirementRuleEl = document.getElementById("actualRetirementRule");
     const currentAgeEl = document.getElementById("currentAge");
     const remainYMEl = document.getElementById("remainYM");
     const remainDaysEl = document.getElementById("remainDays");
@@ -438,7 +446,9 @@ if (related.length === 0) {
           return;
         }
       } else {
-        retirementAge = parseInt(jobTypeEl ? jobTypeEl.value : "60", 10);
+        const selectedOption = jobTypeEl ? jobTypeEl.options[jobTypeEl.selectedIndex] : null;
+        const dataAge = selectedOption ? selectedOption.getAttribute("data-age") : "60";
+        retirementAge = parseInt(dataAge || "60", 10);
       }
 
       const today = new Date();
@@ -456,6 +466,32 @@ if (related.length === 0) {
         birth.getDate(),
       );
 
+      // 직종별 실제 퇴직 예정일 로직 적용
+      let actualRetirement = new Date(retirement);
+      let ruleText = "일반 정년 기준 (회사 규정 우선 확인 권장)";
+      const jobCode = jobTypeEl ? jobTypeEl.value : "general";
+
+      if (jobCode === "civil_servant" || jobCode === "military") {
+        actualRetirement = new Date(retirement.getFullYear(), retirement.getMonth() + 1, 0);
+        ruleText = "정년 도달일이 속한 달의 말일 기준";
+      } else if (jobCode === "teacher_k12") {
+        let y = retirement.getFullYear();
+        if (retirement.getMonth() >= 2) y += 1; // 3월 이후 생일이면 다음 해
+        actualRetirement = new Date(y, 2, 0); // 2월 말일 (3월 1일 전날)
+        ruleText = "정년 도달 학년도의 말일(다음 해 2월 말일) 기준";
+      } else if (jobCode === "professor") {
+        const m = retirement.getMonth() + 1;
+        let y = retirement.getFullYear();
+        if (m >= 3 && m <= 8) {
+          actualRetirement = new Date(y, 8, 0);
+          ruleText = "정년 도달일이 속한 학기 말(8월 말일) 기준";
+        } else {
+          if (m >= 9) y += 1;
+          actualRetirement = new Date(y, 2, 0);
+          ruleText = "정년 도달일이 속한 학기 말(2월 말일) 기준";
+        }
+      }
+
       // 현재 만 나이
       let ageYears = today.getFullYear() - birth.getFullYear();
       const hasHadBirthday =
@@ -464,19 +500,23 @@ if (related.length === 0) {
           today.getDate() >= birth.getDate());
       if (!hasHadBirthday) ageYears -= 1;
 
-      // 남은 시간
+      // 남은 시간 계산은 직종별 실제 퇴직 예정일(actualRetirement)을 기준으로 합니다.
       const msPerDay = 1000 * 60 * 60 * 24;
-      const diffMs = retirement.getTime() - today.getTime();
+      const diffMs = actualRetirement.getTime() - today.getTime();
       const daysLeft = Math.round(diffMs / msPerDay);
 
       if (retirementDateEl)
         retirementDateEl.textContent = formatDateKR(retirement);
       if (retirementAgeTextEl)
-        retirementAgeTextEl.textContent = `정년 ${retirementAge}세 기준`;
+        retirementAgeTextEl.textContent = `법정 정년 ${retirementAge}세`;
+      if (actualRetirementDateEl)
+        actualRetirementDateEl.textContent = formatDateKR(actualRetirement);
+      if (actualRetirementRuleEl)
+        actualRetirementRuleEl.textContent = ruleText;
       if (currentAgeEl) currentAgeEl.textContent = `만 ${ageYears}세`;
 
       if (daysLeft >= 0) {
-        const ymd = diffYMD(today, retirement);
+        const ymd = diffYMD(today, actualRetirement);
         const totalMonths = ymd.years * 12 + ymd.months;
         const totalYears = (daysLeft / 365.25).toFixed(1);
 
@@ -492,7 +532,7 @@ if (related.length === 0) {
           statusMsg.className = "status-msg future";
         }
       } else {
-        const past = diffYMD(retirement, today);
+        const past = diffYMD(actualRetirement, today);
         const daysPast = Math.abs(daysLeft);
         if (remainYMEl)
           remainYMEl.textContent = `${past.years}년 ${past.months}개월 초과`;
