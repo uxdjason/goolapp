@@ -76,40 +76,14 @@ if (related.length === 0) {
         </div>
 
         <div class="form-group">
-          <label>보유 주택 수</label>
-          <div class="radio-row">
-            <label class="radio-pill"
-              ><input type="radio" name="house-count" value="1" checked /><span
-                >1주택</span
-              ></label
-            >
-            <label class="radio-pill"
-              ><input type="radio" name="house-count" value="2" /><span
-                >2주택</span
-              ></label
-            >
-            <label class="radio-pill"
-              ><input type="radio" name="house-count" value="3" /><span
-                >3주택 이상</span
-              ></label
-            >
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>주택 소재지 (조정대상지역 여부)</label>
-          <div class="radio-row">
-            <label class="radio-pill"
-              ><input type="radio" name="regulated" value="no" checked /><span
-                >일반지역</span
-              ></label
-            >
-            <label class="radio-pill"
-              ><input type="radio" name="regulated" value="yes" /><span
-                >조정대상지역</span
-              ></label
-            >
-          </div>
+          <label for="house-count">보유 주택 수 및 지역</label>
+          <select id="house-count">
+            <option value="1">1주택 (1세대 1주택 특례)</option>
+            <option value="2-normal">2주택 (일반)</option>
+            <option value="2-regulated">2주택 (조정대상지역)</option>
+            <option value="3-normal">3주택 이상 (일반)</option>
+            <option value="3-regulated">3주택 이상 (조정대상지역)</option>
+          </select>
         </div>
 
         <div id="err-msg" class="error-msg" hidden></div>
@@ -122,11 +96,16 @@ if (related.length === 0) {
       </div>
 
       <div id="result-section" class="result-section" hidden>
-        <h2 class="result-title">📊 예상 보유세 계산 결과</h2>
+        <h2 class="result-title">
+          📊 예상 보유세 계산 결과
+          <span class="badge" id="multi-badge" hidden>조정대상지역 중과세율 적용</span>
+        </h2>
+        <p class="subtitle">※ 2026년 기준 추정액</p>
 
         <div class="result-total">
           <span class="total-label">연간 보유세 합계</span>
           <span class="total-value" id="total-tax">-</span>
+          <span class="total-monthly" id="total-tax-monthly">-</span>
         </div>
 
         <div class="result-grid">
@@ -336,6 +315,30 @@ if (related.length === 0) {
     margin: 0;
     font-size: 1.15rem;
     color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .badge[hidden] {
+    display: none;
+  }
+
+  .subtitle {
+    margin: -0.5rem 0 0 0;
+    font-size: 0.85rem;
+    color: var(--color-primary);
+    font-weight: 600;
   }
 
   .result-total {
@@ -357,6 +360,12 @@ if (related.length === 0) {
   .total-value {
     font-size: 1.8rem;
     font-weight: 700;
+  }
+
+  .total-monthly {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin-top: 0.2rem;
   }
 
   .result-grid {
@@ -470,6 +479,8 @@ if (related.length === 0) {
     const compTax = document.getElementById("comp-tax");
     const ruralTax = document.getElementById("rural-tax");
     const totalTax = document.getElementById("total-tax");
+    const totalTaxMonthly = document.getElementById("total-tax-monthly");
+    const multiBadge = document.getElementById("multi-badge");
 
     // 만원 입력 → 한국어 표시
     function formatManwonHint(manwon: number): string {
@@ -587,18 +598,16 @@ if (related.length === 0) {
         declared = market * 0.72;
       }
 
+// 종부세 세율: 2주택 이하 일반세율 0.5%~2.7%, 3주택+ 중과 0.5%~5.0% (2026년 현행 유지)
+// 재산세: 0.1~0.4% 누진세율 (2026년 현행 유지)
+// 공정시장가액비율: 주택 60% (2026년 현행 유지)
+
       // 주택 수, 조정지역
-      const countInput = document.querySelector<HTMLInputElement>(
-        'input[name="house-count"]:checked',
-      );
-      const regInput = document.querySelector<HTMLInputElement>(
-        'input[name="regulated"]:checked',
-      );
-      const count = countInput ? countInput.value : "1";
-      const regulated = regInput ? regInput.value === "yes" : false;
+      const countEl = document.getElementById("house-count") as HTMLSelectElement | null;
+      const countVal = countEl ? countEl.value : "1";
 
       // 다주택 판정 (종부세 중과)
-      const isMulti = count === "3" || (count === "2" && regulated);
+      const isMulti = countVal === "3-regulated" || countVal === "3-normal" || countVal === "2-regulated";
 
       // 재산세 과세표준 = 공시가 × 60%
       const propBaseManwon = declared * 0.6;
@@ -609,7 +618,7 @@ if (related.length === 0) {
       // 종부세 공제액 (만원 단위)
       // 1주택: 12억 (120,000만원)
       // 다주택: 9억 (90,000만원)
-      const deduction = count === "1" ? 120000 : 90000;
+      const deduction = countVal === "1" ? 120000 : 90000;
       const compBaseRaw = Math.max(0, declared - deduction) * 0.6;
       const compTaxManwon = calcCompTax(compBaseRaw, isMulti);
       // 농어촌특별세 = 종부세 × 20%
@@ -627,6 +636,8 @@ if (related.length === 0) {
       if (compTax) compTax.textContent = formatWon(compTaxManwon);
       if (ruralTax) ruralTax.textContent = formatWon(ruralTaxManwon);
       if (totalTax) totalTax.textContent = formatWon(totalManwon);
+      if (totalTaxMonthly) totalTaxMonthly.textContent = "(월 환산: " + formatWon(totalManwon / 12) + " 납부 수준)";
+      if (multiBadge) multiBadge.hidden = !isMulti;
 
       if (resultSection) {
         resultSection.hidden = false;
@@ -643,14 +654,8 @@ if (related.length === 0) {
         if (marketEl) marketEl.value = "";
         if (declaredEl) declaredEl.value = "";
         if (typeEl) typeEl.value = "apartment";
-        const firstCount = document.querySelector<HTMLInputElement>(
-          'input[name="house-count"][value="1"]',
-        );
-        if (firstCount) firstCount.checked = true;
-        const firstReg = document.querySelector<HTMLInputElement>(
-          'input[name="regulated"][value="no"]',
-        );
-        if (firstReg) firstReg.checked = true;
+        const countEl = document.getElementById("house-count") as HTMLSelectElement | null;
+        if (countEl) countEl.value = "1";
         // hint 리셋
         if (marketHint) marketHint.textContent = formatManwonHint(parseFloat(marketEl?.value || ""));
         if (declaredHint) declaredHint.textContent = formatManwonHint(parseFloat(declaredEl?.value || ""));
@@ -667,9 +672,8 @@ if (related.length === 0) {
       });
     });
     if (typeEl) typeEl.addEventListener("change", hideResult);
-    document.querySelectorAll('input[name="house-count"], input[name="regulated"]').forEach((el) => {
-      el.addEventListener("change", hideResult);
-    });
+    const countEl = document.getElementById("house-count");
+    if (countEl) countEl.addEventListener("change", hideResult);
 
     // 포커스 시 값 초기화 방해 방지 — placeholder만 사용하고 기본값 없음
     [marketEl, declaredEl].forEach((el) => {
