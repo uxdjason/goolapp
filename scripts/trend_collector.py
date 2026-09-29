@@ -1,23 +1,51 @@
 # -*- coding: utf-8 -*-
 """
-GoolAPP 트렌드 수집기 (v2)
+GoolAPP 수요 기반 앱 선정 스크립트 (trend_collector.py v3)
 ──────────────────────────────────────────────────────────────────────
+변경 이력:
+  v1-v2: Google Trends RSS + Nate 실시간 검색어 기반
+  v3   : 수요 기반으로 전환
+         (1) 실제 유입 CSV(네이버 블로그 + GSC) → 연관 검색어 묶음 분석
+         (2) 네이버 검색광고 API → 월간 검색량·경쟁도
+         (3) 시즌 달력(references/seo/seasonal-calendar.yaml) → 시즌 선행 후보
+         (4) [선택, --with-trends] 기존 Google Trends RSS + Nate 참고용 출력
+         (5) 점수 산정 → 사용자 번호 선택 → demand-report-YYYY-MM-DD.md 저장
+
 사용법:
+  # 수요 기반 (기본)
   python scripts/trend_collector.py
 
-동작:
-  1. Google Trends KR RSS → 실시간 급상승 키워드 수집
-  2. Naver DataLab API    → 수집된 키워드 교차 검증 (네이버 검색량 확인)
-  3. AI                   → 저관여 앱 가능성 판단 + 앱 아이디어 제안
-  4. 터미널에 번호 매긴 앱 후보 목록 출력 → 사용자가 번호 선택
-  5. 선택 결과를 references/reports/trend-report-YYYY-MM-DD.md 에 저장
+  # 유입 CSV 경로 직접 지정 (없으면 references/demand/ 자동 스캔)
+  python scripts/trend_collector.py --demand-dir references/demand/2026-09/
+
+  # 트렌드 소스도 함께 출력 (참고용)
+  python scripts/trend_collector.py --with-trends
+
+완료 기준 (revenue-recovery-plan §P1-1):
+  - API 키 없어도 유입 CSV + 시즌 달력만으로 리포트 생성
+  - 07/08 네이버 유입 CSV를 넣으면 "학점 4.3↔4.5 환산기", "직종별 정년 계산",
+    "다주택자 보유세" 같은 후보가 상위에 나옴 (회귀 테스트 기준)
 ──────────────────────────────────────────────────────────────────────
 """
 import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
-import json, os, pathlib, datetime, time, urllib.request, xml.etree.ElementTree as ET
+import argparse
+import csv
+import datetime
+import glob
+import json
+import math
+import os
+import pathlib
+import re
+import time
+import urllib.request
+import xml.etree.ElementTree as ET
+import hmac
+import hashlib
+import base64
 
 root_dir = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(root_dir))
@@ -28,273 +56,220 @@ load_dotenv()
 REPORT_DIR = pathlib.Path("references/reports")
 REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
+DEMAND_DIR = pathlib.Path("references/demand")
+DEMAND_DIR.mkdir(parents=True, exist_ok=True)
 
-# ── 1. Google Trends KR RSS ──────────────────────────────────────────────────
+SEASONAL_CALENDAR = pathlib.Path("references/seo/seasonal-calendar.yaml")
+SERP_BLOCKLIST = pathlib.Path("references/seo/serp-widget-blocklist.yaml")
 
-def collect_google_trends_rss() -> list[dict]:
-    """
-    Google Trends 한국 RSS 피드에서 급상승 키워드 수집.
-    반환: [{"keyword": str, "traffic": str, "news_title": str}, ...]
-    """
-    url = "https://trends.google.com/trending/rss?geo=KR"
-    print(f"[1/3] Google Trends RSS 호출 중...")
-    print(f"      URL : {url}")
-    print(f"      잠시 기다려주세요...", flush=True)
-    t0 = time.time()
 
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            raw = resp.read()
-        print(f"      응답 수신 완료 ({time.time()-t0:.1f}초)")
+# ── 공통 유틸 ──────────────────────────────────────────────────────────────────
 
-        root = ET.fromstring(raw)
-        ns = {"ht": "https://trends.google.com/trending/rss"}
-        items = []
-
-        for item in root.findall(".//item"):
-            title_el = item.find("title")
-            traffic_el = item.find("ht:approx_traffic", ns)
-            news_el = item.find("ht:news_item/ht:news_item_title", ns)
-
-            keyword = title_el.text.strip() if title_el is not None else ""
-            traffic = traffic_el.text.strip() if traffic_el is not None else "N/A"
-            news    = news_el.text.strip() if news_el is not None else ""
-
-            if keyword:
-                items.append({"keyword": keyword, "traffic": traffic, "news_title": news})
-
-        # 한국어가 포함된 키워드만 (외국어 트렌드 제거)
-        def is_korean(s):
-            return any('\uac00' <= c <= '\ud7a3' for c in s)
-
-        korean_items = [x for x in items if is_korean(x["keyword"])]
-        print(f"  → 총 {len(items)}개 중 한국어 키워드 {len(korean_items)}개 추출")
-        return korean_items
-
-    except Exception as e:
-        print(f"  [ERROR] Google Trends RSS 수집 실패: {e}")
+def load_yaml_list(path: pathlib.Path) -> list:
+    """YAML 파일을 리스트로 로드 (PyYAML 없으면 간단 파서 사용)."""
+    if not path.exists():
         return []
-
-
-# ── 1.5 Nate 실시간 검색어 ────────────────────────────────────────────────────
-
-def collect_nate_trends() -> list[dict]:
-    """네이트(Nate) 실시간 검색어 10개 수집"""
-    print("      Nate 실시간 검색어 호출 중...")
-    items = []
     try:
-        url = "https://www.nate.com/js/data/jsonLiveKeywordDataV1.js"
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        t0 = time.time()
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            raw = resp.read().decode("euc-kr")
-            data = json.loads(raw)
-            for row in data:
-                kw = row[1]
-                # 너무 긴 설명문구 제외
-                if len(kw) < 20:
-                    items.append({
-                        "keyword": kw,
-                        "traffic": "N/A",
-                        "news_title": "네이트 실시간 검색어"
-                    })
-        print(f"      응답 수신 완료 ({time.time()-t0:.1f}초)")
-        print(f"  → Nate Trends: 키워드 {len(items)}개 추출")
-    except Exception as e:
-        print(f"  [WARN] Nate 수집 실패: {e}")
-    return items
-
-
-# ── 2. Naver DataLab API ─────────────────────────────────────────────────────
-
-def collect_naver_trends(keywords: list[str]) -> dict:
-    """
-    Naver DataLab API로 키워드별 최근 검색량 지수 조회.
-    반환: {keyword: {"recent_avg": float, "rise_rate_pct": float}, ...}
-    """
-    client_id     = os.getenv("NAVER_CLIENT_ID")
-    client_secret = os.getenv("NAVER_CLIENT_SECRET")
-
-    if not client_id or not client_secret:
-        print("  [WARN] NAVER_CLIENT_ID / NAVER_CLIENT_SECRET 없음 — Naver 검증 건너뜀")
-        return {}
-
-    if not keywords:
-        return {}
-
-    total_batches = (min(len(keywords), 25) + 4) // 5
-    print(f"[2/3] Naver DataLab API 교차 검증")
-    print(f"      키워드 {len(keywords)}개 → {total_batches}개 배치로 호출")
-    print(f"      URL : https://openapi.naver.com/v1/datalab/search")
-
-    end_date   = datetime.date.today()
-    start_date = end_date - datetime.timedelta(days=30)
-    interest_map = {}
-
-    # 최대 25개, 5개씩 배치
-    for i in range(0, min(len(keywords), 25), 5):
-        batch = keywords[i:i+5]
-        batch_num = i // 5 + 1
-        print(f"      배치 {batch_num}/{total_batches} 호출 중: {batch} ...", flush=True)
-        keyword_groups = [{"groupName": kw, "keywords": [kw]} for kw in batch]
-
-        payload = json.dumps({
-            "startDate":     start_date.strftime("%Y-%m-%d"),
-            "endDate":       end_date.strftime("%Y-%m-%d"),
-            "timeUnit":      "date",
-            "keywordGroups": keyword_groups,
-        }, ensure_ascii=False).encode("utf-8")
-
-        req = urllib.request.Request(
-            "https://openapi.naver.com/v1/datalab/search",
-            data=payload,
-        )
-        req.add_header("X-Naver-Client-Id", client_id)
-        req.add_header("X-Naver-Client-Secret", client_secret)
-        req.add_header("Content-Type", "application/json")
-
-        try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-
-            for result in data.get("results", []):
-                kw     = result["title"]
-                ratios = [d["ratio"] for d in result.get("data", []) if d["ratio"] > 0]
-                if ratios:
-                    recent  = ratios[-7:] if len(ratios) >= 7 else ratios
-                    prev    = ratios[:7]  if len(ratios) >= 14 else ratios[:len(ratios)//2]
-                    r_avg   = sum(recent) / len(recent)
-                    p_avg   = sum(prev)   / len(prev)   if prev else r_avg
-                    rise    = round((r_avg - p_avg) / max(p_avg, 0.1) * 100, 1)
-                    interest_map[kw] = {
-                        "recent_avg":   round(r_avg, 1),
-                        "rise_rate_pct": rise,
-                    }
-            for kw in batch:
-                if kw in interest_map:
-                    n = interest_map[kw]
-                    print(f"      └ {kw}: 최근 {n['recent_avg']:.1f} / 상승률 {n['rise_rate_pct']:+.1f}%")
-        except Exception as e:
-            print(f"      └ [실패] {e}")
-
-        time.sleep(0.3)
-
-    print(f"      완료: {len(interest_map)}개 키워드에 대한 네이버 검색량 데이터 수집 완료")
-    return interest_map
-
-
-# ── 3. 기존 앱 목록 로드 (중복 방지) ─────────────────────────────────────────
-
-def load_existing_keywords() -> set:
-    """기존 앱의 title, primaryKeyword, slug를 모두 수집 (중복 방지용)"""
-    existing = set()
-    try:
-        import glob, re
-        for fpath in glob.glob("src/content/apps/*.md"):
-            # slug는 파일명에서 추출
-            slug = pathlib.Path(fpath).stem
-            # slug의 단어들을 개별로 추가 (예: loan-interest-calculator → 이자, interest, loan)
-            for word in slug.replace("-", " ").split():
-                existing.add(word.lower())
-
-            content = pathlib.Path(fpath).read_text(encoding="utf-8")
-            if "---" not in content:
-                continue
-            try:
-                fm_text = content.split("---")[1]
-                for m in re.finditer(r'(?:title|primaryKeyword|keywords):\s*["\[]?([^"\]\n]+)["\]]?', fm_text):
-                    val = m.group(1).strip()
-                    existing.add(val.replace(" ", ""))
-                    # 개별 단어도 추가
-                    for w in val.replace(",", " ").split():
-                        existing.add(w.strip().lower())
-            except Exception:
-                pass
-    except Exception as e:
-        print(f"  [WARN] 기존 앱 목록 로드 실패: {e}")
-    return existing
+        import yaml
+        with open(path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+        return data if isinstance(data, list) else []
+    except ImportError:
+        # PyYAML 없을 때 간단 파싱 (리스트 형식만)
+        items = []
+        current = {}
+        for line in path.read_text(encoding="utf-8").splitlines():
+            line = line.rstrip()
+            if line.startswith("- topic:") or line.startswith("- keyword:"):
+                if current:
+                    items.append(current)
+                current = {}
+                key = "topic" if "topic:" in line else "keyword"
+                current[key] = line.split(":", 1)[1].strip().strip('"')
+            elif line.startswith("  ") and ":" in line and current:
+                k, v = line.strip().split(":", 1)
+                v = v.strip().strip('"')
+                try:
+                    v = int(v)
+                except ValueError:
+                    try:
+                        v = float(v)
+                    except ValueError:
+                        pass
+                current[k.strip()] = v
+        if current:
+            items.append(current)
+        return items
 
 
 def load_existing_slugs() -> list[str]:
-    """기존 앱 slug 목록 반환 (AI에게 전달해 의미적 중복 판단용)"""
-    import glob
+    """기존 앱 slug 목록."""
     return sorted(pathlib.Path(f).stem for f in glob.glob("src/content/apps/*.md"))
 
 
-# ── 4. AI 전처리 (저관여 앱 가능성 판단) ────────────────────────────────────
+def load_existing_keywords() -> set:
+    """기존 앱의 primaryKeyword / title / slug 단어 집합."""
+    existing = set()
+    for fpath in glob.glob("src/content/apps/*.md"):
+        slug = pathlib.Path(fpath).stem
+        for word in slug.replace("-", " ").split():
+            existing.add(word.lower())
+        content = pathlib.Path(fpath).read_text(encoding="utf-8")
+        if "---" not in content:
+            continue
+        try:
+            fm_text = content.split("---")[1]
+            for m in re.finditer(r'(?:title|primaryKeyword|keywords):\s*["\\[]?([^"\\]\n]+)', fm_text):
+                val = m.group(1).strip()
+                existing.add(val.replace(" ", ""))
+                for w in val.replace(",", " ").split():
+                    existing.add(w.strip().lower())
+        except Exception:
+            pass
+    return existing
 
-def ai_evaluate(candidates: list[dict], naver_data: dict, existing_slugs: list[str]) -> list[dict]:
-    """
-    AI가 각 키워드에 대해:
-    - 저관여 웹앱으로 만들 수 있는지 판단 (외부 API 불필요 기준)
-    - 뉴스 맥락으로 키워드 의미 정확히 파악
-    - 기존 앱과 의미적 중복 여부 확인
-    - 구체적인 앱 아이디어 제안
-    """
-    n = len(candidates)
-    print(f"[3/3] AI 앱 가능성 평가 중...")
-    print(f"      키워드 {n}개를 Claude/Gemini에 전달 중...")
-    print(f"      (API 응답까지 10~30초 소요될 수 있습니다)", flush=True)
-    t0 = time.time()
 
+# ── 1. 유입 CSV 파싱 ─────────────────────────────────────────────────────────
+
+def load_demand_csvs(demand_dir: pathlib.Path) -> list[dict]:
+    """
+    references/demand/ 하위 CSV 파일을 읽어 검색어 목록 반환.
+    지원 형식:
+      A) 네이버 블로그 유입분석 CSV (컬럼: 검색어, 유입수 등)
+      B) GSC 검색어 CSV (컬럼: 상위 검색어, 클릭수, 노출수 등)
+    반환: [{"keyword": str, "count": int, "source": str}, ...]
+    """
+    results = []
+    csv_files = list(demand_dir.rglob("*.csv"))
+    if not csv_files:
+        print(f"  [INFO] {demand_dir}/ 에서 CSV 파일을 찾을 수 없습니다.")
+        print(f"  [INFO] 네이버 블로그 유입분석 CSV 또는 GSC 검색어 CSV를 아래 경로에 저장하세요:")
+        print(f"         {demand_dir}/YYYY-MM/naver-blog-YYYY-MM.csv")
+        print(f"         {demand_dir}/YYYY-MM/gsc-queries-YYYY-MM.csv")
+        return []
+
+    print(f"  [CSV] {len(csv_files)}개 CSV 파일 발견")
+    for fpath in csv_files:
+        source = "naver_blog" if "naver" in fpath.name.lower() or "blog" in fpath.name.lower() else "gsc"
+        try:
+            # BOM 처리 + 다중 인코딩 시도
+            for enc in ("utf-8-sig", "cp949", "utf-8"):
+                try:
+                    text = fpath.read_text(encoding=enc)
+                    break
+                except UnicodeDecodeError:
+                    continue
+            else:
+                print(f"    [WARN] 인코딩 감지 실패: {fpath.name}")
+                continue
+
+            lines = text.splitlines()
+            
+            # 실제 헤더 행 찾기 (상단 메타데이터 무시)
+            header_idx = 0
+            for i, line in enumerate(lines[:20]):
+                if any(x in line.lower() for x in ["상세유입경로", "검색어", "쿼리", "query", "keyword", "상위 검색어"]):
+                    header_idx = i
+                    break
+                    
+            reader = csv.DictReader(lines[header_idx:])
+            headers = reader.fieldnames or []
+
+            # 컬럼명 자동 감지
+            kw_col = next((h for h in headers if h and any(x in h.lower() for x in ["상세유입경로", "검색어", "쿼리", "query", "keyword", "상위 검색어"])), None)
+            cnt_col = next((h for h in headers if h and any(x in h.lower() for x in ["비율", "유입수", "클릭수", "clicks", "count", "수"])), None)
+
+            if not kw_col:
+                print(f"    [WARN] 검색어 컬럼 감지 실패 (headers={headers[:5]}): {fpath.name}")
+                continue
+
+            count = 0
+            for row in reader:
+                kw = str(row.get(kw_col, "")).strip()
+                if not kw or kw in ("-", "기타", "(not set)", "(not provided)"):
+                    continue
+                try:
+                    # '비율' 등 소수점이 있을 수 있으므로 float 후 int 캐스팅
+                    cnt_raw = str(row.get(cnt_col, "1")).replace(",", "").strip()
+                    cnt = int(float(cnt_raw) * 100) if "비율" in cnt_col else int(float(cnt_raw))
+                except (ValueError, TypeError):
+                    cnt = 1
+                results.append({"keyword": kw, "count": cnt, "source": source})
+                count += 1
+
+            print(f"    ✓ {fpath.name}: {count}개 검색어 로드 ({source})")
+        except Exception as e:
+            print(f"    [WARN] CSV 로드 실패 ({fpath.name}): {e}")
+
+    # count 기준 내림차순 정렬 + 중복 병합
+    merged: dict[str, dict] = {}
+    for item in results:
+        kw = item["keyword"]
+        if kw in merged:
+            merged[kw]["count"] += item["count"]
+        else:
+            merged[kw] = item.copy()
+    final = sorted(merged.values(), key=lambda x: x["count"], reverse=True)
+    print(f"  → 유입 검색어 총 {len(final)}개 (중복 병합 후)")
+    return final
+
+
+# ── 2. AI로 검색어 묶음 분석 ─────────────────────────────────────────────────
+
+def ai_cluster_queries(queries: list[dict], existing_slugs: list[str]) -> list[dict]:
+    """
+    AI가 유입 검색어를 의미 단위로 묶고 앱 아이디어 제안.
+    반환: [{"cluster_name": str, "queries": [...], "app_idea": str, ...}, ...]
+    """
+    if not queries:
+        return []
+
+    print(f"\n[AI] 유입 검색어 {len(queries)}개 클러스터링 중...")
     try:
         import scripts.lib.ai_client as ai_client
     except ImportError:
         print("  [ERROR] ai_client 임포트 실패")
-        return candidates
+        return []
 
-    kw_list = []
-    for item in candidates:
-        kw = item["keyword"]
-        n  = naver_data.get(kw, {})
-        kw_list.append({
-            "keyword":       kw,
-            "google_traffic": item.get("traffic", "N/A"),
-            "news_context":   item.get("news_title", "")[:120],  # 더 긴 맥락 전달
-            "naver_recent":   n.get("recent_avg", "N/A"),
-            "naver_rise_pct": n.get("rise_rate_pct", "N/A"),
-        })
+    # 상위 80개만 전달 (토큰 절약)
+    top_queries = queries[:80]
+    kw_list = [{"keyword": q["keyword"], "count": q["count"]} for q in top_queries]
 
-    SYSTEM = f"""너는 한국 저관여 웹앱 기획 전문가다.
-입력: 한국 실시간 트렌딩 키워드 목록 (JSON 배열)
-출력: 각 키워드에 대해 아래 필드들'만' 포함하는 JSON 배열. (입력받은 news_context, traffic 등 원본 데이터는 절대 다시 출력하지 마라). 설명 없이 JSON만 반환.
+    SYSTEM = f"""너는 한국 저관여 웹앱(GoolAPP) 기획 전문가다.
+입력: 실제 유입 검색어 목록 (count=유입수)
+출력: 의미 단위로 묶은 클러스터 배열 (JSON만, 설명 없이)
 
-## 중요: 키워드 의미 파악
-- news_context(뉴스 헤드라인)를 반드시 읽고 키워드의 실제 의미를 파악하라.
-- 예: "천궁" + 뉴스에 "미사일/방산" → 한국 방공 미사일 시스템 / "천궁" + 뉴스에 "별자리" → 천문학
-- 동음이의어나 중의적 단어는 반드시 뉴스 맥락으로 판단하라.
+각 클러스터 형식:
+{{
+  "cluster_name": "주요 도구 검색어 (예: 학점 환산기)",
+  "queries": ["원본 검색어1", "원본 검색어2", ...],
+  "total_count": 묶음 내 count 합계,
+  "app_idea": "구체적인 앱 아이디어 한 줄",
+  "app_type": "calculator|quiz|tool|fun|datetime|finance 중 하나",
+  "slug_hint": "영문 소문자 하이픈 slug",
+  "classification": "new|extend|optimize 중 하나",
+  "extend_slug": "extend일 때 기존 앱 slug, 아니면 null",
+  "appifiable": true|false,
+  "reason": "한 줄 이유"
+}}
 
-## 출력 JSON 객체의 필수 필드:
-- "keyword": 원본 키워드
-- "appifiable": true/false
-- "reason": 한 줄 이유 (이미 유사 앱 존재 시 명시)
-- "app_idea": 앱 아이디어 (appifiable=true, 구체적으로 한 줄)
-- "app_type": "calculator" | "quiz" | "tool" | "fun" | "datetime" | "finance" 중 하나
-- "slug_hint": 영문 소문자 하이픈 slug
-- "duplicate_of": 기존 앱과 중복이면 해당 slug 문자열, 아니면 반드시 null
+classification 기준:
+- new: 해당 앱이 아예 없음 → 신규 앱 제작 필요
+- extend: 기존 앱이 일부만 커버 → 기능 확장 필요
+- optimize: 이미 잘 커버 → SEO title/description 최적화만
 
-## 중요: 모든 필드는 반드시 값이 있어야 합니다
-- appifiable=false 인 항목: app_idea=null, app_type=null, slug_hint=null
-- 값이 없을 때 빈 문자열("") 금지. 반드시 null 사용
-- 필드를 생략하거나 값 없이 콜론만 쓰는 것 절대 금지 (예: "app_type": → 오류)
+appifiable=false 기준:
+- 연예인·드라마·사건·스포츠 경기 결과
+- 실시간 API 없이 구현 불가 (날씨, 실시간 주가 등)
+- 기존 앱과 완전히 동일한 기능
 
-## 기존 서비스 중인 앱 slug 목록 (이와 의미가 겹치면 appifiable=false):
+기존 앱 slug 목록 (의미 중복 여부 판단용):
 {chr(10).join(existing_slugs)}
 
-## appifiable=false 기준:
-- 연예인 이름, 드라마/영화 제목, 뉴스 사건, 스포츠 경기 결과, 특정 인물/브랜드
-- 기존 앱 목록과 의미적으로 동일하거나 매우 유사한 기능 (예: 이미 이자 계산기 있으면 또 만들 필요 없음)
-- 외부 실시간 API(날씨, 지도, 공공 데이터 등) 없이 구현 불가능한 도구
-  예) 실시간 기상 시뮬레이터, 실시간 교통 안내, 주가 조회
-
-## appifiable=true 기준 (순수 JavaScript만으로 구현 가능한 것):
-- 숫자 입력 → 계산 결과 출력 (세금, 이자, 건강지수, 날짜, 부동산 비용 등)
-- 퀴즈/테스트/성향 진단 (정적 데이터로 운영 가능한 것)
-- 생성기/추첨기 (로또, 랜덤 등)
-- 부동산 관련: 취득세 계산기, 청약 가점 계산기, 전월세 전환율 계산기 등 (공식 기반)
-- 건강/생활: BMI, 칼로리, 수면 시간 계산 등
-- 금융: 복리 계산, 적금 이자, 환율 환산 등 (실시간 환율 불필요 — 직접 입력)"""
+규칙:
+- 비슷한 검색어는 하나의 cluster로 묶어라 (예: "gpa 환산", "4.3 4.5 환산", "학점 변환기" → 같은 클러스터)
+- 클러스터가 너무 잘게 쪼개지지 않도록 할 것 (최소 5개 이상 검색어가 있어야 의미 있는 클러스터)
+- 결과는 total_count 내림차순으로 정렬"""
 
     user_input = json.dumps(kw_list, ensure_ascii=False)
 
@@ -304,96 +279,354 @@ def ai_evaluate(candidates: list[dict], naver_data: dict, existing_slugs: list[s
             system=SYSTEM,
             user=user_input,
             max_tokens=4000,
-            log_label="trend_collector:ai_eval",
+            log_label="trend_collector_v3:cluster",
         )
         cleaned = text.strip()
         if cleaned.startswith("```json"): cleaned = cleaned[7:]
-        elif cleaned.startswith("```"):   cleaned = cleaned[3:]
-        if cleaned.endswith("```"):       cleaned = cleaned[:-3]
-        cleaned = cleaned.strip()
+        elif cleaned.startswith("```"): cleaned = cleaned[3:]
+        if cleaned.endswith("```"): cleaned = cleaned[:-3]
 
-        # JSON 자동 복구: 값 없이 끊긴 필드 처리 (예: "app_type":  → "app_type": null)
-        import re as _re
-        cleaned = _re.sub(r':\s*([,}\]])', r': null\1', cleaned)
-        # 배열이 닫히지 않은 경우 닫기
+        # JSON 자동 복구
+        cleaned = re.sub(r':\s*([,}\]])', r': null\1', cleaned.strip())
         if cleaned.count('[') > cleaned.count(']'):
             cleaned = cleaned.rstrip().rstrip(',') + "\n]"
 
-        # JSON 파싱
-        result = json.loads(cleaned)
-        
-        # 원본 데이터와 AI 평가 결과 병합
-        final_result = []
-        for orig in kw_list:  # use kw_list since it has google_traffic, naver_rise_pct
-            kw = orig["keyword"]
-            ai_item = next((x for x in result if x.get("keyword") == kw), None)
-            merged = orig.copy()
-            if ai_item:
-                merged.update(ai_item)
-            else:
-                merged["appifiable"] = None
-                merged["reason"] = "AI 누락"
-            final_result.append(merged)
-            
-        print(f"      완료 ({time.time()-t0:.1f}초) — 앱 제작 가능: {sum(1 for x in final_result if x.get('appifiable'))}개")
-        return final_result
-
+        clusters = json.loads(cleaned)
+        print(f"  → AI 클러스터링 완료: {len(clusters)}개 묶음")
+        return clusters if isinstance(clusters, list) else []
     except Exception as e:
-        print(f"  [WARN] AI 평가 실패 ({e})")
-        # 디버그: AI가 반환한 원문 일부 출력
+        print(f"  [WARN] AI 클러스터링 실패: {e}")
+        # 폴백: 상위 10개를 개별 후보로 반환
+        fallback = []
+        for q in top_queries[:10]:
+            fallback.append({
+                "cluster_name": q["keyword"],
+                "queries": [q["keyword"]],
+                "total_count": q["count"],
+                "app_idea": None,
+                "app_type": None,
+                "slug_hint": None,
+                "classification": "new",
+                "extend_slug": None,
+                "appifiable": None,
+                "reason": "AI 미처리",
+            })
+        return fallback
+
+
+# ── 3. 시즌 달력 기반 후보 ────────────────────────────────────────────────────
+
+def load_seasonal_candidates() -> list[dict]:
+    """
+    seasonal-calendar.yaml에서 현재 날짜 기준 lead_weeks 이내 항목 반환.
+    반환: [{"cluster_name": str, "seasonal": True, ...}, ...]
+    """
+    items = load_yaml_list(SEASONAL_CALENDAR)
+    if not items:
+        print("  [INFO] seasonal-calendar.yaml 없음. 시즌 후보 건너뜀.")
+        return []
+
+    today = datetime.date.today()
+    candidates = []
+    for item in items:
         try:
-            print(f"  [DEBUG] AI 원문 앞 300자: {text[:300]}")
-        except Exception:
-            pass
-        print("  원본 키워드 목록을 그대로 반환합니다.")
-        for item in candidates:
-            item["appifiable"] = None
-            item["reason"]     = "AI 미처리"
-            item["app_idea"]   = ""
-            item["app_type"]   = ""
-            item["slug_hint"]  = ""
-            item["duplicate_of"] = None
-        return candidates
+            peak_month = int(item.get("peak_month", 0))
+            lead_weeks = int(item.get("lead_weeks", 4))
+            if not (1 <= peak_month <= 12):
+                continue
+
+            # 이번 해 또는 내년 peak_month 계산
+            peak_this_year = datetime.date(today.year, peak_month, 1)
+            peak_next_year = datetime.date(today.year + 1, peak_month, 1)
+
+            # 가장 가까운 peak 시점
+            candidates_dates = [peak_this_year, peak_next_year]
+            nearest_peak = min(candidates_dates, key=lambda d: abs((d - today).days))
+
+            # lead_weeks 기간 안에 들어오는지 확인
+            days_until_peak = (nearest_peak - today).days
+            lead_days = lead_weeks * 7
+
+            if -7 <= days_until_peak <= lead_days:  # 피크 1주 후까지 포함
+                related_apps = item.get("related_apps", [])
+                classification = "extend" if related_apps else "new"
+                candidates.append({
+                    "cluster_name": item.get("topic", ""),
+                    "queries": [item.get("topic", "")],
+                    "total_count": 0,  # 시즌 신호는 검색량 데이터 없음
+                    "app_idea": item.get("notes", ""),
+                    "app_type": "calculator",
+                    "slug_hint": None,
+                    "classification": classification,
+                    "extend_slug": related_apps[0] if related_apps else None,
+                    "related_apps": related_apps,
+                    "appifiable": True,
+                    "reason": f"시즌 선행 {lead_weeks}주 이내 (피크: {peak_month}월, D-{max(0, days_until_peak)}일)",
+                    "seasonal": True,
+                    "peak_month": peak_month,
+                    "days_until_peak": days_until_peak,
+                })
+        except Exception as e:
+            continue
+
+    print(f"  → 시즌 후보 {len(candidates)}개 (현재 날짜 기준 lead 구간)")
+    return candidates
 
 
-# ── 5. 터미널 출력 + 사용자 선택 ────────────────────────────────────────────
+# ── 4. 네이버 검색광고 API — 월간 검색량 ──────────────────────────────────────
 
-def display_and_select(items: list[dict]) -> list[dict]:
+def get_naver_searchad_volume(keywords: list[str]) -> dict:
     """
-    앱 제작 가능 후보를 번호 매겨 터미널에 출력하고,
-    사용자가 원하는 번호(들)를 입력하면 해당 항목 반환.
+    네이버 검색광고 API (keywordstool)로 키워드별 월간 검색량 조회.
+    반환: {keyword: {"pc": int, "mobile": int, "total": int, "comp_idx": str}, ...}
+    
+    환경변수 필요:
+      NAVER_SEARCHAD_API_KEY
+      NAVER_SEARCHAD_SECRET
+      NAVER_SEARCHAD_CUSTOMER_ID
     """
-    appifiable = [x for x in items if x.get("appifiable") is True]
+    api_key = os.getenv("NAVER_SEARCHAD_API_KEY", "")
+    secret = os.getenv("NAVER_SEARCHAD_SECRET", "")
+    customer_id = os.getenv("NAVER_SEARCHAD_CUSTOMER_ID", "")
 
-    if not appifiable:
+    if not (api_key and secret and customer_id):
+        print("  [INFO] NAVER_SEARCHAD_API_KEY / SECRET / CUSTOMER_ID 없음 → 검색량 조회 건너뜀")
+        print("         .env에 추가하면 검색량 기반 점수 산정이 가능해집니다.")
+        print("         U-6 참조: 네이버 검색광고 계정에서 API 키 발급")
+        return {}
+
+    if not keywords:
+        return {}
+
+    print(f"\n[검색량] 네이버 검색광고 API 호출 ({len(keywords)}개 키워드)...")
+    base_url = "https://api.searchad.naver.com"
+    result = {}
+
+    # 5개씩 배치
+    for i in range(0, len(keywords), 5):
+        batch = keywords[i:i + 5]
+        hint_params = "&".join(f"hintKeywords={urllib.request.quote(k)}" for k in batch)
+        url = f"{base_url}/keywordstool?{hint_params}&showDetail=1"
+
+        timestamp = str(int(time.time() * 1000))
+        message = f"{timestamp}.GET./keywordstool"
+        signature = base64.b64encode(
+            hmac.new(secret.encode("utf-8"), message.encode("utf-8"), hashlib.sha256).digest()
+        ).decode("utf-8")
+
+        req = urllib.request.Request(url)
+        req.add_header("X-Timestamp", timestamp)
+        req.add_header("X-API-KEY", api_key)
+        req.add_header("X-Customer", customer_id)
+        req.add_header("X-Signature", signature)
+        req.add_header("Content-Type", "application/json; charset=UTF-8")
+
+        try:
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+
+            for item in data.get("keywordList", []):
+                kw = item.get("relKeyword", "")
+                pc = item.get("monthlyPcQcCnt", 0)
+                mobile = item.get("monthlyMobileQcCnt", 0)
+                comp_idx = item.get("compIdx", "중간")
+                # "< 10" 처리
+                pc = 0 if isinstance(pc, str) else int(pc)
+                mobile = 0 if isinstance(mobile, str) else int(mobile)
+                total = pc + mobile
+                result[kw] = {"pc": pc, "mobile": mobile, "total": total, "comp_idx": str(comp_idx)}
+                print(f"  └ {kw}: PC {pc:,} / 모바일 {mobile:,} / 경쟁도 {comp_idx}")
+        except Exception as e:
+            print(f"  [WARN] 검색량 조회 실패 ({batch}): {e}")
+
+        time.sleep(0.5)
+
+    print(f"  → 검색량 조회 완료: {len(result)}개")
+    return result
+
+
+# ── 5. SERP 위젯 블록리스트 로드 ─────────────────────────────────────────────
+
+def load_serp_blocklist() -> set:
+    """serp-widget-blocklist.yaml에서 블록 키워드 집합 반환."""
+    items = load_yaml_list(SERP_BLOCKLIST)
+    blocked = set()
+    for item in items:
+        kw = item.get("keyword", "")
+        if kw:
+            blocked.add(kw)
+            blocked.add(kw.replace(" ", ""))
+    return blocked
+
+
+# ── 6. 점수 산정 ─────────────────────────────────────────────────────────────
+
+CATEGORY_WEIGHTS = {
+    "금융": 1.5, "세금": 1.5, "부동산": 1.5, "대출": 1.5, "급여": 1.5, "보험": 1.5,
+    "finance": 1.5,
+    "생활": 1.0, "건강": 1.0, "calculator": 1.0, "tool": 1.0, "datetime": 1.0,
+    "퀴즈": 0.7, "게임": 0.7, "운세": 0.7, "fun": 0.7, "quiz": 0.7,
+}
+
+FINANCE_KEYWORDS = {"세금", "부동산", "대출", "이자", "금리", "연봉", "급여", "보험", "종부세", "재산세", "종합소득세", "최저임금", "퇴직금", "연금"}
+
+
+def calc_score(cluster: dict, search_vol: dict, serp_blocked: set, today: datetime.date) -> float:
+    """
+    score = log10(월간검색수 + 1)
+          × 광고단가 가중치
+          × SERP 가중치
+          × 시즌 가중치
+          × 유입 실적 가중치
+    """
+    name = cluster.get("cluster_name", "")
+    queries = cluster.get("queries", [])
+    total_count = cluster.get("total_count", 0)
+    seasonal = cluster.get("seasonal", False)
+    app_type = cluster.get("app_type") or ""
+
+    # 월간 검색량 (검색광고 API 결과 또는 추정)
+    vol = 0
+    for q in queries:
+        if q in search_vol:
+            vol = max(vol, search_vol[q].get("total", 0))
+    if vol == 0:
+        # 유입 실적이 있으면 최소 검색량 추정
+        vol = max(total_count * 50, 100) if total_count > 0 else 100
+
+    # 광고단가 가중치
+    cat_weight = CATEGORY_WEIGHTS.get(app_type, 1.0)
+    # 키워드 기반 보완
+    for fw in FINANCE_KEYWORDS:
+        if fw in name:
+            cat_weight = max(cat_weight, 1.5)
+            break
+    if any(k in name for k in ["퀴즈", "게임", "운세", "점"]):
+        cat_weight = min(cat_weight, 0.7)
+
+    # SERP 가중치
+    serp_weight = 1.0
+    for q in queries:
+        if q in serp_blocked or q.replace(" ", "") in serp_blocked:
+            serp_weight = 0.3
+            break
+
+    # 시즌 가중치
+    season_weight = 1.0
+    if seasonal:
+        season_weight = 1.3
+    # 유입 실적 가중치
+    inflow_weight = 1.5 if total_count > 0 else 1.0
+
+    score = math.log10(vol + 1) * cat_weight * serp_weight * season_weight * inflow_weight
+    return round(score, 3)
+
+
+# ── 7. [선택] 기존 Google Trends RSS + Nate 실시간 (--with-trends) ─────────────
+
+def collect_google_trends_rss() -> list[dict]:
+    url = "https://trends.google.com/trending/rss?geo=KR"
+    print(f"  [Trends] Google Trends RSS 호출 중...")
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            raw = resp.read()
+        root = ET.fromstring(raw)
+        ns = {"ht": "https://trends.google.com/trending/rss"}
+        items = []
+        for item in root.findall(".//item"):
+            title_el = item.find("title")
+            traffic_el = item.find("ht:approx_traffic", ns)
+            news_el = item.find("ht:news_item/ht:news_item_title", ns)
+            keyword = title_el.text.strip() if title_el is not None else ""
+            traffic = traffic_el.text.strip() if traffic_el is not None else "N/A"
+            news = news_el.text.strip() if news_el is not None else ""
+            if keyword and any('\uac00' <= c <= '\ud7a3' for c in keyword):
+                items.append({"keyword": keyword, "traffic": traffic, "news_title": news})
+        print(f"  → Google Trends: 한국어 키워드 {len(items)}개")
+        return items
+    except Exception as e:
+        print(f"  [WARN] Google Trends 실패: {e}")
+        return []
+
+
+def collect_nate_trends() -> list[dict]:
+    print("  [Trends] Nate 실시간 검색어 호출 중...")
+    items = []
+    try:
+        url = "https://www.nate.com/js/data/jsonLiveKeywordDataV1.js"
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            raw = resp.read().decode("euc-kr")
+            data = json.loads(raw)
+            for row in data:
+                kw = row[1]
+                if len(kw) < 20:
+                    items.append({"keyword": kw, "traffic": "N/A", "news_title": "Nate 실시간"})
+        print(f"  → Nate: {len(items)}개")
+    except Exception as e:
+        print(f"  [WARN] Nate 실패: {e}")
+    return items
+
+
+# ── 8. 터미널 출력 + 사용자 선택 ─────────────────────────────────────────────
+
+def display_and_select(candidates: list[dict], serp_blocked: set) -> list[dict]:
+    """
+    후보 목록을 점수순으로 정렬·출력하고 사용자가 번호로 선택.
+    """
+    scoreable = [c for c in candidates if c.get("appifiable") is not False]
+    if not scoreable:
         print("\n[!] 앱 제작 가능한 후보가 없습니다.")
         return []
 
-    print("\n" + "=" * 65)
-    print("  저관여 앱 후보 목록")
-    print("=" * 65)
-    for i, item in enumerate(appifiable, 1):
-        kw      = item.get("keyword", "")
-        idea    = item.get("app_idea", "")
-        atype   = item.get("app_type", "")
-        g_traf  = item.get("google_traffic", "N/A")
-        n_rise  = item.get("naver_rise_pct", "N/A")
-        n_rise_str = f"{n_rise:+.1f}%" if isinstance(n_rise, (int, float)) else str(n_rise)
-        slug    = item.get("slug_hint", "")
+    print("\n" + "=" * 70)
+    print("  수요 기반 앱 후보 목록 (점수순)")
+    print("=" * 70)
 
-        print(f"\n  [{i}] {kw}  (Google: {g_traf} / Naver상승: {n_rise_str})")
-        print(f"       타입  : {atype}")
+    for i, item in enumerate(scoreable, 1):
+        name = item.get("cluster_name", "")
+        idea = item.get("app_idea") or ""
+        atype = item.get("app_type") or ""
+        slug = item.get("slug_hint") or ""
+        cls = item.get("classification", "new")
+        reason = item.get("reason", "")
+        score = item.get("_score", 0)
+        vol = item.get("_vol_str", "")
+        seasonal = item.get("seasonal", False)
+        ext = item.get("extend_slug", "")
+        queries = item.get("queries", [])
+        is_blocked = any(q in serp_blocked for q in queries)
+        blocked_label = "⚠️ SERP위젯" if is_blocked else ""
+
+        print(f"\n  [{i}] {name}  (점수: {score:.2f}) {blocked_label}")
+        print(f"       분류   : {cls}" + (f" → {ext}" if ext else "") + (" 🗓 시즌" if seasonal else ""))
+        print(f"       타입   : {atype}")
+        print(f"       검색량 : {vol}")
         print(f"       아이디어: {idea}")
-        print(f"       slug  : {slug}")
+        print(f"       slug   : {slug}")
+        print(f"       근거   : {reason}")
+        if len(queries) > 1:
+            print(f"       검색어 : {', '.join(queries[:5])}")
 
-    print("\n" + "=" * 65)
-    print("  참고 — 앱으로 만들기 어려운 키워드:")
-    not_app = [x for x in items if x.get("appifiable") is False]
-    for x in not_app:
-        print(f"    ✗ {x['keyword']} — {x.get('reason','')}")
-    print("=" * 65)
+    # 제외 목록
+    excluded = [c for c in candidates if c.get("appifiable") is False]
+    if excluded:
+        print("\n" + "=" * 70)
+        print("  앱으로 만들기 어려운 후보:")
+        for x in excluded:
+            print(f"    ✗ {x.get('cluster_name','')} — {x.get('reason','')}")
 
-    print("\n원하는 앱 번호를 선택하세요 (예: 1  또는  1,3  또는  skip):")
+    # SERP 확인 체크리스트
+    blocked_items = [c for c in scoreable if c.get("_serp_blocked")]
+    if blocked_items:
+        print("\n" + "=" * 70)
+        print("  ⚠️  사용자 직접 확인 필요 (SERP 위젯 여부):")
+        for item in blocked_items:
+            print(f"    → '{item.get('cluster_name','')}': 네이버/구글 검색 결과에 위젯이 없는지 확인 후 선택")
+
+    print("\n" + "=" * 70)
+    print("원하는 앱 번호를 선택하세요 (예: 1  또는  1,3  또는  skip):")
     raw = input("  > ").strip()
 
     if not raw or raw.lower() == "skip":
@@ -404,80 +637,93 @@ def display_and_select(items: list[dict]) -> list[dict]:
     for part in raw.replace(" ", "").split(","):
         try:
             idx = int(part) - 1
-            if 0 <= idx < len(appifiable):
-                selected.append(appifiable[idx])
+            if 0 <= idx < len(scoreable):
+                selected.append(scoreable[idx])
         except ValueError:
             pass
-
     return selected
 
 
-# ── 6. 리포트 저장 ────────────────────────────────────────────────────────────
+# ── 9. 리포트 저장 ──────────────────────────────────────────────────────────
 
-def save_report(all_items: list[dict], selected: list[dict]) -> pathlib.Path:
-    today    = datetime.date.today().isoformat()
-    out_path = REPORT_DIR / f"trend-report-{today}.md"
+def save_report(all_candidates: list[dict], selected: list[dict]) -> pathlib.Path:
+    today = datetime.date.today().isoformat()
+    out_path = REPORT_DIR / f"demand-report-{today}.md"
 
     lines = [
-        f"# GoolAPP 트렌드 리포트 — {today}",
+        f"# GoolAPP 수요 기반 리포트 — {today}",
         "",
-        "> Google Trends RSS + Naver DataLab API 기반 자동 수집",
+        "> 유입 CSV(네이버 블로그 + GSC) + 시즌 달력 + 네이버 검색광고 API 기반 자동 수집",
         f"> 생성 시각: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}",
         "",
     ]
 
-    # 선택된 앱
     if selected:
         lines += ["## ✅ 선택된 앱 후보", ""]
         for item in selected:
-            kw   = item.get("keyword", "")
-            idea = item.get("app_idea", "")
-            slug = item.get("slug_hint", "")
-            lines.append(f"### {kw}")
+            name = item.get("cluster_name", "")
+            idea = item.get("app_idea") or ""
+            slug = item.get("slug_hint") or ""
+            cls = item.get("classification", "new")
+            queries = item.get("queries", [])
+            lines.append(f"### {name}")
             lines.append(f"- **아이디어**: {idea}")
             lines.append(f"- **slug**: `{slug}`")
+            lines.append(f"- **분류**: {cls}")
             lines.append(f"- **타입**: {item.get('app_type','')}")
-            lines.append(f"- **Google 트래픽**: {item.get('google_traffic','N/A')}")
-            n_rise = item.get('naver_rise_pct', 'N/A')
-            n_rise_str = f"{n_rise:+.1f}%" if isinstance(n_rise, (int,float)) else str(n_rise)
-            lines.append(f"- **Naver 상승률**: {n_rise_str}")
+            lines.append(f"- **점수**: {item.get('_score', 0):.2f}")
+            lines.append(f"- **연관 검색어**: {', '.join(queries)}")
             lines.append("")
-        lines += [
-            "---",
-            "",
-            "### 다음 단계",
-            "```",
-        ]
+
+        lines += ["---", "", "### 다음 단계 명령어", "```"]
         for item in selected:
-            kw   = item.get("keyword", "")
-            slug = item.get("slug_hint", "")
-            lines.append(f'python scripts/new_app_pipeline.py "{kw}" {slug}')
+            name = item.get("cluster_name", "")
+            slug = item.get("slug_hint") or ""
+            queries = item.get("queries", [])
+            q_arg = ",".join(queries[:5])
+            cls = item.get("classification", "new")
+            extend = item.get("extend_slug", "")
+            if cls == "extend" and extend:
+                lines.append(f'python scripts/new_app_pipeline.py "{name}" {slug} --queries "{q_arg}" --extend {extend}')
+            else:
+                lines.append(f'python scripts/new_app_pipeline.py "{name}" {slug} --queries "{q_arg}"')
         lines += ["```", ""]
 
-    # 전체 후보 목록
-    appifiable = [x for x in all_items if x.get("appifiable") is True]
-    not_app    = [x for x in all_items if x.get("appifiable") is False]
+    # 전체 후보 표
+    scoreable = [c for c in all_candidates if c.get("appifiable") is not False]
+    not_app = [c for c in all_candidates if c.get("appifiable") is False]
 
     lines += [
+        "---", "",
+        f"## 전체 앱 후보 ({len(scoreable)}개, 점수순)",
+        "",
+        "| # | 후보명 | 분류 | 점수 | 검색량 | 시즌 | slug 힌트 |",
+        "|---|--------|------|------|--------|------|-----------|",
+    ]
+    for i, item in enumerate(scoreable, 1):
+        name = item.get("cluster_name", "")
+        cls = item.get("classification", "new")
+        score = item.get("_score", 0)
+        vol = item.get("_vol_str", "")
+        seasonal = "🗓" if item.get("seasonal") else ""
+        slug = item.get("slug_hint") or ""
+        lines.append(f"| {i} | **{name}** | {cls} | {score:.2f} | {vol} | {seasonal} | `{slug}` |")
+
+    if not_app:
+        lines += ["", f"## 제외된 후보 ({len(not_app)}개)", ""]
+        for item in not_app:
+            lines.append(f"- {item.get('cluster_name','')} — {item.get('reason','')}")
+
+    lines += [
+        "",
         "---",
         "",
-        f"## 전체 앱 제작 가능 후보 ({len(appifiable)}개)",
+        "## 사용자 확인 사항",
         "",
-        "| # | 키워드 | 타입 | 아이디어 | Google | Naver상승% |",
-        "|---|--------|------|----------|--------|-----------|",
+        "- [ ] SERP 위젯 여부: 위 ⚠️ 표시 항목을 네이버에서 직접 검색해 위젯 없는지 확인",
+        "- [ ] 선택 후 `python scripts/new_app_pipeline.py` 실행",
+        "- [ ] 완료 후 `references/AI_CONTEXT.md`에 로그 추가",
     ]
-    for i, item in enumerate(appifiable, 1):
-        kw      = item.get("keyword","")
-        idea    = item.get("app_idea","")
-        atype   = item.get("app_type","")
-        g_traf  = item.get("google_traffic","N/A")
-        n_rise  = item.get("naver_rise_pct","N/A")
-        n_str   = f"{n_rise:+.1f}%" if isinstance(n_rise,(int,float)) else str(n_rise)
-        lines.append(f"| {i} | **{kw}** | {atype} | {idea} | {g_traf} | {n_str} |")
-
-    lines += ["", f"## 앱으로 만들기 어려운 키워드 ({len(not_app)}개)", ""]
-    for item in not_app:
-        lines.append(f"- {item['keyword']} — {item.get('reason','')}")
 
     out_path.write_text("\n".join(lines), encoding="utf-8")
     return out_path
@@ -485,82 +731,120 @@ def save_report(all_items: list[dict], selected: list[dict]) -> pathlib.Path:
 
 # ── 메인 ──────────────────────────────────────────────────────────────────────
 
-def run():
-    print("=" * 65)
-    print("  GoolAPP 트렌드 수집기 v2")
-    print("  Google Trends RSS + Naver DataLab → 앱 후보 제안")
-    print("=" * 65)
+def run(demand_dir: pathlib.Path, with_trends: bool = False):
+    print("=" * 70)
+    print("  GoolAPP 수요 기반 앱 선정 스크립트 v3")
+    print("  유입 CSV + 시즌 달력 + 네이버 검색광고 API → 앱 후보 제안")
+    print("=" * 70)
 
-    # 1. 트렌드 수집 (Google + Nate)
-    google_items = collect_google_trends_rss()
-    nate_items   = collect_nate_trends()
-    
-    # 중복 키워드 병합 (Google 우선)
-    combined_items = list(google_items)
-    seen_kws = {x["keyword"].replace(" ", "") for x in combined_items}
-    for item in nate_items:
-        if item["keyword"].replace(" ", "") not in seen_kws:
-            combined_items.append(item)
-            seen_kws.add(item["keyword"].replace(" ", ""))
-
-    if not combined_items:
-        print("[!] 트렌드 수집 실패. 네트워크를 확인하세요.")
-        return
-
-    # 2. 기존 앱과 중복 제거 (텍스트 기반 1차 필터)
-    existing      = load_existing_keywords()
+    today = datetime.date.today()
     existing_slugs = load_existing_slugs()
-    
-    # 2.5 후보가 너무 적을 경우 YAML 파일에서 고정 키워드 추가 (최소 15~20개 확보)
-    try:
-        import yaml, random
-        yaml_path = pathlib.Path("references/seo/keyword-candidates.yaml")
-        if yaml_path.exists():
-            with open(yaml_path, "r", encoding="utf-8") as f:
-                seeds = yaml.safe_load(f)
-            # 이미 기존 앱이거나 combined_items에 있는 것 제외
-            current_kws = {x["keyword"].replace(" ", "") for x in combined_items}
-            seeds_filtered = [s for s in seeds if s.replace(" ", "") not in existing and s.replace(" ", "") not in current_kws]
-            
-            # 부족한 만큼 채우기 (최대 10개 랜덤 추가)
-            add_count = max(0, 15 - len(combined_items))
-            if add_count > 0 and seeds_filtered:
-                to_add = random.sample(seeds_filtered, min(add_count, len(seeds_filtered)))
-                for kw in to_add:
-                    combined_items.append({"keyword": kw, "traffic": "N/A", "news_title": "기본 제공 아이디어 (트렌드 외)"})
-                print(f"  → 트렌드 키워드 부족으로 예비 후보 {len(to_add)}개 추가")
-    except Exception as e:
-        print(f"  [WARN] 예비 후보 추가 실패: {e}")
+    existing_keywords = load_existing_keywords()
+    serp_blocked = load_serp_blocklist()
 
-    filtered = [x for x in combined_items if x["keyword"].replace(" ","") not in existing]
-    print(f"  기존 앱 1차 필터링: {len(combined_items)}개 → {len(filtered)}개 (나머지는 AI가 의미적 중복 재확인)")
+    all_candidates: list[dict] = []
 
-    if not filtered:
-        print("[!] 새로운 키워드가 없습니다 (모두 기존 앱과 중복).")
-        return
+    # ── Step 1: 유입 CSV 분석 ──────────────────────────────────────────────────
+    print("\n[1/4] 유입 CSV 분석...")
+    raw_queries = load_demand_csvs(demand_dir)
 
-    # 3. Naver DataLab 교차검증
-    kw_list    = [x["keyword"] for x in filtered]
-    naver_data = collect_naver_trends(kw_list)
+    if raw_queries:
+        clusters = ai_cluster_queries(raw_queries, existing_slugs)
+        # appifiable이 None인 항목 → 기본 true 처리
+        for c in clusters:
+            if c.get("appifiable") is None:
+                c["appifiable"] = True
+        all_candidates.extend(clusters)
+    else:
+        print("  유입 CSV가 없어 AI 클러스터링을 건너뜁니다.")
 
-    # 4. AI 평가 (existing_slugs 전달 → 의미적 중복도 판단)
-    evaluated = ai_evaluate(filtered, naver_data, existing_slugs)
+    # ── Step 2: 시즌 달력 ─────────────────────────────────────────────────────
+    print("\n[2/4] 시즌 달력 기반 후보 추가...")
+    seasonal = load_seasonal_candidates()
+    # 기존 클러스터와 중복 제거 (topic 기준)
+    existing_names = {c.get("cluster_name", "") for c in all_candidates}
+    for s in seasonal:
+        if s.get("cluster_name", "") not in existing_names:
+            all_candidates.append(s)
 
-    # 5. 터미널 출력 + 사용자 선택
-    selected = display_and_select(evaluated)
+    # ── Step 3: 검색량 조회 (네이버 검색광고 API) ────────────────────────────
+    print("\n[3/4] 네이버 검색량 조회...")
+    kw_to_query = []
+    for c in all_candidates:
+        if c.get("appifiable") is not False:
+            kw_to_query.extend(c.get("queries", [])[:2])
+    kw_to_query = list(dict.fromkeys(kw_to_query))[:30]  # 중복 제거, 최대 30개
+    search_vol = get_naver_searchad_volume(kw_to_query)
 
-    # 6. 리포트 저장
-    out_path = save_report(evaluated, selected)
+    # ── Step 4: 점수 산정 + 정렬 ─────────────────────────────────────────────
+    print("\n[4/4] 점수 산정 및 정렬...")
+    for c in all_candidates:
+        if c.get("appifiable") is False:
+            c["_score"] = 0
+            c["_vol_str"] = "-"
+            c["_serp_blocked"] = False
+            continue
+        score = calc_score(c, search_vol, serp_blocked, today)
+        c["_score"] = score
+
+        # 검색량 문자열
+        queries = c.get("queries", [])
+        vol = 0
+        for q in queries:
+            if q in search_vol:
+                vol = max(vol, search_vol[q].get("total", 0))
+        c["_vol_str"] = f"{vol:,}" if vol > 0 else "데이터 없음"
+
+        # SERP 블록 여부
+        c["_serp_blocked"] = any(q in serp_blocked for q in queries)
+
+    # 점수 내림차순 정렬 (appifiable=False는 맨 뒤)
+    all_candidates.sort(key=lambda x: (x.get("appifiable") is False, -x.get("_score", 0)))
+
+    # ── [선택] Google Trends + Nate ───────────────────────────────────────────
+    if with_trends:
+        print("\n[참고] 기존 트렌드 소스 수집 (--with-trends)...")
+        trend_items = collect_google_trends_rss() + collect_nate_trends()
+        if trend_items:
+            print(f"\n  참고용 트렌드 키워드 ({len(trend_items)}개):")
+            for item in trend_items[:20]:
+                print(f"    - {item['keyword']} (트래픽: {item.get('traffic','N/A')})")
+
+    # ── 터미널 출력 + 사용자 선택 ────────────────────────────────────────────
+    selected = display_and_select(all_candidates, serp_blocked)
+
+    # ── 리포트 저장 ──────────────────────────────────────────────────────────
+    out_path = save_report(all_candidates, selected)
     print(f"\n✅ 리포트 저장: {out_path}")
 
     if selected:
         print("\n[다음 단계] 선택한 앱을 만들려면:")
         for item in selected:
-            kw   = item.get("keyword","")
-            slug = item.get("slug_hint","")
-            print(f'  python scripts/new_app_pipeline.py "{kw}" {slug}')
+            name = item.get("cluster_name", "")
+            slug = item.get("slug_hint") or ""
+            queries = item.get("queries", [])
+            q_arg = ",".join(queries[:5])
+            cls = item.get("classification", "new")
+            extend = item.get("extend_slug", "")
+            if cls == "extend" and extend:
+                print(f'  python scripts/new_app_pipeline.py "{name}" {slug} --queries "{q_arg}" --extend {extend}')
+            else:
+                print(f'  python scripts/new_app_pipeline.py "{name}" {slug} --queries "{q_arg}"')
     print()
 
 
 if __name__ == "__main__":
-    run()
+    parser = argparse.ArgumentParser(description="GoolAPP 수요 기반 앱 선정 스크립트 v3")
+    parser.add_argument(
+        "--demand-dir",
+        type=str,
+        default=str(DEMAND_DIR),
+        help=f"유입 CSV 디렉토리 경로 (기본: {DEMAND_DIR})",
+    )
+    parser.add_argument(
+        "--with-trends",
+        action="store_true",
+        help="Google Trends RSS + Nate 실시간 검색어도 참고용으로 출력",
+    )
+    args = parser.parse_args()
+    run(pathlib.Path(args.demand_dir), with_trends=args.with_trends)

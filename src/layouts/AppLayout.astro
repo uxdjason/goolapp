@@ -204,7 +204,9 @@ const appJsonLd = JSON.stringify({
   .app-ui-section {
     /* from goolapp-app-mobile-260508.md: padding 24px, border-radius 24px, glass */
     padding: var(--space-8);
-    margin: var(--space-6) 0 var(--space-12);
+    /* P0-1: top 광고와 앱 UI 사이 충분한 여백 확보 (플랜 §4 P0-1 §2).
+       var(--space-10)으로 설정해 광고 로드 후에도 버튼과 충분히 떨어지게 함. */
+    margin: var(--space-10) 0 var(--space-12);
     border-radius: var(--radius-2xl);
     background: rgba(251, 249, 245, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.4);

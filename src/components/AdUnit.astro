@@ -12,6 +12,7 @@ if (position === 'middle') slotId = import.meta.env.PUBLIC_ADSENSE_SLOT_MIDDLE |
 if (position === 'bottom') slotId = import.meta.env.PUBLIC_ADSENSE_SLOT_BOTTOM || slotId;
 ---
 <div class={`ad-unit ad-${position}`} role="complementary" aria-label={`광고 (${position})`}>
+  <p class="ad-label-text">광고</p>
   {showAdsense ? (
     <>
       <ins class="adsbygoogle"
@@ -37,12 +38,24 @@ if (position === 'bottom') slotId = import.meta.env.PUBLIC_ADSENSE_SLOT_BOTTOM |
     width: 100%;
     margin: var(--space-10) 0;
     clear: both;
-    min-height: 120px; /* Ensure space is reserved */
+    /* 반응형 광고(auto)는 모바일/데스크톱 모두 최대 280px까지 뜰 수 있음.
+       광고 로드 전에 공간을 미리 확보해 CLS(레이아웃 밀림)를 방지한다. */
+    min-height: 280px;
+  }
+  /* '광고' 라벨: 광고 영역 위에 표시해 실수 클릭 유발 구조 제거 */
+  .ad-label-text {
+    margin: 0 0 4px;
+    font-family: var(--font-family-gothic);
+    font-size: 11px;
+    color: var(--color-on-surface-variant, #888);
+    text-align: center;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
   }
   /* Show a subtle background even for real ad tags in development/preview */
   .adsbygoogle {
     background: rgba(139, 79, 50, 0.03);
-    min-height: 120px;
+    min-height: 280px;
     display: block;
   }
   .ad-placeholder {
@@ -50,7 +63,7 @@ if (position === 'bottom') slotId = import.meta.env.PUBLIC_ADSENSE_SLOT_BOTTOM |
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 120px;
+    min-height: 280px;
     background: rgba(139, 79, 50, 0.08); /* More visible background */
     border: 2px dashed rgba(139, 79, 50, 0.3);
     border-radius: var(--radius-lg);
