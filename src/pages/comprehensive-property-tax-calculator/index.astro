@@ -55,17 +55,21 @@ if (related.length === 0) {
           </div>
         </div>
 
-        <div class="field-group" id="ownership-group">
-          <label class="field-label">주택 수</label>
+        <div class="field-group" id="house-count-group">
+          <label class="field-label" for="house-count">보유 주택 수 및 지역</label>
+          <select id="house-count" class="field-input">
+            <option value="1">1주택 (1세대 1주택 특례)</option>
+            <option value="2-normal">2주택 (일반)</option>
+            <option value="2-regulated">2주택 (조정대상지역)</option>
+            <option value="3-multi">3주택 이상</option>
+          </select>
+        </div>
+
+        <div class="field-group" id="joint-group">
+          <label class="field-label">소유 형태 (명의)</label>
           <div class="tab-group" role="tablist">
-            <button
-              type="button"
-              class="tab-btn owner-btn active"
-              data-owner="single">1주택자</button
-            >
-            <button type="button" class="tab-btn owner-btn" data-owner="multi"
-              >다주택자</button
-            >
+            <button type="button" class="tab-btn joint-btn active" data-joint="single">단독명의</button>
+            <button type="button" class="tab-btn joint-btn" data-joint="joint">공동명의 (50:50)</button>
           </div>
         </div>
 
@@ -81,22 +85,6 @@ if (related.length === 0) {
           />
           <div class="hint" id="price-hint">
             숫자로 입력하면 우리말로 표시합니다.
-          </div>
-        </div>
-
-        <div class="field-group" id="adjusted-group">
-          <label class="field-label">조정대상지역 여부</label>
-          <div class="tab-group" role="tablist">
-            <button
-              type="button"
-              class="tab-btn adjusted-btn active"
-              data-adjusted="no">비조정지역</button
-            >
-            <button
-              type="button"
-              class="tab-btn adjusted-btn"
-              data-adjusted="yes">조정대상지역</button
-            >
           </div>
         </div>
 
@@ -135,7 +123,9 @@ if (related.length === 0) {
       </div>
 
       <section class="result-section" id="result-section" hidden>
-        <h2 class="result-title">계산 결과</h2>
+        <h2 class="result-title">
+          계산 결과 <span class="badge" id="year-badge">2026년 기준</span>
+        </h2>
 
         <div class="result-summary">
           <div class="summary-label">최종 납부세액 합계</div>
@@ -340,6 +330,18 @@ if (related.length === 0) {
     font-size: 1.15rem;
     font-weight: 700;
     color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    background: #eef2ff;
+    color: var(--color-primary);
+    border-radius: 4px;
+    font-weight: 600;
   }
 
   .result-summary {
@@ -404,8 +406,7 @@ if (related.length === 0) {
   document.addEventListener("DOMContentLoaded", function () {
     const state = {
       type: "house", // 'house' | 'land'
-      owner: "single", // 'single' | 'multi'
-      adjusted: "no", // 'yes' | 'no'
+      joint: "single", // 'single' | 'joint'
     };
 
     const priceInput = document.getElementById("price") as HTMLInputElement;
@@ -414,15 +415,10 @@ if (related.length === 0) {
     const ageInput = document.getElementById("age") as HTMLInputElement;
     const calcBtn = document.getElementById("calc-btn") as HTMLButtonElement;
     const resetBtn = document.getElementById("reset-btn") as HTMLButtonElement;
-    const resultSection = document.getElementById(
-      "result-section",
-    ) as HTMLElement;
-    const ownershipGroup = document.getElementById(
-      "ownership-group",
-    ) as HTMLElement;
-    const adjustedGroup = document.getElementById(
-      "adjusted-group",
-    ) as HTMLElement;
+    const resultSection = document.getElementById("result-section") as HTMLElement;
+    const houseCountGroup = document.getElementById("house-count-group") as HTMLElement;
+    const jointGroup = document.getElementById("joint-group") as HTMLElement;
+    const houseCountEl = document.getElementById("house-count") as HTMLSelectElement;
     const errMsg = document.getElementById("err-msg") as HTMLElement;
 
     function showError(msg: string) {
@@ -445,49 +441,30 @@ if (related.length === 0) {
     };
 
     // 부동산 유형 탭
-    document
-      .querySelectorAll<HTMLButtonElement>(".tab-btn[data-type]")
-      .forEach((btn) => {
-        btn.addEventListener("click", () => {
-          document
-            .querySelectorAll(".tab-btn[data-type]")
-            .forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
-          state.type = btn.dataset.type as "house" | "land";
-          // 토지는 주택 수/조정대상지역 무관
-          if (ownershipGroup) ownershipGroup.style.display = state.type === "house" ? "" : "none";
-          if (adjustedGroup) adjustedGroup.style.display = state.type === "house" ? "" : "none";
-          hideResult();
-        });
+    document.querySelectorAll<HTMLButtonElement>(".tab-btn[data-type]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn[data-type]").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.type = btn.dataset.type as "house" | "land";
+        if (houseCountGroup) houseCountGroup.style.display = state.type === "house" ? "" : "none";
+        if (jointGroup) jointGroup.style.display = state.type === "house" ? "" : "none";
+        hideResult();
       });
+    });
 
-    // 주택 수 탭
-    document
-      .querySelectorAll<HTMLButtonElement>(".owner-btn")
-      .forEach((btn) => {
-        btn.addEventListener("click", () => {
-          document
-            .querySelectorAll(".owner-btn")
-            .forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
-          state.owner = btn.dataset.owner as "single" | "multi";
-          hideResult();
-        });
+    // 명의 탭
+    document.querySelectorAll<HTMLButtonElement>(".joint-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".joint-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.joint = btn.dataset.joint as "single" | "joint";
+        hideResult();
       });
+    });
 
-    // 조정대상지역 탭
-    document
-      .querySelectorAll<HTMLButtonElement>(".adjusted-btn")
-      .forEach((btn) => {
-        btn.addEventListener("click", () => {
-          document
-            .querySelectorAll(".adjusted-btn")
-            .forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
-          state.adjusted = btn.dataset.adjusted as "yes" | "no";
-          hideResult();
-        });
-      });
+    if (houseCountEl) {
+      houseCountEl.addEventListener("change", hideResult);
+    }
 
     // 입력값 변경 시 결과 영역 숨기기
     [priceInput, holdingInput, ageInput].forEach((inp) => {
@@ -529,11 +506,20 @@ if (related.length === 0) {
       return parts.join(" ") + "원";
     }
 
-    // 종부세 계산 로직 (2026년 현행 기준 근사)
+// 1세대 1주택 공제: 12억 원 (2026년 현행 유지)
+// 기본공제: 9억 원 (2026년 현행 유지)
+// 공정시장가액비율: 60% (2026년 현행 유지)
+// 고령자공제: 60~65세 20%, 65~70세 30%, 70세 이상 40%
+// 장기보유공제: 5~10년 20%, 10~15년 40%, 15년 이상 50%
+// 두 공제 합산 한도 80%
+
     function calculateTax() {
       const price = Number(priceInput.value) || 0;
       const holding = Number(holdingInput.value) || 0;
       const age = Number(ageInput.value) || 0;
+      const houseCount = houseCountEl ? houseCountEl.value : "1";
+      const isHouse = state.type === "house";
+      const isJoint = state.joint === "joint";
 
       if (price <= 0) {
         showError("공시가격을 입력해주세요.");
@@ -541,60 +527,58 @@ if (related.length === 0) {
       }
       clearError();
 
-      // 공제금액
       let deduction = 0;
-      if (state.type === "house") {
-        deduction = state.owner === "single" ? 1_200_000_000 : 900_000_000; // 1주택 12억, 다주택 9억
-      } else {
-        deduction = 500_000_000; // 종합합산토지 5억
-      }
-
-      // 공정시장가액비율
-      const fairRatio = state.type === "house" ? 0.6 : 1.0;
-
-      // 과세표준
-      const taxBase = Math.max(0, (price - deduction) * fairRatio);
-
-      // 세율 (2026년 현행 기준)
+      let taxBase = 0;
       let rawTax = 0;
-      if (state.type === "house") {
-        const isMultiAdj = state.owner === "multi" && state.adjusted === "yes";
-        if (isMultiAdj) {
-          // 다주택 + 조정대상지역 중과세율
-          rawTax = calcHouseTaxMultiAdjusted(taxBase);
+      let seniorDiscount = 0;
+      let totalDiscountRate = 0;
+
+      const fairRatio = isHouse ? 0.6 : 1.0;
+
+      if (isHouse) {
+        // 주택
+        const isMultiAdj = houseCount === "2-regulated" || houseCount === "3-multi";
+        const isSingleHouse = houseCount === "1";
+
+        if (isJoint) {
+          // 공동명의: 부부 각자 지분 50%로 쪼개어 계산 (인당 9억 공제)
+          const halfPrice = price / 2;
+          deduction = 900_000_000 * 2; // 전체 합산 기준 표기용
+          const basePerPerson = Math.max(0, (halfPrice - 900_000_000) * fairRatio);
+          const taxPerPerson = isMultiAdj ? calcHouseTaxMultiAdjusted(basePerPerson) : calcHouseTaxNormal(basePerPerson);
+          rawTax = taxPerPerson * 2;
+          taxBase = basePerPerson * 2;
+          // 공동명의(9억+9억)는 고령자/장기보유 공제 적용 안 됨 (1세대 1주택 단독명의 특례 미선택 시)
         } else {
-          // 일반세율
-          rawTax = calcHouseTaxNormal(taxBase);
+          // 단독명의
+          deduction = isSingleHouse ? 1_200_000_000 : 900_000_000;
+          taxBase = Math.max(0, (price - deduction) * fairRatio);
+          rawTax = isMultiAdj ? calcHouseTaxMultiAdjusted(taxBase) : calcHouseTaxNormal(taxBase);
+
+          // 고령자/장기보유 공제는 '단독명의 + 1주택자'인 경우에만 적용
+          if (isSingleHouse) {
+            let seniorRate = 0;
+            if (age >= 70) seniorRate = 0.4;
+            else if (age >= 65) seniorRate = 0.3;
+            else if (age >= 60) seniorRate = 0.2;
+
+            let holdRate = 0;
+            if (holding >= 15) holdRate = 0.5;
+            else if (holding >= 10) holdRate = 0.4;
+            else if (holding >= 5) holdRate = 0.2;
+
+            totalDiscountRate = Math.min(0.8, seniorRate + holdRate);
+            seniorDiscount = Math.floor(rawTax * totalDiscountRate);
+          }
         }
       } else {
         // 토지 (종합합산)
+        deduction = 500_000_000;
+        taxBase = Math.max(0, (price - deduction) * fairRatio);
         rawTax = calcLandTax(taxBase);
       }
 
-      // 고령자 공제 (1주택자만)
-      // 만60세이상 20% / 만65세이상 30% / 만70세이상 40%
-      let seniorRate = 0;
-      if (state.type === "house" && state.owner === "single") {
-        if (age >= 70) seniorRate = 0.4;
-        else if (age >= 65) seniorRate = 0.3;
-        else if (age >= 60) seniorRate = 0.2;
-      }
-
-      // 장기보유공제 (1주택자만)
-      // 5년이상 20% / 10년이상 40% / 15년이상 50%
-      let holdRate = 0;
-      if (state.type === "house" && state.owner === "single") {
-        if (holding >= 15) holdRate = 0.5;
-        else if (holding >= 10) holdRate = 0.4;
-        else if (holding >= 5) holdRate = 0.2;
-      }
-
-      // 합산공제율 최대 80%
-      const totalDiscountRate = Math.min(0.8, seniorRate + holdRate);
-      const seniorDiscount = Math.floor(rawTax * totalDiscountRate);
       const finalTax = Math.max(0, rawTax - seniorDiscount);
-
-      // 농특세 (종부세의 20%)
       const farmTax = Math.floor(finalTax * 0.2);
       const totalTax = finalTax + farmTax;
 
@@ -687,7 +671,7 @@ if (related.length === 0) {
         "※ 본 계산기는 참고용으로 제공되며, 실제 세액은 국세청 공식 산정 기준에 따라 다를 수 있습니다.",
       );
       messages.push(
-        "※ 2026년 7월 기준 세율과 공제 기준을 적용합니다. 세부담 상한(직전년도 세액의 150%)은 반영되지 않았습니다.",
+        "※ 2026년 기준 공정시장가액비율(60%) 및 종부세 기본공제액(단독 12억, 공동 9억+9억)이 적용되었습니다.",
       );
       if (notice) notice.innerHTML = messages.map((m) => "<div>" + m + "</div>").join("");
 
@@ -708,28 +692,16 @@ if (related.length === 0) {
 
       // 상태 초기화
       state.type = "house";
-      state.owner = "single";
-      state.adjusted = "no";
+      state.joint = "single";
       document.querySelectorAll(".tab-btn[data-type]").forEach((b) => {
-        b.classList.toggle(
-          "active",
-          (b as HTMLElement).dataset.type === "house",
-        );
+        b.classList.toggle("active", (b as HTMLElement).dataset.type === "house");
       });
-      document.querySelectorAll(".owner-btn").forEach((b) => {
-        b.classList.toggle(
-          "active",
-          (b as HTMLElement).dataset.owner === "single",
-        );
+      document.querySelectorAll(".joint-btn").forEach((b) => {
+        b.classList.toggle("active", (b as HTMLElement).dataset.joint === "single");
       });
-      document.querySelectorAll(".adjusted-btn").forEach((b) => {
-        b.classList.toggle(
-          "active",
-          (b as HTMLElement).dataset.adjusted === "no",
-        );
-      });
-      if (ownershipGroup) ownershipGroup.style.display = "";
-      if (adjustedGroup) adjustedGroup.style.display = "";
+      if (houseCountEl) houseCountEl.value = "1";
+      if (houseCountGroup) houseCountGroup.style.display = "";
+      if (jointGroup) jointGroup.style.display = "";
     }
 
     if (calcBtn) calcBtn.addEventListener("click", calculateTax);
