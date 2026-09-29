@@ -34,6 +34,15 @@ if (related.length === 0) {
   <Fragment slot="app">
     <div class="app-calc-layout">
       <div class="app-form-group">
+        <label class="app-label" for="formatSelect">
+          바코드 형식 <span class="required">*</span>
+        </label>
+        <select id="formatSelect" class="app-input" style="margin-bottom: 1rem;">
+          <option value="CODE128">CODE128 (범용: 영문/숫자/특수문자)</option>
+          <option value="CODE39">CODE39 (산업용: 영문 대문자/숫자)</option>
+          <option value="EAN13">EAN-13 (상품용: 숫자 12자리)</option>
+        </select>
+
         <label class="app-label" for="textInput">
           바코드 데이터 <span class="required">*</span>
         </label>
@@ -62,17 +71,26 @@ if (related.length === 0) {
           <button id="generateBtn" type="button" class="app-btn app-btn-primary">
             바코드 생성
           </button>
-          <button id="saveBtn" type="button" class="app-btn app-btn-secondary" hidden>
-            바코드 저장 (PNG)
-          </button>
+          <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+            <button id="savePngBtn" type="button" class="app-btn app-btn-secondary" style="flex: 1;" hidden>
+              PNG 저장
+            </button>
+            <button id="saveSvgBtn" type="button" class="app-btn app-btn-secondary" style="flex: 1;" hidden>
+              SVG 저장
+            </button>
+          </div>
         </div>
 
         <p id="errorMsg" class="error-msg" hidden></p>
       </div>
 
-      <div class="result-section" id="resultSection" hidden>
+      <div class="result-section" id="resultSection" hidden style="min-height: 200px;">
         <h3 class="result-title">생성된 바코드</h3>
         <div id="barcodeContainer" class="barcode-container"></div>
+      </div>
+
+      <div class="qr-notice" style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--color-on-surface-variant);">
+        ※ 한글이나 URL을 담으려면 <a href="/qr-code-generator/" style="color: var(--color-primary); text-decoration: underline; font-weight: 600;">QR 코드 생성기</a>를 이용하세요.
       </div>
 
       <div class="empty-state" id="emptyState">
@@ -226,16 +244,22 @@ if (related.length === 0) {
     });
   }
 
+  const formatSelect = document.getElementById('formatSelect') as HTMLSelectElement;
   const textInput = document.getElementById('textInput') as HTMLInputElement;
   const labelInput = document.getElementById('labelInput') as HTMLInputElement;
   const generateBtn = document.getElementById('generateBtn') as HTMLButtonElement;
-  const saveBtn = document.getElementById('saveBtn') as HTMLButtonElement;
+  const savePngBtn = document.getElementById('savePngBtn') as HTMLButtonElement;
+  const saveSvgBtn = document.getElementById('saveSvgBtn') as HTMLButtonElement;
   const errorMsg = document.getElementById('errorMsg') as HTMLParagraphElement;
   const resultSection = document.getElementById('resultSection') as HTMLDivElement;
   const emptyState = document.getElementById('emptyState') as HTMLDivElement;
   const barcodeContainer = document.getElementById('barcodeContainer') as HTMLDivElement;
 
   const ASCII_RE = /^[\x20-\x7E]{1,30}$/;
+  const CODE39_RE = /^[A-Z0-9\-\.\ \$\/\+\%]{1,30}$/;
+  const EAN13_RE = /^\d{12,13}$/;
+  
+  let generatedSvgString = '';
 
   function showError(msg: string) {
     errorMsg.textContent = msg;
@@ -256,8 +280,16 @@ if (related.length === 0) {
       showError('바코드 데이터를 입력해주세요.');
       return;
     }
-    if (!ASCII_RE.test(text)) {
-      showError('영문·숫자·특수문자(ASCII) 1~30자만 입력 가능합니다. 한글은 지원되지 않습니다.');
+    
+    const format = formatSelect.value;
+    if (format === 'CODE128' && !ASCII_RE.test(text)) {
+      showError('CODE128은 영문·숫자·특수문자(ASCII) 1~30자만 지원합니다.');
+      return;
+    } else if (format === 'CODE39' && !CODE39_RE.test(text)) {
+      showError('CODE39는 영문 대문자, 숫자, 일부 특수문자(-.$/+%)만 지원합니다.');
+      return;
+    } else if (format === 'EAN13' && !EAN13_RE.test(text)) {
+      showError('EAN-13은 12자리 또는 13자리 숫자만 지원합니다.');
       return;
     }
 
@@ -273,7 +305,7 @@ if (related.length === 0) {
       // 임시 캔버스에 바코드 그리기
       const tempCanvas = document.createElement('canvas');
       JsBarcode(tempCanvas, text, {
-        format: 'CODE128',
+        format: format,
         width: 2,
         height: 100,
         displayValue: false,
@@ -305,11 +337,25 @@ if (related.length === 0) {
       barcodeContainer.innerHTML = '';
       barcodeContainer.appendChild(finalCanvas);
 
+      // SVG 생성 (다운로드용)
+      const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      JsBarcode(svgEl, text, {
+        format: format,
+        width: 2,
+        height: 100,
+        displayValue: true,
+        text: label ? `${text} (${label})` : text,
+        margin: 10,
+        background: '#ffffff',
+      });
+      generatedSvgString = new XMLSerializer().serializeToString(svgEl);
+
       emptyState.hidden = true;
       resultSection.hidden = false;
 
       setTimeout(() => {
-        saveBtn.hidden = false;
+        savePngBtn.hidden = false;
+        saveSvgBtn.hidden = false;
       }, 200);
     } catch (e) {
       console.error(e);
@@ -317,27 +363,48 @@ if (related.length === 0) {
     }
   }
 
-  function saveBarcode() {
-    const canvas = barcodeContainer.querySelector('canvas') as HTMLCanvasElement | null;
-    if (!canvas) {
-      showError('저장할 바코드가 없습니다. 먼저 바코드를 생성해주세요.');
-      return;
+  function savePng() {
+      const canvas = barcodeContainer.querySelector('canvas') as HTMLCanvasElement | null;
+      if (!canvas) {
+        showError('저장할 바코드가 없습니다. 먼저 바코드를 생성해주세요.');
+        return;
+      }
+      try {
+        const dataURL = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = dataURL;
+        a.download = 'barcode.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch (e) {
+        showError('PNG 저장 중 오류가 발생했습니다.');
+      }
     }
-    try {
-      const dataURL = canvas.toDataURL('image/png');
-      const a = document.createElement('a');
-      a.href = dataURL;
-      a.download = 'barcode.png';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch (e) {
-      showError('이미지 저장 중 오류가 발생했습니다.');
+  
+    function saveSvg() {
+      if (!generatedSvgString) {
+        showError('저장할 바코드가 없습니다.');
+        return;
+      }
+      try {
+        const blob = new Blob([generatedSvgString], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'barcode.svg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        showError('SVG 저장 중 오류가 발생했습니다.');
+      }
     }
-  }
 
   generateBtn.addEventListener('click', generateBarcode);
-  saveBtn.addEventListener('click', saveBarcode);
+  savePngBtn.addEventListener('click', savePng);
+  saveSvgBtn.addEventListener('click', saveSvg);
 
   textInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
