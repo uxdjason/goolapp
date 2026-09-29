@@ -5,27 +5,26 @@ description: 라이프스타일, 가족력, 성별, 건강상태 등 27가지 �
   기준 남은 인생을 년/월/일로 확인하세요.
 shortDescription: 라이프스타일, 가족력, 성별, 건강상태 등 27가지 질문으로 예상 수명을 정확히 계산하는 무료 온라인 계산기입니다.
 category: ['fun', 'calculator']
-primaryKeyword: 예상 수명 계산기
+primaryKeyword: 기대수명 계산기
 secondaryKeywords:
-- 수명 예측
-- 남은 인생 계산
-- 건강 진단 계산기
-- 기대수명 측정
-- 라이프스타일 건강검진
+  - 평균 수명 계산기
+  - 기대 여명 계산
+  - 내 수명 계산
+  - 건강 수명 계산기
+  - 나의 기대수명
 publishedAt: 2026-05-20
+updatedAt: 2026-10-01
 seo:
-  title: 예상 수명 계산기 - 당신의 남은 인생 예측해보기
-  description: 라이프스타일, 가족력, 성별, 건강상태 등 27가지 질문으로 예상 수명을 정확히 계산하는 무료 온라인 계산기입니다. 현재
-    나이 기준 남은 인생을 년/월/일로 확인하세요.
+  title: 기대수명 계산기 - 나의 예상 수명 즉시 확인
+  description: 성별·생활습관·건강 요인을 입력하면 나의 예상 기대수명을 즉시 계산합니다. 평균 수명 대비 건강 수명을 확인하고 노후 계획에 활용하세요.
   canonicalPath: /life-expectancy-calculator/
   ogTitle: 예상 수명 계산기 - 남은 인생은 몇 년일까?
   ogDescription: 당신의 라이프스타일과 건강습관을 분석해 예상 수명을 계산합니다. 성별, 연령, 운동 습관, 가족력, 흡연 여부 등을
     입력하면 정확한 수명 예측이 가능합니다. 남은 인생을 년/월/일 단위로 알아보세요.
   ogImage: /og/GoolAPP-life-expectancy-calculator.webp
   twitterCard: summary_large_image
-  searchTitle: 예상 수명 계산기 - 당신의 남은 인생 예측해보기
-  searchDescription: 라이프스타일, 가족력, 성별, 건강상태 등 27가지 질문으로 예상 수명을 정확히 계산하는 무료 온라인 계산기입니다.
-    현재 나이 기준 남은 인생을 년/월/일로 확인하세요.
+  searchTitle: 기대수명 계산기 - 나의 예상 수명 즉시 확인
+  searchDescription: 성별·생활습관·건강 요인을 입력하면 나의 예상 기대수명을 즉시 계산합니다. 평균 수명 대비 건강 수명을 확인하고 노후 계획에 활용하세요.
   intent: transactional
   primaryKeyword: 예상 수명 계산기
   secondaryKeywords:
