@@ -49,10 +49,18 @@ if (related.length === 0) {
     <div class="app-calc-layout">
       <!-- Tab Navigation -->
       <div class="app-tab-nav">
-        <button class="app-tab-btn active" data-target="countdown"
-          >카운트다운</button
-        >
+        <button class="app-tab-btn active" data-target="countdown">카운트다운</button>
         <button class="app-tab-btn" data-target="stopwatch">스톱워치</button>
+        <div class="tab-nav-actions">
+          <label class="sound-toggle" title="소리 알림">
+            <input type="checkbox" id="sound-enabled" checked />
+            <span>🔔</span>
+          </label>
+          <button id="fullscreen-btn" class="fullscreen-btn" title="전체화면">
+            <svg id="fs-icon-expand" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+            <svg id="fs-icon-compress" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="10" y1="14" x2="3" y2="21"></line><line x1="21" y1="3" x2="14" y2="10"></line></svg>
+          </button>
+        </div>
       </div>
 
       <!-- Countdown View -->
@@ -126,6 +134,16 @@ if (related.length === 0) {
         </div>
       </div>
 
+      <!-- 전체화면 오버레이 -->
+      <div id="fullscreen-overlay" class="fullscreen-overlay" hidden>
+        <div class="fs-time-display" id="fs-time">00:00</div>
+        <div class="fs-label" id="fs-label">카운트다운</div>
+        <button id="fs-exit-btn" class="fs-exit-btn" title="전체화면 종료">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="10" y1="14" x2="3" y2="21"></line><line x1="21" y1="3" x2="14" y2="10"></line></svg>
+          <span>ESC 또는 클릭으로 종료</span>
+        </button>
+      </div>
+
       <!-- 공통 경고 모달 -->
       <div id="app-alert-modal" class="app-modal-overlay" hidden>
         <div class="app-modal">
@@ -192,9 +210,9 @@ if (related.length === 0) {
   }
 
   .time-display {
-    font-size: 64px;
+    font-size: clamp(3rem, 10vw, 4rem);
     font-weight: var(--font-weight-bold);
-    font-family: var(--font-family-base);
+    font-family: 'Courier New', Courier, monospace;
     margin: var(--space-6) 0;
     text-align: center;
     font-variant-numeric: tabular-nums;
@@ -320,9 +338,102 @@ if (related.length === 0) {
     border-radius: 4px;
   }
 
+  .app-tab-nav {
+    display: flex;
+    align-items: center;
+  }
+
+  .tab-nav-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .sound-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+    user-select: none;
+  }
+  .sound-toggle input { display: none; }
+  .sound-toggle:has(input:checked) { opacity: 1; }
+
+  .fullscreen-btn {
+    background: none;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-sm);
+    padding: 0.35rem 0.5rem;
+    cursor: pointer;
+    color: var(--color-on-surface-variant);
+    display: flex;
+    align-items: center;
+    transition: background 0.15s, color 0.15s;
+  }
+  .fullscreen-btn:hover {
+    background: var(--color-surface-container-highest);
+    color: var(--color-primary);
+  }
+
+  /* Fullscreen 오버레이 */
+  .fullscreen-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+  .fullscreen-overlay[hidden] { display: none; }
+
+  .fs-time-display {
+    font-size: clamp(4rem, 18vw, 14rem);
+    font-weight: 700;
+    font-family: 'Courier New', Courier, monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 4px;
+    color: #fff;
+    text-align: center;
+    line-height: 1;
+  }
+
+  .fs-label {
+    font-size: clamp(1rem, 3vw, 2rem);
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .fs-exit-btn {
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    color: rgba(255,255,255,0.6);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    transition: background 0.15s, color 0.15s;
+  }
+  .fs-exit-btn:hover {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+
   @media (max-width: 768px) {
     .time-display {
-      font-size: 48px;
+      font-size: clamp(2.5rem, 12vw, 3rem);
     }
     .time-input-group input {
       width: 60px;
@@ -396,20 +507,90 @@ if (related.length === 0) {
     let swIsRunning = false;
     let swLaps = [];
 
-    // Audio for timer finish
-    let alarmSound = null;
-    try {
-      alarmSound = new Audio(
-        "https://goolapp.com/wp-content/uploads/2023/12/alarm.mp3",
-      ); // Fallback or could use local asset
-    } catch (e) {}
+    // Sound toggle
+    const soundToggle = document.getElementById('sound-enabled');
+    function isSoundEnabled() { return soundToggle && soundToggle.checked; }
 
-    function playAlarm() {
-      if (alarmSound) {
-        alarmSound.currentTime = 0;
-        alarmSound.play().catch(() => console.log("Audio play blocked"));
+    // Web Audio API 비프 생성 (외부 파일 불필요)
+    function playBeep() {
+      if (!isSoundEnabled()) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+        gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 1.5);
+      } catch(e) { console.log('Web Audio not supported'); }
+    }
+
+    // 전체화면 오버레이
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const fsIconExpand = document.getElementById('fs-icon-expand');
+    const fsIconCompress = document.getElementById('fs-icon-compress');
+    const fsOverlay = document.getElementById('fullscreen-overlay');
+    const fsTime = document.getElementById('fs-time');
+    const fsLabel = document.getElementById('fs-label');
+    const fsExitBtn = document.getElementById('fs-exit-btn');
+
+    function openFullscreen() {
+      if (!fsOverlay) return;
+      fsOverlay.hidden = false;
+      document.documentElement.requestFullscreen().catch(() => {});
+      fsIconExpand.style.display = 'none';
+      fsIconCompress.style.display = 'block';
+      updateFsDisplay();
+    }
+
+    function closeFullscreen() {
+      if (!fsOverlay) return;
+      fsOverlay.hidden = true;
+      if (document.fullscreenElement) document.exitFullscreen();
+      fsIconExpand.style.display = 'block';
+      fsIconCompress.style.display = 'none';
+    }
+
+    // 오버레이 시간 동기화 (100ms마다)
+    function updateFsDisplay() {
+      if (fsOverlay && !fsOverlay.hidden) {
+        if (mode === 'countdown') {
+          const h = Math.floor(cdRemaining / 3600);
+          const m = Math.floor((cdRemaining % 3600) / 60);
+          const s = cdRemaining % 60;
+          fsTime.textContent = h > 0
+            ? `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+            : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+          fsLabel.textContent = '카운트다운';
+        } else {
+          fsTime.textContent = formatStopwatchTime(swElapsedTime);
+          fsLabel.textContent = '스톱워치';
+        }
+        requestAnimationFrame(updateFsDisplay);
       }
     }
+
+    if (fullscreenBtn) {
+      fullscreenBtn.addEventListener('click', () => {
+        if (fsOverlay && !fsOverlay.hidden) {
+          closeFullscreen();
+        } else {
+          openFullscreen();
+        }
+      });
+    }
+
+    if (fsExitBtn) fsExitBtn.addEventListener('click', closeFullscreen);
+
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && fsOverlay && !fsOverlay.hidden) {
+        closeFullscreen();
+      }
+    });
 
     function formatStopwatchTime(ms) {
       const totalDeciSeconds = Math.floor(ms / 10);
@@ -485,7 +666,7 @@ if (related.length === 0) {
               cdIsRunning = false;
               cdStartBtn.style.display = "block";
               cdStopBtn.style.display = "none";
-              playAlarm();
+              playBeep();
               showAlert("타이머가 종료되었습니다!");
             }
           }, 1000);
